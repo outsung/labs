@@ -7,7 +7,11 @@
       "Bash(gh api:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Skill(frontend-design)",
+      "WebFetch(domain:outsung.github.io)",
+      "Bash(curl:*)",
+      "Bash(git mv:*)"
     ]
   }
 }
