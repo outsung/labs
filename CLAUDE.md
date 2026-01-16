@@ -31,8 +31,7 @@ git add . && git commit -m "Add project-name" && git push
 |---------|------|-----|
 | jerry-plants | 제리의 프리미엄 식물샵 | [링크](https://outsung.github.io/labs/jerry-plants/) |
 | commune | 프라이빗 공간대여 & 모임 서비스 | [링크](https://outsung.github.io/labs/commune/) |
-| wayfare | 여행 일정 컨설팅 서비스 (3만원~) | [링크](https://outsung.github.io/labs/wayfare/) |
-| cellar | 프리미엄 와인 구독 서비스 | [링크](https://outsung.github.io/labs/cellar/) |
+| wayfare | 여행 일정 컨설팅 서비스 (full-page scroll-snap 디자인) | [링크](https://outsung.github.io/labs/wayfare/) |
 
 ## 디자인 가이드
 

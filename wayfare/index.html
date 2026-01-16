@@ -4,23 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WAYFARE — Personal Travel Concierge</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --ivory: #FFFEF9;
-            --sand: #F5F0E8;
-            --warm: #EDE6DA;
-            --stone: #D4CCC0;
-            --earth: #8B7355;
-            --brown: #5C4A36;
-            --deep: #2C2416;
-            --black: #1A1612;
-            --sky: #7BA3B5;
-            --ocean: #4A7C8C;
-            --coral: #D4836A;
-            --sunset: #E8A87C;
+            --bg-dark: #0f0f0f;
+            --bg-warm: #1a1814;
+            --sand: #e8dcc4;
+            --cream: #f5f0e6;
+            --terracotta: #c4703c;
+            --ocean: #2d5a6b;
+            --forest: #3d5a47;
+            --sunset: #d4836a;
+            --text: #f5f5f5;
+            --text-dim: #8a8a8a;
         }
 
         * {
@@ -30,645 +28,570 @@
         }
 
         html {
+            scroll-snap-type: y mandatory;
             scroll-behavior: smooth;
         }
 
         body {
-            font-family: 'Inter', 'Noto Sans KR', sans-serif;
-            background: var(--ivory);
-            color: var(--deep);
-            font-weight: 400;
-            line-height: 1.7;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            overflow-x: hidden;
         }
 
-        ::selection {
-            background: var(--ocean);
-            color: var(--ivory);
-        }
-
-        /* Navigation */
+        /* Navigation - Fixed */
         nav {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            padding: 1.5rem 4rem;
+            padding: 2rem 4rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 1000;
-            background: rgba(255, 254, 249, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        nav.scrolled {
-            border-color: var(--stone);
+            z-index: 100;
+            mix-blend-mode: difference;
         }
 
         .logo {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.6rem;
-            color: var(--deep);
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            color: var(--text);
             text-decoration: none;
-            letter-spacing: 0.1em;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 3rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            font-size: 0.8rem;
+        .nav-contact {
+            font-size: 0.7rem;
             font-weight: 500;
-            color: var(--earth);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text);
             text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--deep);
-        }
-
-        .nav-cta {
-            padding: 0.8rem 2rem;
-            background: var(--deep);
-            color: var(--ivory);
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.05em;
-            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid currentColor;
             transition: all 0.3s ease;
         }
 
-        .nav-cta:hover {
-            background: var(--ocean);
+        .nav-contact:hover {
+            background: var(--text);
+            color: var(--bg-dark);
         }
 
-        /* Hero */
-        .hero {
+        /* Progress indicator */
+        .progress-bar {
+            position: fixed;
+            right: 3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border: 1px solid var(--text);
+            border-radius: 50%;
+            background: transparent;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .progress-dot.active {
+            background: var(--terracotta);
+            border-color: var(--terracotta);
+            transform: scale(1.3);
+        }
+
+        /* Section base */
+        section {
             min-height: 100vh;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            background: var(--ivory);
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Section 1: Hero - 비행기 경로 애니메이션 */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-dark);
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            opacity: 0.1;
+        }
+
+        .hero-bg svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .flight-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawPath 3s ease forwards 0.5s;
+        }
+
+        @keyframes drawPath {
+            to { stroke-dashoffset: 0; }
         }
 
         .hero-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 8rem 6rem;
+            text-align: center;
+            z-index: 1;
+            padding: 2rem;
         }
 
-        .hero-tag {
+        .hero-eyebrow {
             font-size: 0.7rem;
             font-weight: 600;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.4em;
             text-transform: uppercase;
-            color: var(--ocean);
-            margin-bottom: 1.5rem;
+            color: var(--terracotta);
+            margin-bottom: 2rem;
             opacity: 0;
-            animation: fadeUp 0.8s ease 0.2s forwards;
+            animation: fadeInUp 1s ease forwards 0.3s;
         }
 
         .hero h1 {
-            font-family: 'DM Serif Display', serif;
-            font-size: clamp(2.8rem, 5vw, 4rem);
+            font-family: 'Libre Baskerville', serif;
+            font-size: clamp(2.5rem, 7vw, 5rem);
             font-weight: 400;
-            color: var(--deep);
             line-height: 1.2;
             margin-bottom: 1.5rem;
             opacity: 0;
-            animation: fadeUp 0.8s ease 0.4s forwards;
+            animation: fadeInUp 1s ease forwards 0.5s;
         }
 
         .hero h1 em {
             font-style: italic;
-            color: var(--ocean);
+            color: var(--terracotta);
         }
 
-        .hero-desc {
+        .hero-sub {
             font-size: 1rem;
-            color: var(--earth);
+            font-weight: 300;
+            color: var(--text-dim);
             max-width: 450px;
-            margin-bottom: 2.5rem;
+            margin: 0 auto 3rem;
             opacity: 0;
-            animation: fadeUp 0.8s ease 0.6s forwards;
+            animation: fadeInUp 1s ease forwards 0.7s;
         }
 
         .hero-price {
-            display: flex;
-            align-items: baseline;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            opacity: 0;
-            animation: fadeUp 0.8s ease 0.7s forwards;
-        }
-
-        .price-amount {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2rem;
-            color: var(--deep);
-        }
-
-        .price-label {
-            font-size: 0.85rem;
-            color: var(--earth);
-        }
-
-        .hero-cta {
             display: inline-flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 2.5rem;
-            background: var(--deep);
-            color: var(--ivory);
-            font-size: 0.8rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            text-decoration: none;
-            transition: all 0.3s ease;
+            align-items: baseline;
+            gap: 0.8rem;
+            padding: 1.2rem 2.5rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
             opacity: 0;
-            animation: fadeUp 0.8s ease 0.8s forwards;
+            animation: fadeInUp 1s ease forwards 0.9s;
         }
 
-        .hero-cta:hover {
-            background: var(--ocean);
-            gap: 1.5rem;
+        .hero-price-amount {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.8rem;
+            color: var(--text);
         }
 
-        .hero-cta svg {
-            width: 16px;
-            height: 16px;
-            transition: transform 0.3s ease;
+        .hero-price-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
         }
 
-        .hero-cta:hover svg {
-            transform: translateX(5px);
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .hero-visual {
-            position: relative;
-            background: var(--sand);
-            overflow: hidden;
-        }
-
-        .hero-image-grid {
+        .scroll-indicator {
             position: absolute;
-            inset: 0;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             gap: 1rem;
-            padding: 4rem;
         }
 
-        .hero-image-item {
-            background: var(--warm);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-image-item::before {
-            content: attr(data-location);
-            position: absolute;
-            bottom: 1rem;
-            left: 1rem;
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.2rem;
-            font-style: italic;
-            color: var(--deep);
-            opacity: 0.5;
-        }
-
-        .hero-image-item:nth-child(1) {
-            grid-row: span 2;
-            background: linear-gradient(135deg, var(--sky) 0%, var(--ocean) 100%);
-        }
-
-        .hero-image-item:nth-child(2) {
-            background: linear-gradient(135deg, var(--sunset) 0%, var(--coral) 100%);
-        }
-
-        .hero-image-item:nth-child(3) {
-            background: linear-gradient(135deg, var(--earth) 0%, var(--brown) 100%);
-        }
-
-        /* How it works */
-        .process {
-            padding: 8rem 4rem;
-            background: var(--sand);
-        }
-
-        .process-header {
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto 5rem;
-        }
-
-        .section-tag {
-            font-size: 0.7rem;
-            font-weight: 600;
+        .scroll-text {
+            font-size: 0.65rem;
+            font-weight: 500;
             letter-spacing: 0.3em;
             text-transform: uppercase;
-            color: var(--ocean);
-            margin-bottom: 1rem;
+            color: var(--text-dim);
         }
 
-        .process-header h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2.5rem;
-            font-weight: 400;
-            color: var(--deep);
-            margin-bottom: 1rem;
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, var(--terracotta), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
         }
 
-        .process-header p {
-            color: var(--earth);
-            font-size: 0.95rem;
+        @keyframes scrollPulse {
+            0%, 100% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.6); opacity: 0.5; }
         }
 
-        .process-steps {
+        /* Section 2: How it works - 카드 스택 */
+        .process {
+            display: flex;
+            align-items: center;
+            background: var(--bg-warm);
+            padding: 0 8vw;
+        }
+
+        .process-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
-            max-width: 1200px;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 8rem;
+            width: 100%;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        .step {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .step-number {
-            width: 50px;
-            height: 50px;
-            border: 2px solid var(--ocean);
-            border-radius: 50%;
+        .process-text {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.2rem;
-            color: var(--ocean);
         }
 
-        .step h3 {
+        .section-tag {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--terracotta);
+            margin-bottom: 1.5rem;
+        }
+
+        .process-title {
+            font-family: 'Libre Baskerville', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 400;
+            line-height: 1.3;
+            margin-bottom: 1.5rem;
+        }
+
+        .process-desc {
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: var(--text-dim);
+            line-height: 1.8;
+        }
+
+        .process-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            perspective: 1000px;
+        }
+
+        .process-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+            transition: all 0.5s ease;
+            transform-origin: top center;
+        }
+
+        .process-card:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: var(--terracotta);
+            transform: translateX(10px);
+        }
+
+        .process-card-number {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 2rem;
+            font-style: italic;
+            color: var(--terracotta);
+            line-height: 1;
+        }
+
+        .process-card h3 {
             font-size: 1rem;
             font-weight: 600;
-            color: var(--deep);
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
         }
 
-        .step p {
+        .process-card p {
             font-size: 0.85rem;
-            color: var(--earth);
+            color: var(--text-dim);
             line-height: 1.6;
         }
 
-        /* Features */
+        /* Section 3: What You Get - 가로 스크롤 효과 */
         .features {
-            padding: 8rem 4rem;
-            background: var(--ivory);
+            display: flex;
+            align-items: center;
+            background: var(--bg-dark);
+            position: relative;
+        }
+
+        .features-inner {
+            width: 100%;
+            padding: 0 8vw;
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .features-header h2 {
+            font-family: 'Libre Baskerville', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 400;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: rgba(255,255,255,0.05);
             max-width: 1200px;
             margin: 0 auto;
-            align-items: center;
-        }
-
-        .features-content h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2.5rem;
-            font-weight: 400;
-            color: var(--deep);
-            margin-bottom: 2rem;
-            line-height: 1.3;
-        }
-
-        .feature-list {
-            list-style: none;
         }
 
         .feature-item {
-            display: flex;
-            gap: 1rem;
-            padding: 1.5rem 0;
-            border-bottom: 1px solid var(--stone);
-        }
-
-        .feature-icon {
-            width: 24px;
-            height: 24px;
-            flex-shrink: 0;
-            color: var(--ocean);
-        }
-
-        .feature-item h4 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--deep);
-            margin-bottom: 0.3rem;
-        }
-
-        .feature-item p {
-            font-size: 0.85rem;
-            color: var(--earth);
-        }
-
-        .features-visual {
-            background: var(--sand);
-            padding: 3rem;
+            background: var(--bg-dark);
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.4s ease;
             position: relative;
         }
 
-        .sample-schedule {
-            background: var(--ivory);
-            padding: 2rem;
-            box-shadow: 0 20px 40px rgba(44, 36, 22, 0.1);
+        .feature-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--terracotta);
+            transition: width 0.4s ease;
         }
 
-        .schedule-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--stone);
-            margin-bottom: 1.5rem;
+        .feature-item:hover::after {
+            width: 60%;
         }
 
-        .schedule-title {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.3rem;
-            color: var(--deep);
+        .feature-item:hover {
+            background: rgba(255,255,255,0.02);
         }
 
-        .schedule-date {
-            font-size: 0.75rem;
-            color: var(--earth);
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1.5rem;
+            stroke: var(--terracotta);
+            fill: none;
         }
 
-        .schedule-item {
-            display: grid;
-            grid-template-columns: 60px 1fr;
-            gap: 1rem;
-            padding: 1rem 0;
-            border-bottom: 1px dashed var(--stone);
-        }
-
-        .schedule-time {
-            font-size: 0.8rem;
+        .feature-item h3 {
+            font-size: 0.9rem;
             font-weight: 600;
-            color: var(--ocean);
+            margin-bottom: 0.8rem;
         }
 
-        .schedule-activity {
-            font-size: 0.85rem;
-            color: var(--deep);
+        .feature-item p {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            line-height: 1.6;
         }
 
-        .schedule-note {
-            font-size: 0.75rem;
-            color: var(--earth);
-            margin-top: 0.3rem;
+        /* Section 4: Sample Schedule - 타임라인 */
+        .sample {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--ocean) 0%, var(--bg-dark) 100%);
+            padding: 0 8vw;
         }
 
-        /* Request Form */
-        .request {
-            padding: 8rem 4rem;
-            background: var(--deep);
-            color: var(--ivory);
-        }
-
-        .request-container {
-            max-width: 800px;
+        .sample-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+            width: 100%;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        .request-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .request-header .section-tag {
-            color: var(--sunset);
-        }
-
-        .request-header h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2.5rem;
+        .sample-text h2 {
+            font-family: 'Libre Baskerville', serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
             font-weight: 400;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .request-header p {
-            color: var(--stone);
+        .sample-text p {
             font-size: 0.95rem;
+            color: var(--sand);
+            opacity: 0.8;
+            line-height: 1.8;
+            margin-bottom: 2rem;
         }
 
-        .request-form {
-            display: grid;
-            gap: 2rem;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-group.full {
-            grid-column: span 2;
-        }
-
-        .form-label {
-            font-size: 0.75rem;
+        .sample-badge {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: rgba(255,255,255,0.1);
+            font-size: 0.7rem;
             font-weight: 600;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--stone);
         }
 
-        .form-input,
-        .form-select,
-        .form-textarea {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem 1.2rem;
-            font-family: 'Inter', sans-serif;
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, var(--terracotta), transparent);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 1.5rem 0;
+            padding-left: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -3rem;
+            top: 2rem;
+            width: 8px;
+            height: 8px;
+            background: var(--terracotta);
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-time {
+            font-family: 'Libre Baskerville', serif;
             font-size: 0.9rem;
-            color: var(--ivory);
-            outline: none;
-            transition: all 0.3s ease;
+            color: var(--terracotta);
+            margin-bottom: 0.3rem;
         }
 
-        .form-input::placeholder,
-        .form-textarea::placeholder {
-            color: var(--earth);
+        .timeline-title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
         }
 
-        .form-input:focus,
-        .form-select:focus,
-        .form-textarea:focus {
-            border-color: var(--ocean);
-            background: rgba(255, 255, 255, 0.08);
+        .timeline-note {
+            font-size: 0.8rem;
+            color: var(--sand);
+            opacity: 0.6;
         }
 
-        .form-select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D4CCC0' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-        }
-
-        .form-select option {
-            background: var(--deep);
-            color: var(--ivory);
-        }
-
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .checkbox-item {
+        /* Section 5: Pricing - 풀 블리드 카드 */
+        .pricing {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
+            background: var(--cream);
+            color: var(--bg-dark);
+            padding: 0 8vw;
         }
 
-        .checkbox-item input {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--ocean);
-        }
-
-        .checkbox-item span {
-            font-size: 0.85rem;
-            color: var(--stone);
-        }
-
-        .form-submit {
-            margin-top: 1rem;
-            padding: 1.2rem 3rem;
-            background: var(--sunset);
-            border: none;
-            color: var(--deep);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            justify-self: center;
-        }
-
-        .form-submit:hover {
-            background: var(--ivory);
-            transform: translateY(-2px);
-        }
-
-        /* Pricing */
-        .pricing {
-            padding: 8rem 4rem;
-            background: var(--sand);
+        .pricing-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .pricing-header {
             text-align: center;
-            max-width: 600px;
-            margin: 0 auto 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .pricing-header .section-tag {
+            color: var(--terracotta);
         }
 
         .pricing-header h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2.5rem;
+            font-family: 'Libre Baskerville', serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
             font-weight: 400;
-            color: var(--deep);
-            margin-bottom: 1rem;
+            color: var(--bg-dark);
         }
 
-        .pricing-cards {
+        .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 2rem;
-            max-width: 1100px;
-            margin: 0 auto;
         }
 
         .pricing-card {
-            background: var(--ivory);
+            background: var(--bg-dark);
+            color: var(--text);
             padding: 3rem 2rem;
-            text-align: center;
-            border: 1px solid var(--stone);
-            transition: all 0.3s ease;
-        }
-
-        .pricing-card.featured {
-            border-color: var(--ocean);
-            transform: scale(1.05);
-            box-shadow: 0 20px 40px rgba(44, 36, 22, 0.15);
+            transition: transform 0.4s ease;
         }
 
         .pricing-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(44, 36, 22, 0.1);
+            transform: translateY(-10px);
+        }
+
+        .pricing-card.featured {
+            background: var(--terracotta);
+            transform: scale(1.05);
         }
 
         .pricing-card.featured:hover {
-            transform: scale(1.05) translateY(-5px);
+            transform: scale(1.05) translateY(-10px);
         }
 
         .pricing-name {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: var(--ocean);
             margin-bottom: 1rem;
+            opacity: 0.7;
         }
 
         .pricing-amount {
-            font-family: 'DM Serif Display', serif;
+            font-family: 'Libre Baskerville', serif;
             font-size: 3rem;
-            color: var(--deep);
-            margin-bottom: 0.5rem;
+            font-weight: 400;
+            margin-bottom: 0.3rem;
         }
 
-        .pricing-desc {
-            font-size: 0.85rem;
-            color: var(--earth);
+        .pricing-period {
+            font-size: 0.8rem;
+            opacity: 0.6;
             margin-bottom: 2rem;
             padding-bottom: 2rem;
-            border-bottom: 1px solid var(--stone);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .pricing-features {
@@ -678,579 +601,538 @@
 
         .pricing-features li {
             font-size: 0.85rem;
-            color: var(--deep);
             padding: 0.6rem 0;
+            opacity: 0.8;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .pricing-features li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--terracotta);
+        }
+
+        .pricing-card.featured .pricing-features li::before {
+            color: var(--bg-dark);
         }
 
         .pricing-btn {
-            display: inline-block;
+            display: block;
             width: 100%;
             padding: 1rem;
-            background: var(--deep);
-            color: var(--ivory);
-            font-size: 0.8rem;
-            font-weight: 500;
+            background: transparent;
+            border: 1px solid currentColor;
+            color: inherit;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
             letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-align: center;
             text-decoration: none;
             transition: all 0.3s ease;
         }
 
         .pricing-btn:hover {
-            background: var(--ocean);
+            background: var(--text);
+            color: var(--bg-dark);
         }
 
         .pricing-card.featured .pricing-btn {
-            background: var(--ocean);
+            border-color: var(--bg-dark);
+            color: var(--bg-dark);
         }
 
         .pricing-card.featured .pricing-btn:hover {
-            background: var(--deep);
+            background: var(--bg-dark);
+            color: var(--terracotta);
         }
 
-        /* Testimonials */
-        .testimonials {
-            padding: 8rem 4rem;
-            background: var(--ivory);
+        /* Section 6: CTA - 전체화면 폼 */
+        .cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-dark);
+            position: relative;
         }
 
-        .testimonials-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .testimonials-header h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2.5rem;
+        .cta-bg-text {
+            position: absolute;
+            font-family: 'Libre Baskerville', serif;
+            font-size: 25vw;
             font-weight: 400;
-            color: var(--deep);
+            color: rgba(255,255,255,0.02);
+            white-space: nowrap;
+            user-select: none;
         }
 
-        .testimonial-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .testimonial-card {
+        .cta-content {
+            text-align: center;
+            z-index: 1;
             padding: 2rem;
-            background: var(--sand);
+            max-width: 600px;
         }
 
-        .testimonial-text {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.1rem;
-            font-style: italic;
-            color: var(--deep);
-            line-height: 1.6;
+        .cta h2 {
+            font-family: 'Libre Baskerville', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
             margin-bottom: 1.5rem;
         }
 
-        .testimonial-author {
+        .cta p {
+            font-size: 1rem;
+            color: var(--text-dim);
+            margin-bottom: 3rem;
+        }
+
+        .cta-form {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 1rem;
         }
 
-        .author-avatar {
-            width: 45px;
-            height: 45px;
-            background: var(--stone);
-            border-radius: 50%;
+        .cta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
 
-        .author-info h4 {
+        .cta-input {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1.2rem 1.5rem;
+            font-family: 'Pretendard', sans-serif;
             font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--deep);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.3s;
         }
 
-        .author-info p {
-            font-size: 0.75rem;
-            color: var(--earth);
+        .cta-input::placeholder {
+            color: var(--text-dim);
         }
 
-        /* Footer */
-        footer {
-            padding: 4rem;
-            background: var(--deep);
-            color: var(--ivory);
+        .cta-input:focus {
+            border-color: var(--terracotta);
         }
 
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .footer-logo {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.5rem;
-            letter-spacing: 0.1em;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .footer-links a {
+        .cta-btn {
+            background: var(--terracotta);
+            border: none;
+            padding: 1.2rem 2rem;
+            font-family: 'Pretendard', sans-serif;
             font-size: 0.8rem;
-            color: var(--stone);
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .cta-btn:hover {
+            background: var(--sunset);
+            transform: translateY(-2px);
+        }
+
+        /* Footer inside CTA */
+        .footer {
+            position: absolute;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+        }
+
+        .footer a {
+            font-size: 0.7rem;
+            color: var(--text-dim);
             text-decoration: none;
-            transition: color 0.3s ease;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
         }
 
-        .footer-links a:hover {
-            color: var(--ivory);
-        }
-
-        .footer-copy {
-            font-size: 0.75rem;
-            color: var(--earth);
+        .footer a:hover {
+            color: var(--terracotta);
         }
 
         /* Responsive */
         @media (max-width: 1024px) {
-            .hero {
+            .process-container,
+            .sample-container {
                 grid-template-columns: 1fr;
+                gap: 4rem;
             }
 
-            .hero-visual {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            html {
+                scroll-snap-type: none;
+            }
+
+            nav {
+                padding: 1.5rem 2rem;
+            }
+
+            .progress-bar {
                 display: none;
             }
 
-            .process-steps {
-                grid-template-columns: repeat(2, 1fr);
+            section {
+                min-height: auto;
+                padding: 6rem 2rem;
+            }
+
+            .hero {
+                min-height: 100vh;
             }
 
             .features-grid {
                 grid-template-columns: 1fr;
             }
 
-            .pricing-cards {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-            }
-
-            .pricing-card.featured {
-                transform: none;
-            }
-
-            .testimonial-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            nav {
-                padding: 1rem 2rem;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .hero-content {
-                padding: 8rem 2rem 4rem;
-            }
-
-            .process,
-            .features,
-            .request,
-            .pricing,
-            .testimonials {
-                padding: 5rem 2rem;
-            }
-
-            .process-steps {
+            .cta-row {
                 grid-template-columns: 1fr;
             }
 
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .form-group.full {
-                grid-column: auto;
-            }
-
-            .footer-content {
+            .footer {
+                position: relative;
+                bottom: auto;
+                margin-top: 4rem;
                 flex-direction: column;
-                gap: 2rem;
-                text-align: center;
+                align-items: center;
+                gap: 1rem;
             }
         }
+
+        /* Section reveal animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
     </style>
 </head>
 <body>
     <nav>
         <a href="#" class="logo">WAYFARE</a>
-        <ul class="nav-links">
-            <li><a href="#process">서비스 안내</a></li>
-            <li><a href="#pricing">가격</a></li>
-            <li><a href="#reviews">후기</a></li>
-        </ul>
-        <a href="#request" class="nav-cta">일정 요청하기</a>
+        <a href="#contact" class="nav-contact">문의하기</a>
     </nav>
 
-    <section class="hero">
+    <div class="progress-bar">
+        <div class="progress-dot active" data-section="0"></div>
+        <div class="progress-dot" data-section="1"></div>
+        <div class="progress-dot" data-section="2"></div>
+        <div class="progress-dot" data-section="3"></div>
+        <div class="progress-dot" data-section="4"></div>
+        <div class="progress-dot" data-section="5"></div>
+    </div>
+
+    <!-- Section 1: Hero -->
+    <section class="hero" data-section="0">
+        <div class="hero-bg">
+            <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
+                <path class="flight-path" d="M0,300 Q250,100 500,300 T1000,300" stroke="rgba(196,112,60,0.3)" stroke-width="2" fill="none"/>
+                <path class="flight-path" d="M0,350 Q300,500 600,350 T1000,400" stroke="rgba(196,112,60,0.15)" stroke-width="1" fill="none" style="animation-delay: 0.5s"/>
+            </svg>
+        </div>
         <div class="hero-content">
-            <span class="hero-tag">Personal Travel Concierge</span>
-            <h1>여행 전문가가<br>당신만의 <em>완벽한 일정</em>을<br>설계합니다</h1>
-            <p class="hero-desc">
+            <p class="hero-eyebrow">Personal Travel Concierge</p>
+            <h1>여행 전문가가 설계하는<br>당신만의 <em>완벽한 여정</em></h1>
+            <p class="hero-sub">
                 검색 지옥에서 벗어나세요. 현지 경험이 풍부한 전문가가
-                당신의 취향, 일정, 컨디션을 고려한 맞춤 여행 플랜을 제작해 드립니다.
+                당신의 취향과 일정에 맞춘 여행 플랜을 제작해 드립니다.
             </p>
             <div class="hero-price">
-                <span class="price-amount">₩30,000</span>
-                <span class="price-label">부터 / 1개 도시 기준</span>
+                <span class="hero-price-amount">₩30,000</span>
+                <span class="hero-price-label">부터 시작</span>
             </div>
-            <a href="#request" class="hero-cta">
-                일정 요청하기
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-            </a>
         </div>
-        <div class="hero-visual">
-            <div class="hero-image-grid">
-                <div class="hero-image-item" data-location="Tokyo"></div>
-                <div class="hero-image-item" data-location="Paris"></div>
-                <div class="hero-image-item" data-location="Bali"></div>
-            </div>
+        <div class="scroll-indicator">
+            <span class="scroll-text">Scroll</span>
+            <div class="scroll-line"></div>
         </div>
     </section>
 
-    <section class="process" id="process">
-        <div class="process-header">
-            <span class="section-tag">How It Works</span>
-            <h2>이렇게 진행됩니다</h2>
-            <p>간단한 4단계로 나만의 여행 일정을 받아보세요</p>
-        </div>
-        <div class="process-steps">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>정보 입력</h3>
-                <p>여행지, 일정, 취향, 예산 등 기본 정보를 알려주세요</p>
+    <!-- Section 2: Process -->
+    <section class="process" data-section="1">
+        <div class="process-container">
+            <div class="process-text">
+                <span class="section-tag reveal">How It Works</span>
+                <h2 class="process-title reveal reveal-delay-1">간단한 4단계로<br>완벽한 여행을</h2>
+                <p class="process-desc reveal reveal-delay-2">
+                    복잡한 여행 계획, 저희가 대신합니다.
+                    정보만 알려주시면 24시간 내 맞춤 일정을 받아보실 수 있어요.
+                </p>
             </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>전문가 배정</h3>
-                <p>해당 지역 경험이 풍부한 전문가가 배정됩니다</p>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>일정 설계</h3>
-                <p>24-48시간 내 맞춤 일정표를 제작해 드립니다</p>
-            </div>
-            <div class="step">
-                <div class="step-number">4</div>
-                <h3>수정 & 확정</h3>
-                <p>1회 무료 수정 후 최종 일정을 확정합니다</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="features">
-        <div class="features-grid">
-            <div class="features-content">
-                <span class="section-tag">What You Get</span>
-                <h2>단순한 일정표가 아닌,<br>진짜 여행 가이드</h2>
-                <ul class="feature-list">
-                    <li class="feature-item">
-                        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                            <path d="M2 17l10 5 10-5"/>
-                            <path d="M2 12l10 5 10-5"/>
-                        </svg>
-                        <div>
-                            <h4>시간대별 상세 일정</h4>
-                            <p>이동 시간, 대기 시간까지 계산한 현실적인 스케줄</p>
-                        </div>
-                    </li>
-                    <li class="feature-item">
-                        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
-                            <path d="M5 8H4a4 4 0 0 0 0 8h1"/>
-                            <path d="M9 8a4 4 0 1 1 0 8"/>
-                            <path d="M15 8a4 4 0 1 0 0 8"/>
-                        </svg>
-                        <div>
-                            <h4>맛집 & 카페 추천</h4>
-                            <p>취향에 맞는 로컬 맛집, 예약 필요 여부까지</p>
-                        </div>
-                    </li>
-                    <li class="feature-item">
-                        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
-                        <div>
-                            <h4>휴식 시간 배치</h4>
-                            <p>체력과 컨디션을 고려한 적절한 휴식 포함</p>
-                        </div>
-                    </li>
-                    <li class="feature-item">
-                        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        <div>
-                            <h4>구글맵 연동</h4>
-                            <p>모든 장소가 포함된 구글맵 링크 제공</p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="features-visual">
-                <div class="sample-schedule">
-                    <div class="schedule-header">
-                        <span class="schedule-title">도쿄 Day 1</span>
-                        <span class="schedule-date">Sample Schedule</span>
+            <div class="process-cards">
+                <div class="process-card reveal">
+                    <span class="process-card-number">01</span>
+                    <div>
+                        <h3>정보 입력</h3>
+                        <p>여행지, 기간, 취향, 예산 등 기본 정보를 알려주세요</p>
                     </div>
-                    <div class="schedule-item">
-                        <span class="schedule-time">09:00</span>
-                        <div>
-                            <div class="schedule-activity">츠키지 아우터 마켓</div>
-                            <div class="schedule-note">아침 해산물 & 타마고야끼</div>
-                        </div>
+                </div>
+                <div class="process-card reveal reveal-delay-1">
+                    <span class="process-card-number">02</span>
+                    <div>
+                        <h3>전문가 매칭</h3>
+                        <p>해당 지역 경험이 풍부한 전문가가 배정됩니다</p>
                     </div>
-                    <div class="schedule-item">
-                        <span class="schedule-time">11:00</span>
-                        <div>
-                            <div class="schedule-activity">팀랩 보더리스</div>
-                            <div class="schedule-note">사전 예매 필수 · 2시간 소요</div>
-                        </div>
+                </div>
+                <div class="process-card reveal reveal-delay-2">
+                    <span class="process-card-number">03</span>
+                    <div>
+                        <h3>일정 제작</h3>
+                        <p>24~48시간 내 상세 맞춤 일정표를 전달드립니다</p>
                     </div>
-                    <div class="schedule-item">
-                        <span class="schedule-time">13:30</span>
-                        <div>
-                            <div class="schedule-activity">점심: 아파 호텔 근처 라멘</div>
-                            <div class="schedule-note">이치란 or 후쿠로 추천</div>
-                        </div>
-                    </div>
-                    <div class="schedule-item">
-                        <span class="schedule-time">15:00</span>
-                        <div>
-                            <div class="schedule-activity">휴식 시간</div>
-                            <div class="schedule-note">호텔 체크인 & 재충전</div>
-                        </div>
-                    </div>
-                    <div class="schedule-item">
-                        <span class="schedule-time">17:30</span>
-                        <div>
-                            <div class="schedule-activity">시부야 스카이 선셋</div>
-                            <div class="schedule-note">일몰 30분 전 도착 권장</div>
-                        </div>
+                </div>
+                <div class="process-card reveal reveal-delay-3">
+                    <span class="process-card-number">04</span>
+                    <div>
+                        <h3>수정 & 확정</h3>
+                        <p>피드백 반영 후 최종 일정을 확정합니다</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="request" id="request">
-        <div class="request-container">
-            <div class="request-header">
-                <span class="section-tag">Request Form</span>
-                <h2>일정 요청하기</h2>
-                <p>아래 정보를 입력해 주시면 24시간 내 견적을 보내드립니다</p>
+    <!-- Section 3: Features -->
+    <section class="features" data-section="2">
+        <div class="features-inner">
+            <div class="features-header">
+                <span class="section-tag reveal">What You Get</span>
+                <h2 class="reveal reveal-delay-1">단순한 일정표가 아닌,<br>진짜 여행 가이드</h2>
             </div>
-            <form class="request-form" onsubmit="return false;">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">이름</label>
-                        <input type="text" class="form-input" placeholder="홍길동">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">이메일</label>
-                        <input type="email" class="form-input" placeholder="hello@email.com">
-                    </div>
+            <div class="features-grid">
+                <div class="feature-item reveal">
+                    <svg class="feature-icon" viewBox="0 0 24 24" stroke-width="1.5">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                        <line x1="9" y1="4" x2="9" y2="10"/>
+                    </svg>
+                    <h3>시간대별 상세 일정</h3>
+                    <p>이동 시간, 대기 시간까지 계산한 현실적인 스케줄</p>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">여행지</label>
-                        <input type="text" class="form-input" placeholder="예: 도쿄, 오사카">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">여행 기간</label>
-                        <input type="text" class="form-input" placeholder="예: 2024.03.15 - 03.19 (4박 5일)">
-                    </div>
+                <div class="feature-item reveal reveal-delay-1">
+                    <svg class="feature-icon" viewBox="0 0 24 24" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    <h3>휴식 시간 배치</h3>
+                    <p>체력과 컨디션을 고려한 적절한 휴식 포함</p>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">인원</label>
-                        <select class="form-select">
-                            <option>1명 (혼자)</option>
-                            <option>2명</option>
-                            <option>3-4명</option>
-                            <option>5명 이상</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">여행 스타일</label>
-                        <select class="form-select">
-                            <option>빡빡하게 (최대한 많이)</option>
-                            <option>적당히 (균형있게)</option>
-                            <option>여유롭게 (휴식 중심)</option>
-                        </select>
-                    </div>
+                <div class="feature-item reveal reveal-delay-2">
+                    <svg class="feature-icon" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path d="M12 2C8 6 4 10 4 14a8 8 0 1 0 16 0c0-4-4-8-8-12z"/>
+                    </svg>
+                    <h3>맛집 & 카페 추천</h3>
+                    <p>취향에 맞는 로컬 맛집, 예약 필요 여부까지</p>
                 </div>
-                <div class="form-group full">
-                    <label class="form-label">음식 취향</label>
-                    <div class="form-checkbox-group">
-                        <label class="checkbox-item">
-                            <input type="checkbox">
-                            <span>현지 로컬 음식</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox">
-                            <span>파인다이닝</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox">
-                            <span>카페 투어</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox">
-                            <span>채식 옵션 필요</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox">
-                            <span>술/바 포함</span>
-                        </label>
-                    </div>
+                <div class="feature-item reveal reveal-delay-3">
+                    <svg class="feature-icon" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <h3>구글맵 연동</h3>
+                    <p>모든 장소가 포함된 구글맵 링크 제공</p>
                 </div>
-                <div class="form-group full">
-                    <label class="form-label">추가 요청사항</label>
-                    <textarea class="form-textarea" placeholder="예: 오전에는 늦게 시작하고 싶어요 / 쇼핑 시간이 필요해요 / 특정 장소는 꼭 가고 싶어요..."></textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Sample -->
+    <section class="sample" data-section="3">
+        <div class="sample-container">
+            <div class="sample-text">
+                <span class="section-tag reveal" style="color: var(--sand);">Sample Schedule</span>
+                <h2 class="reveal reveal-delay-1">이런 일정표를<br>받아보실 수 있어요</h2>
+                <p class="reveal reveal-delay-2">
+                    시간대별 상세 동선, 맛집 추천, 이동 팁까지.
+                    현지에서 바로 따라할 수 있는 실용적인 일정입니다.
+                </p>
+                <span class="sample-badge reveal reveal-delay-3">도쿄 3박 4일 샘플</span>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item reveal">
+                    <span class="timeline-time">09:00</span>
+                    <h4 class="timeline-title">츠키지 아우터 마켓</h4>
+                    <p class="timeline-note">아침 해산물 & 타마고야끼 추천</p>
                 </div>
-                <button type="submit" class="form-submit">견적 요청하기</button>
+                <div class="timeline-item reveal reveal-delay-1">
+                    <span class="timeline-time">11:00</span>
+                    <h4 class="timeline-title">팀랩 보더리스</h4>
+                    <p class="timeline-note">사전 예매 필수 · 소요 2시간</p>
+                </div>
+                <div class="timeline-item reveal reveal-delay-2">
+                    <span class="timeline-time">14:00</span>
+                    <h4 class="timeline-title">점심: 이치란 라멘</h4>
+                    <p class="timeline-note">시부야점 대기 적음</p>
+                </div>
+                <div class="timeline-item reveal reveal-delay-3">
+                    <span class="timeline-time">15:30</span>
+                    <h4 class="timeline-title">휴식 타임</h4>
+                    <p class="timeline-note">호텔 체크인 & 재충전</p>
+                </div>
+                <div class="timeline-item reveal reveal-delay-4">
+                    <span class="timeline-time">18:00</span>
+                    <h4 class="timeline-title">시부야 스카이 선셋</h4>
+                    <p class="timeline-note">일몰 30분 전 도착 권장</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Pricing -->
+    <section class="pricing" data-section="4">
+        <div class="pricing-inner">
+            <div class="pricing-header">
+                <span class="section-tag reveal">Pricing</span>
+                <h2 class="reveal reveal-delay-1">명확한 가격</h2>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card reveal">
+                    <p class="pricing-name">Basic</p>
+                    <div class="pricing-amount">₩30,000</div>
+                    <p class="pricing-period">1개 도시 · 3일 이내</p>
+                    <ul class="pricing-features">
+                        <li>시간대별 상세 일정표</li>
+                        <li>맛집 10곳+ 추천</li>
+                        <li>구글맵 연동</li>
+                        <li>1회 수정 포함</li>
+                    </ul>
+                    <a href="#contact" class="pricing-btn">선택하기</a>
+                </div>
+                <div class="pricing-card featured reveal reveal-delay-1">
+                    <p class="pricing-name">Standard</p>
+                    <div class="pricing-amount">₩50,000</div>
+                    <p class="pricing-period">1개 도시 · 4~7일</p>
+                    <ul class="pricing-features">
+                        <li>Basic 전체 포함</li>
+                        <li>예약 필요 장소 안내</li>
+                        <li>교통 패스 추천</li>
+                        <li>2회 수정 포함</li>
+                        <li>카카오톡 Q&A</li>
+                    </ul>
+                    <a href="#contact" class="pricing-btn">선택하기</a>
+                </div>
+                <div class="pricing-card reveal reveal-delay-2">
+                    <p class="pricing-name">Premium</p>
+                    <div class="pricing-amount">₩80,000</div>
+                    <p class="pricing-period">2개 도시+ or 7일+</p>
+                    <ul class="pricing-features">
+                        <li>Standard 전체 포함</li>
+                        <li>도시 간 이동 플랜</li>
+                        <li>숙소 추천</li>
+                        <li>무제한 수정</li>
+                        <li>여행 중 실시간 Q&A</li>
+                    </ul>
+                    <a href="#contact" class="pricing-btn">선택하기</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: CTA -->
+    <section class="cta" data-section="5" id="contact">
+        <div class="cta-bg-text">WAYFARE</div>
+        <div class="cta-content">
+            <span class="section-tag reveal">Get Started</span>
+            <h2 class="reveal reveal-delay-1">여행 일정 요청하기</h2>
+            <p class="reveal reveal-delay-2">정보를 입력해 주시면 24시간 내 연락드릴게요</p>
+            <form class="cta-form reveal reveal-delay-3" onsubmit="return false;">
+                <div class="cta-row">
+                    <input type="text" class="cta-input" placeholder="이름">
+                    <input type="email" class="cta-input" placeholder="이메일">
+                </div>
+                <div class="cta-row">
+                    <input type="text" class="cta-input" placeholder="여행지 (예: 도쿄)">
+                    <input type="text" class="cta-input" placeholder="여행 기간 (예: 3박 4일)">
+                </div>
+                <input type="text" class="cta-input" placeholder="추가 요청사항 (선택)">
+                <button type="submit" class="cta-btn">요청하기</button>
             </form>
         </div>
-    </section>
-
-    <section class="pricing" id="pricing">
-        <div class="pricing-header">
-            <span class="section-tag">Pricing</span>
-            <h2>명확한 가격</h2>
-        </div>
-        <div class="pricing-cards">
-            <div class="pricing-card">
-                <div class="pricing-name">Basic</div>
-                <div class="pricing-amount">₩30,000</div>
-                <p class="pricing-desc">1개 도시 · 3일 이내</p>
-                <ul class="pricing-features">
-                    <li>시간대별 상세 일정표</li>
-                    <li>맛집 & 카페 10곳+ 추천</li>
-                    <li>구글맵 연동</li>
-                    <li>1회 수정 포함</li>
-                </ul>
-                <a href="#request" class="pricing-btn">선택하기</a>
-            </div>
-            <div class="pricing-card featured">
-                <div class="pricing-name">Standard</div>
-                <div class="pricing-amount">₩50,000</div>
-                <p class="pricing-desc">1개 도시 · 4-7일</p>
-                <ul class="pricing-features">
-                    <li>Basic 포함 내용 전체</li>
-                    <li>예약 필요 장소 안내</li>
-                    <li>교통 패스 추천</li>
-                    <li>2회 수정 포함</li>
-                    <li>카카오톡 Q&A 지원</li>
-                </ul>
-                <a href="#request" class="pricing-btn">선택하기</a>
-            </div>
-            <div class="pricing-card">
-                <div class="pricing-name">Premium</div>
-                <div class="pricing-amount">₩80,000</div>
-                <p class="pricing-desc">2개 도시 이상 or 7일+</p>
-                <ul class="pricing-features">
-                    <li>Standard 포함 내용 전체</li>
-                    <li>도시 간 이동 플랜</li>
-                    <li>숙소 추천</li>
-                    <li>무제한 수정</li>
-                    <li>여행 중 실시간 Q&A</li>
-                </ul>
-                <a href="#request" class="pricing-btn">선택하기</a>
-            </div>
+        <div class="footer">
+            <a href="#">Instagram</a>
+            <a href="#">이용약관</a>
+            <a href="#">개인정보처리방침</a>
         </div>
     </section>
-
-    <section class="testimonials" id="reviews">
-        <div class="testimonials-header">
-            <span class="section-tag">Reviews</span>
-            <h2>실제 이용 후기</h2>
-        </div>
-        <div class="testimonial-grid">
-            <div class="testimonial-card">
-                <p class="testimonial-text">
-                    "검색하느라 시간 낭비하던 걸 생각하면... 진작 맡길 걸 그랬어요.
-                    현지인만 아는 맛집까지 알려주셔서 대만족!"
-                </p>
-                <div class="testimonial-author">
-                    <div class="author-avatar"></div>
-                    <div class="author-info">
-                        <h4>김지연</h4>
-                        <p>도쿄 4박 5일</p>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <p class="testimonial-text">
-                    "휴식 시간을 중간중간 넣어주셔서 체력 안 배치고 여행 잘 다녀왔어요.
-                    3만원이 아깝지 않았습니다."
-                </p>
-                <div class="testimonial-author">
-                    <div class="author-avatar"></div>
-                    <div class="author-info">
-                        <h4>이승현</h4>
-                        <p>오사카 2박 3일</p>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <p class="testimonial-text">
-                    "부모님 모시고 가는 여행이라 걱정했는데, 동선이나 난이도를
-                    딱 맞게 조절해 주셔서 감사했어요."
-                </p>
-                <div class="testimonial-author">
-                    <div class="author-avatar"></div>
-                    <div class="author-info">
-                        <h4>박민수</h4>
-                        <p>방콕 3박 4일</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-logo">WAYFARE</div>
-            <div class="footer-links">
-                <a href="#">Instagram</a>
-                <a href="#">이용약관</a>
-                <a href="#">개인정보처리방침</a>
-                <a href="#">문의하기</a>
-            </div>
-            <span class="footer-copy">© 2024 Wayfare. All rights reserved.</span>
-        </div>
-    </footer>
 
     <script>
-        // Nav scroll effect
-        window.addEventListener('scroll', () => {
-            const nav = document.querySelector('nav');
-            nav.classList.toggle('scrolled', window.scrollY > 50);
+        // Section observer for progress dots & reveal animations
+        const sections = document.querySelectorAll('section');
+        const dots = document.querySelectorAll('.progress-dot');
+        const reveals = document.querySelectorAll('.reveal');
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const index = entry.target.dataset.section;
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i == index);
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        sections.forEach(section => sectionObserver.observe(section));
+
+        // Reveal animation observer
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        reveals.forEach(el => revealObserver.observe(el));
+
+        // Dot navigation
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const sectionIndex = dot.dataset.section;
+                sections[sectionIndex].scrollIntoView({ behavior: 'smooth' });
+            });
         });
 
         // Form submission
-        document.querySelector('.form-submit').addEventListener('click', () => {
-            alert('요청이 접수되었습니다!\n24시간 내 이메일로 견적을 보내드릴게요.');
+        document.querySelector('.cta-btn').addEventListener('click', () => {
+            alert('요청이 접수되었습니다!\n24시간 내 이메일로 연락드릴게요.');
         });
     </script>
 </body>
