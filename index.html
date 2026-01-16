@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LABS — Experiments by Outsung</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --border: #252525;
+            --text: #ffffff;
+            --text-dim: #888888;
+            --accent-1: #00ff88;
+            --accent-2: #ff6b35;
+            --accent-3: #a855f7;
+            --accent-4: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Grid background */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-1);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+        }
+
+        .header-info {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-1);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 12vw, 10rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text) 0%, var(--text-dim) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            font-weight: 400;
+            color: var(--text-dim);
+            max-width: 500px;
+            margin-bottom: 3rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-1);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Projects */
+        .projects {
+            padding: 4rem 3rem 8rem;
+            position: relative;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .section-count {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-1);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--card-accent, var(--accent-1));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .project-card:hover {
+            border-color: var(--card-accent, var(--accent-1));
+            transform: translateY(-5px);
+        }
+
+        .project-card[data-accent="1"] { --card-accent: var(--accent-1); }
+        .project-card[data-accent="2"] { --card-accent: var(--accent-2); }
+        .project-card[data-accent="3"] { --card-accent: var(--accent-3); }
+        .project-card[data-accent="4"] { --card-accent: var(--accent-4); }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .project-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--card-accent, var(--accent-1));
+        }
+
+        .project-status {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            padding: 0.3rem 0.6rem;
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent-1);
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .project-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .project-desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            padding: 0.3rem 0.8rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .project-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+
+        .project-link {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .project-card:hover .project-link {
+            color: var(--card-accent, var(--accent-1));
+        }
+
+        .project-arrow {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover .project-arrow {
+            transform: translateX(5px);
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-left {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem 1.5rem;
+            }
+
+            .hero {
+                padding: 6rem 1.5rem 3rem;
+            }
+
+            .hero-stats {
+                gap: 2rem;
+            }
+
+            .projects {
+                padding: 3rem 1.5rem 5rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-card {
+                padding: 1.5rem;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+        }
+
+        /* Scroll animation */
+        .project-card {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .project-card:nth-child(2) { animation-delay: 0.2s; }
+        .project-card:nth-child(3) { animation-delay: 0.3s; }
+        .project-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <header>
+        <a href="#" class="logo">LABS_</a>
+        <span class="header-info">experiments.outsung</span>
+    </header>
+
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="badge-dot"></span>
+            <span>Building in public</span>
+        </div>
+        <h1>LABS</h1>
+        <p class="hero-sub">
+            바이브 코딩으로 빠르게 아이디어를 실험하고 구현하는 공간
+        </p>
+        <div class="hero-stats">
+            <div class="stat">
+                <div class="stat-value">03</div>
+                <div class="stat-label">Projects</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">∞</div>
+                <div class="stat-label">Ideas</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">24</div>
+                <div class="stat-label">Hours Deploy</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="projects">
+        <div class="section-header">
+            <span class="section-title">Active Projects</span>
+            <span class="section-count">03 entries</span>
+        </div>
+        <div class="projects-grid">
+            <a href="./jerry-plants/" class="project-card" data-accent="1">
+                <div class="project-header">
+                    <span class="project-number">001</span>
+                    <span class="project-status">Live</span>
+                </div>
+                <h2 class="project-name">Jerry Plants</h2>
+                <p class="project-desc">
+                    제리가 운영하는 프리미엄 보태니컬 아뜰리에.
+                    도시 속 작은 공간에 어울리는 엄선된 식물 큐레이션.
+                </p>
+                <div class="project-tags">
+                    <span class="tag">E-Commerce</span>
+                    <span class="tag">Plants</span>
+                    <span class="tag">Luxury</span>
+                </div>
+                <div class="project-footer">
+                    <span class="project-link">
+                        View Project
+                        <svg class="project-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+            <a href="./commune/" class="project-card" data-accent="3">
+                <div class="project-header">
+                    <span class="project-number">002</span>
+                    <span class="project-status">Live</span>
+                </div>
+                <h2 class="project-name">Commune</h2>
+                <p class="project-desc">
+                    프라이빗 공간 대여 & 모임 서비스.
+                    음악과 함께 취향이 통하는 사람들이 모이는 곳.
+                </p>
+                <div class="project-tags">
+                    <span class="tag">Space Rental</span>
+                    <span class="tag">Music</span>
+                    <span class="tag">Community</span>
+                </div>
+                <div class="project-footer">
+                    <span class="project-link">
+                        View Project
+                        <svg class="project-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+            <a href="./wayfare/" class="project-card" data-accent="2">
+                <div class="project-header">
+                    <span class="project-number">003</span>
+                    <span class="project-status">Live</span>
+                </div>
+                <h2 class="project-name">Wayfare</h2>
+                <p class="project-desc">
+                    여행 전문가가 직접 짜주는 맞춤 일정 컨설팅 서비스.
+                    검색 지옥에서 벗어나 완벽한 여행을.
+                </p>
+                <div class="project-tags">
+                    <span class="tag">Travel</span>
+                    <span class="tag">Concierge</span>
+                    <span class="tag">Consulting</span>
+                </div>
+                <div class="project-footer">
+                    <span class="project-link">
+                        View Project
+                        <svg class="project-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <span class="footer-left">© 2024 Outsung Labs</span>
+        <div class="footer-links">
+            <a href="https://github.com/outsung/labs" target="_blank">GitHub</a>
+        </div>
+    </footer>
+</body>
+</html>
