@@ -30,6 +30,7 @@ git add . && git commit -m "Add project-name" && git push
 | 프로젝트 | 설명 | URL |
 |---------|------|-----|
 | jerry-plants | 제리의 프리미엄 식물샵 | [링크](https://outsung.github.io/labs/jerry-plants/) |
+| commune | 프라이빗 공간대여 & 모임 서비스 | [링크](https://outsung.github.io/labs/commune/) |
 
 ## 디자인 가이드
 
