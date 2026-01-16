@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEATHPET - 당신은 끝까지 함께할 수 있나요?</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="DEATHPET">
+    <meta property="og:description" content="당신은 끝까지 함께할 수 있나요?">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Creepster&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Scroll Progress Indicator -->
+    <div class="progress-bar"></div>
+
+    <!-- Scroll Stop Warning Overlay -->
+    <div class="scroll-stop-overlay" id="scrollStopOverlay">
+        <div class="watching-eye"></div>
+        <p class="stop-message">왜 멈췄어?</p>
+    </div>
+
+    <!-- Glitch Flash Overlay -->
+    <div class="glitch-overlay" id="glitchOverlay"></div>
+
+    <!-- Main Container -->
+    <main class="story-container">
+
+        <!-- Scene 1: First Meeting -->
+        <section class="scene scene-1" data-scene="1">
+            <div class="scene-content">
+                <div class="intro-text">
+                    <p class="subtitle fade-in">작은 생명체가</p>
+                    <p class="subtitle fade-in delay-1">당신을 기다리고 있어요</p>
+                </div>
+
+                <div class="pet-container entrance">
+                    <div class="pet" id="mainPet">
+                        <div class="pet-body">
+                            <div class="pet-face">
+                                <div class="pet-eyes">
+                                    <div class="eye left">
+                                        <div class="pupil"></div>
+                                        <div class="eye-shine"></div>
+                                    </div>
+                                    <div class="eye right">
+                                        <div class="pupil"></div>
+                                        <div class="eye-shine"></div>
+                                    </div>
+                                </div>
+                                <div class="pet-mouth happy"></div>
+                                <div class="pet-blush left"></div>
+                                <div class="pet-blush right"></div>
+                            </div>
+                            <div class="pet-ears">
+                                <div class="ear left"></div>
+                                <div class="ear right"></div>
+                            </div>
+                        </div>
+                        <div class="pet-shadow"></div>
+                    </div>
+                </div>
+
+                <div class="dialogue-box">
+                    <p class="dialogue typing" data-text="안녕!">안녕!</p>
+                    <p class="dialogue typing delay-2" data-text="나랑 친구할래?">나랑 친구할래?</p>
+                </div>
+
+                <div class="scroll-hint">
+                    <p>아래로 스크롤해서 친구가 되어주세요</p>
+                    <div class="scroll-arrow"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scene 2: Happy Times -->
+        <section class="scene scene-2" data-scene="2">
+            <div class="scene-content">
+                <div class="memory-container">
+                    <div class="memory eating">
+                        <div class="pet mini eating-anim">
+                            <div class="pet-body">
+                                <div class="pet-face">
+                                    <div class="pet-eyes closed-happy">
+                                        <div class="eye left"></div>
+                                        <div class="eye right"></div>
+                                    </div>
+                                    <div class="pet-mouth eating"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="food-bowl">
+                            <div class="food"></div>
+                        </div>
+                    </div>
+
+                    <div class="memory playing">
+                        <div class="pet mini jumping">
+                            <div class="pet-body">
+                                <div class="pet-face">
+                                    <div class="pet-eyes">
+                                        <div class="eye left sparkle">
+                                            <div class="pupil"></div>
+                                        </div>
+                                        <div class="eye right sparkle">
+                                            <div class="pupil"></div>
+                                        </div>
+                                    </div>
+                                    <div class="pet-mouth open-happy"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ball bouncing"></div>
+                    </div>
+
+                    <div class="memory sleeping">
+                        <div class="pet mini">
+                            <div class="pet-body sleepy">
+                                <div class="pet-face">
+                                    <div class="pet-eyes closed-sleep">
+                                        <div class="eye left"></div>
+                                        <div class="eye right"></div>
+                                    </div>
+                                    <div class="pet-mouth peaceful"></div>
+                                </div>
+                            </div>
+                            <div class="zzz">
+                                <span>z</span>
+                                <span>z</span>
+                                <span>z</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dialogue-box happy-dialogues">
+                    <p class="dialogue fade-in">고마워, 오늘도 함께해줘서</p>
+                    <p class="dialogue fade-in delay-1">너만 있으면 외롭지 않아</p>
+                    <p class="dialogue fade-in delay-2 promise">영원히 함께하자, 약속해?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scene 3: Time Passes -->
+        <section class="scene scene-3" data-scene="3">
+            <div class="scene-content">
+                <div class="time-passing">
+                    <div class="clock-hands"></div>
+                </div>
+
+                <div class="pet-container waiting">
+                    <div class="pet" id="waitingPet">
+                        <div class="pet-body">
+                            <div class="pet-face">
+                                <div class="pet-eyes worried">
+                                    <div class="eye left">
+                                        <div class="pupil looking-up"></div>
+                                    </div>
+                                    <div class="eye right">
+                                        <div class="pupil looking-up"></div>
+                                    </div>
+                                </div>
+                                <div class="pet-mouth worried"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dialogue-box fading">
+                    <p class="dialogue">요즘 바쁘지?</p>
+                    <p class="dialogue delay-1">괜찮아, 기다릴게</p>
+                    <p class="dialogue delay-2 ellipsis">...</p>
+                    <p class="dialogue delay-3 sad">오늘도 안 오는구나</p>
+                </div>
+
+                <div class="dust-particles">
+                    <span></span><span></span><span></span>
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scene 4: Abandoned -->
+        <section class="scene scene-4" data-scene="4">
+            <div class="scene-content">
+                <div class="day-counter" id="dayCounter">
+                    <span class="day-number">Day 7</span>
+                </div>
+
+                <div class="window-frame">
+                    <div class="window-light"></div>
+                    <div class="pet-container at-window">
+                        <div class="pet sad" id="sadPet">
+                            <div class="pet-body weakened">
+                                <div class="pet-face">
+                                    <div class="pet-eyes sad-eyes">
+                                        <div class="eye left">
+                                            <div class="pupil small"></div>
+                                            <div class="tear"></div>
+                                        </div>
+                                        <div class="eye right">
+                                            <div class="pupil small"></div>
+                                            <div class="tear"></div>
+                                        </div>
+                                    </div>
+                                    <div class="pet-mouth trembling"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dialogue-box desperate">
+                    <p class="dialogue whisper">배고파...</p>
+                    <p class="dialogue whisper delay-1">왜 안 와?</p>
+                    <p class="dialogue whisper delay-2 breaking">날 잊은 거야?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scene 5: Turning Point -->
+        <section class="scene scene-5" data-scene="5">
+            <div class="scene-content">
+                <div class="darkness-creeping">
+                    <div class="shadow-tendril left"></div>
+                    <div class="shadow-tendril right"></div>
+                    <div class="shadow-tendril top"></div>
+                    <div class="shadow-tendril bottom"></div>
+                </div>
+
+                <div class="pet-container turning">
+                    <div class="pet changing" id="changingPet">
+                        <div class="pet-body">
+                            <div class="pet-face">
+                                <div class="pet-eyes darkening">
+                                    <div class="eye left">
+                                        <div class="pupil dilating"></div>
+                                    </div>
+                                    <div class="eye right">
+                                        <div class="pupil dilating"></div>
+                                    </div>
+                                </div>
+                                <div class="pet-mouth flat"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dialogue-box ominous">
+                    <p class="dialogue slow">나...</p>
+                    <p class="dialogue slow delay-1">화나지 않아</p>
+                    <p class="dialogue slow delay-2 turn">근데 너는...</p>
+                    <p class="dialogue slow delay-3 accusation">나한테 화나야 하는 거 아니야?</p>
+                </div>
+
+                <div class="screen-shake-trigger"></div>
+            </div>
+        </section>
+
+        <!-- Scene 6: Warning -->
+        <section class="scene scene-6" data-scene="6">
+            <div class="scene-content">
+                <div class="void"></div>
+
+                <div class="warning-text">
+                    <p class="glitch-text" data-text="스크롤을 멈추지 마세요">스크롤을 멈추지 마세요</p>
+                    <p class="glitch-text delay-1" data-text="끝까지... 보세요...">끝까지... 보세요...</p>
+                </div>
+
+                <div class="hidden-watcher" id="hiddenWatcher">
+                    <div class="watcher-eye"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scene 7: The End -->
+        <section class="scene scene-7" data-scene="7">
+            <div class="scene-content">
+                <div class="final-void"></div>
+
+                <div class="final-message">
+                    <p class="final-text">다음엔...</p>
+                    <p class="final-text delay-1 threat">날 버리지 마</p>
+                </div>
+
+                <div class="jumpscare-container" id="jumpscareContainer">
+                    <div class="glitch-pet">
+                        <div class="pet-face corrupted">
+                            <div class="pet-eyes hollow">
+                                <div class="eye left void-eye"></div>
+                                <div class="eye right void-eye"></div>
+                            </div>
+                            <div class="pet-mouth twisted"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scene 8: CTA -->
+        <section class="scene scene-8" data-scene="8">
+            <div class="scene-content cta-content">
+                <div class="logo-container">
+                    <h1 class="logo glitch-hover" data-text="DEATHPET">DEATHPET</h1>
+                    <p class="coming-soon">Coming 2025</p>
+                </div>
+
+                <p class="cta-question">당신은 끝까지 함께할 수 있나요?</p>
+
+                <form class="email-form" id="emailForm" action="https://formspree.io/f/your-form-id" method="POST">
+                    <div class="input-wrapper">
+                        <input type="email" name="email" placeholder="이메일 주소" required>
+                        <button type="submit">등록하기</button>
+                    </div>
+                    <p class="form-subtitle">출시 알림을 받고 가장 먼저 만나보세요</p>
+                </form>
+
+                <div class="waiting-count">
+                    <span class="count-number" id="waitingCount">2,847</span>명이 기다리고 있어요
+                </div>
+
+                <div class="share-section">
+                    <p class="share-prompt">이 이야기를 공유하세요</p>
+                    <div class="share-buttons">
+                        <button class="share-btn twitter" data-platform="twitter">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </button>
+                        <button class="share-btn facebook" data-platform="facebook">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </button>
+                        <button class="share-btn copy" data-platform="copy">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <footer class="footer">
+                    <p>DEATHPET &copy; 2025</p>
+                </footer>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Audio (optional) -->
+    <audio id="ambientAudio" loop preload="none">
+        <source src="assets/sounds/ambient.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="glitchAudio" preload="none">
+        <source src="assets/sounds/glitch.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

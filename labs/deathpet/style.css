@@ -1,0 +1,1526 @@
+/* ============================================
+   DEATHPET - Viral Landing Page Styles
+   ============================================ */
+
+/* CSS Variables */
+:root {
+    /* Colors - Journey from warm to cold */
+    --bg-warm: #fff9f5;
+    --bg-pastel: #fef6f0;
+    --bg-neutral: #e8e4e0;
+    --bg-gray: #9a9590;
+    --bg-dark: #2a2520;
+    --bg-void: #0a0908;
+
+    /* Pet Colors */
+    --pet-body: #ffb4a2;
+    --pet-body-sad: #d4a59a;
+    --pet-body-dying: #8a7a75;
+    --pet-face: #ffd5c8;
+    --pet-blush: #ff8fa3;
+    --pet-eye: #2d2520;
+    --pet-eye-shine: #ffffff;
+
+    /* Text Colors */
+    --text-warm: #5a4a42;
+    --text-neutral: #4a4540;
+    --text-cold: #8a8580;
+    --text-dark: #e8e4e0;
+    --text-glitch: #ff3333;
+
+    /* Accent */
+    --accent: #ff6b6b;
+    --accent-dark: #cc4444;
+
+    /* Fonts */
+    --font-display: 'Caveat', cursive;
+    --font-body: 'Noto Sans KR', sans-serif;
+    --font-horror: 'Creepster', cursive;
+
+    /* Timing */
+    --transition-slow: 1.5s ease;
+    --transition-medium: 0.6s ease;
+    --transition-fast: 0.3s ease;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-warm);
+    color: var(--text-warm);
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background var(--transition-slow);
+}
+
+/* Progress Bar */
+.progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--pet-blush));
+    width: 0%;
+    z-index: 1000;
+    transition: width 0.1s linear, background var(--transition-medium);
+}
+
+body.dark-mode .progress-bar {
+    background: linear-gradient(90deg, var(--text-glitch), #660000);
+}
+
+/* ============================================
+   SCENE CONTAINER
+   ============================================ */
+
+.story-container {
+    width: 100%;
+}
+
+.scene {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: background var(--transition-slow);
+}
+
+.scene-content {
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* ============================================
+   PET CHARACTER (CSS-based)
+   ============================================ */
+
+.pet-container {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.pet {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    transition: all var(--transition-medium);
+}
+
+.pet-body {
+    width: 120px;
+    height: 100px;
+    background: var(--pet-body);
+    border-radius: 60px 60px 50px 50px;
+    position: relative;
+    margin: 0 auto;
+    box-shadow:
+        inset -10px -10px 20px rgba(0,0,0,0.1),
+        inset 10px 10px 20px rgba(255,255,255,0.3);
+    transition: all var(--transition-medium);
+    animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+.pet-face {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 60px;
+}
+
+/* Eyes */
+.pet-eyes {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5px;
+}
+
+.eye {
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pupil {
+    width: 14px;
+    height: 14px;
+    background: var(--pet-eye);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all var(--transition-fast);
+}
+
+.eye-shine {
+    width: 6px;
+    height: 6px;
+    background: var(--pet-eye-shine);
+    border-radius: 50%;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+}
+
+/* Blush */
+.pet-blush {
+    width: 20px;
+    height: 10px;
+    background: var(--pet-blush);
+    border-radius: 50%;
+    position: absolute;
+    top: 35px;
+    opacity: 0.6;
+}
+
+.pet-blush.left { left: -5px; }
+.pet-blush.right { right: -5px; }
+
+/* Mouth */
+.pet-mouth {
+    width: 15px;
+    height: 8px;
+    border-bottom: 3px solid var(--pet-eye);
+    border-radius: 0 0 15px 15px;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: all var(--transition-fast);
+}
+
+.pet-mouth.happy {
+    width: 20px;
+    height: 10px;
+    border-radius: 0 0 20px 20px;
+}
+
+.pet-mouth.eating {
+    width: 12px;
+    height: 12px;
+    border: none;
+    background: var(--pet-eye);
+    border-radius: 50%;
+    animation: chew 0.3s ease-in-out infinite;
+}
+
+@keyframes chew {
+    0%, 100% { transform: translateX(-50%) scaleY(1); }
+    50% { transform: translateX(-50%) scaleY(0.7); }
+}
+
+.pet-mouth.open-happy {
+    width: 18px;
+    height: 14px;
+    background: var(--pet-eye);
+    border: none;
+    border-radius: 50%;
+}
+
+.pet-mouth.worried {
+    border-bottom: none;
+    border-top: 3px solid var(--pet-eye);
+    border-radius: 15px 15px 0 0;
+}
+
+.pet-mouth.trembling {
+    animation: tremble 0.2s ease-in-out infinite;
+}
+
+@keyframes tremble {
+    0%, 100% { transform: translateX(-50%); }
+    50% { transform: translateX(calc(-50% + 2px)); }
+}
+
+.pet-mouth.flat {
+    height: 0;
+    border-bottom: 3px solid var(--pet-eye);
+    border-radius: 0;
+}
+
+.pet-mouth.twisted {
+    width: 40px;
+    height: 20px;
+    border: none;
+    background: #1a0a0a;
+    border-radius: 0 0 40px 40px;
+    clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+}
+
+/* Ears */
+.pet-ears {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ear {
+    width: 25px;
+    height: 30px;
+    background: var(--pet-body);
+    border-radius: 50% 50% 0 0;
+    position: relative;
+}
+
+.ear::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 15px;
+    background: var(--pet-face);
+    border-radius: 50% 50% 0 0;
+}
+
+.ear.left { transform: rotate(-15deg); }
+.ear.right { transform: rotate(15deg); }
+
+/* Shadow */
+.pet-shadow {
+    width: 80px;
+    height: 15px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 50%;
+    margin: 10px auto 0;
+    animation: shadow-breathe 3s ease-in-out infinite;
+}
+
+@keyframes shadow-breathe {
+    0%, 100% { transform: scale(1); opacity: 0.15; }
+    50% { transform: scale(0.95); opacity: 0.2; }
+}
+
+/* Pet States */
+.pet.sad .pet-body {
+    background: var(--pet-body-sad);
+    filter: saturate(0.7);
+}
+
+.pet.changing .pet-body {
+    background: var(--pet-body-dying);
+    filter: saturate(0.4) brightness(0.8);
+}
+
+/* Closed Eyes */
+.pet-eyes.closed-happy .eye,
+.pet-eyes.closed-sleep .eye {
+    height: 4px;
+    background: var(--pet-eye);
+}
+
+.pet-eyes.closed-sleep .eye {
+    animation: sleep-eyes 4s ease-in-out infinite;
+}
+
+@keyframes sleep-eyes {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(1.5); }
+}
+
+/* Sad Eyes */
+.pet-eyes.sad-eyes .eye {
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+.tear {
+    width: 8px;
+    height: 12px;
+    background: linear-gradient(to bottom, transparent, #7ac7ff);
+    border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: tear-fall 2s ease-in-out infinite;
+}
+
+@keyframes tear-fall {
+    0% { opacity: 0; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+}
+
+/* Darkening Eyes */
+.pet-eyes.darkening .eye {
+    background: #ddd;
+    transition: all 1s ease;
+}
+
+.pet-eyes.darkening .pupil.dilating {
+    width: 20px;
+    height: 20px;
+    background: #1a0a0a;
+}
+
+/* Hollow Eyes */
+.pet-eyes.hollow .eye {
+    background: #1a0a0a;
+    box-shadow:
+        0 0 20px rgba(255,0,0,0.3),
+        inset 0 0 10px rgba(255,0,0,0.2);
+}
+
+.void-eye {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #ff0000 0%, #1a0a0a 50%);
+    animation: void-pulse 1s ease-in-out infinite;
+}
+
+@keyframes void-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Pet Weakened */
+.pet-body.weakened {
+    background: var(--pet-body-dying);
+    filter: saturate(0.3) brightness(0.7);
+    animation: none;
+    transform: scale(0.9);
+}
+
+/* Mini Pet for memories */
+.pet.mini {
+    width: 80px;
+    height: 80px;
+}
+
+.pet.mini .pet-body {
+    width: 60px;
+    height: 50px;
+}
+
+.pet.mini .pet-face {
+    width: 40px;
+    height: 30px;
+    top: 10px;
+}
+
+.pet.mini .eye {
+    width: 14px;
+    height: 14px;
+}
+
+.pet.mini .pupil {
+    width: 8px;
+    height: 8px;
+}
+
+/* Jumping Animation */
+.pet.jumping {
+    animation: jump 0.5s ease-in-out infinite;
+}
+
+@keyframes jump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+/* ============================================
+   SCENE 1: First Meeting
+   ============================================ */
+
+.scene-1 {
+    background: var(--bg-warm);
+}
+
+.intro-text {
+    margin-bottom: 2rem;
+}
+
+.subtitle {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--text-warm);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fade-up 1s ease forwards;
+}
+
+.subtitle.delay-1 {
+    animation-delay: 0.5s;
+}
+
+@keyframes fade-up {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pet-container.entrance .pet {
+    opacity: 0;
+    transform: scale(0.5);
+    animation: pet-entrance 1s ease 1s forwards;
+}
+
+@keyframes pet-entrance {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.dialogue-box {
+    margin-top: 2rem;
+}
+
+.dialogue {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--text-warm);
+    margin: 0.5rem 0;
+    opacity: 0;
+    animation: fade-in 0.8s ease forwards;
+}
+
+.dialogue.delay-1 { animation-delay: 1.5s; }
+.dialogue.delay-2 { animation-delay: 2s; }
+.dialogue.delay-3 { animation-delay: 2.5s; }
+
+@keyframes fade-in {
+    to { opacity: 1; }
+}
+
+/* Typing Effect */
+.typing {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 1s steps(10) forwards, fade-in 0.1s ease forwards;
+    width: 0;
+    display: inline-block;
+}
+
+.typing.delay-2 {
+    animation: typing 1.5s steps(15) 2s forwards, fade-in 0.1s ease 2s forwards;
+}
+
+@keyframes typing {
+    to { width: 100%; }
+}
+
+/* Scroll Hint */
+.scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    animation: fade-in 1s ease 3s forwards;
+}
+
+.scroll-hint p {
+    font-size: 0.9rem;
+    color: var(--text-cold);
+    margin-bottom: 0.5rem;
+}
+
+.scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid var(--text-cold);
+    border-bottom: 2px solid var(--text-cold);
+    transform: rotate(45deg);
+    margin: 0 auto;
+    animation: bounce-arrow 1.5s ease-in-out infinite;
+}
+
+@keyframes bounce-arrow {
+    0%, 100% { transform: rotate(45deg) translateY(0); }
+    50% { transform: rotate(45deg) translateY(8px); }
+}
+
+/* ============================================
+   SCENE 2: Happy Times
+   ============================================ */
+
+.scene-2 {
+    background: linear-gradient(135deg, var(--bg-pastel) 0%, #fff5f0 100%);
+}
+
+.memory-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+}
+
+.memory {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
+
+.memory.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.memory.eating { transition-delay: 0.2s; }
+.memory.playing { transition-delay: 0.4s; }
+.memory.sleeping { transition-delay: 0.6s; }
+
+/* Food Bowl */
+.food-bowl {
+    width: 50px;
+    height: 25px;
+    background: #f0e6e0;
+    border-radius: 0 0 25px 25px;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: inset 0 -5px 10px rgba(0,0,0,0.1);
+}
+
+.food {
+    width: 40px;
+    height: 15px;
+    background: linear-gradient(#a67c52, #8b6342);
+    border-radius: 50%;
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Ball */
+.ball {
+    width: 25px;
+    height: 25px;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    border-radius: 50%;
+    margin: 10px auto 0;
+    box-shadow: inset -3px -3px 8px rgba(0,0,0,0.2);
+}
+
+.ball.bouncing {
+    animation: ball-bounce 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes ball-bounce {
+    from { transform: translateY(0) scale(1, 1); }
+    to { transform: translateY(-10px) scale(0.95, 1.05); }
+}
+
+/* ZZZ */
+.zzz {
+    position: absolute;
+    top: -10px;
+    right: -20px;
+}
+
+.zzz span {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--text-cold);
+    opacity: 0;
+    animation: zzz-float 2s ease-in-out infinite;
+}
+
+.zzz span:nth-child(1) { animation-delay: 0s; font-size: 0.8rem; }
+.zzz span:nth-child(2) { animation-delay: 0.5s; font-size: 1rem; transform: translateX(5px); }
+.zzz span:nth-child(3) { animation-delay: 1s; font-size: 1.2rem; transform: translateX(10px); }
+
+@keyframes zzz-float {
+    0% { opacity: 0; transform: translateY(0); }
+    50% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Happy Dialogues */
+.happy-dialogues .dialogue {
+    color: var(--text-warm);
+}
+
+.happy-dialogues .promise {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+/* ============================================
+   SCENE 3: Time Passes
+   ============================================ */
+
+.scene-3 {
+    background: var(--bg-neutral);
+    transition: background 2s ease;
+}
+
+.time-passing {
+    width: 100px;
+    height: 100px;
+    border: 3px solid var(--text-cold);
+    border-radius: 50%;
+    position: relative;
+    margin: 0 auto 2rem;
+    opacity: 0.5;
+}
+
+.clock-hands::before,
+.clock-hands::after {
+    content: '';
+    position: absolute;
+    background: var(--text-cold);
+    left: 50%;
+    bottom: 50%;
+    transform-origin: bottom center;
+}
+
+.clock-hands::before {
+    width: 3px;
+    height: 30px;
+    animation: clock-hour 4s linear infinite;
+}
+
+.clock-hands::after {
+    width: 2px;
+    height: 40px;
+    animation: clock-minute 1s linear infinite;
+}
+
+@keyframes clock-hour {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes clock-minute {
+    to { transform: rotate(360deg); }
+}
+
+/* Waiting Pet */
+.pet-container.waiting .pet {
+    filter: saturate(0.7);
+}
+
+.pet-container.waiting .pupil.looking-up {
+    transform: translate(-50%, -70%);
+}
+
+/* Fading Dialogue */
+.dialogue-box.fading .dialogue {
+    color: var(--text-cold);
+}
+
+.dialogue-box.fading .ellipsis {
+    letter-spacing: 0.5em;
+}
+
+.dialogue-box.fading .sad {
+    opacity: 0.6;
+}
+
+/* Dust Particles */
+.dust-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.dust-particles span {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 50%;
+    animation: dust-float 8s linear infinite;
+}
+
+.dust-particles span:nth-child(1) { left: 10%; animation-delay: 0s; }
+.dust-particles span:nth-child(2) { left: 30%; animation-delay: 1s; }
+.dust-particles span:nth-child(3) { left: 50%; animation-delay: 2s; }
+.dust-particles span:nth-child(4) { left: 70%; animation-delay: 3s; }
+.dust-particles span:nth-child(5) { left: 85%; animation-delay: 4s; }
+.dust-particles span:nth-child(6) { left: 95%; animation-delay: 5s; }
+
+@keyframes dust-float {
+    0% { top: -10px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 110%; opacity: 0; }
+}
+
+/* ============================================
+   SCENE 4: Abandoned
+   ============================================ */
+
+.scene-4 {
+    background: var(--bg-gray);
+}
+
+.day-counter {
+    font-family: var(--font-body);
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--text-cold);
+    letter-spacing: 0.2em;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+.day-number {
+    font-weight: 500;
+    transition: all 0.5s ease;
+}
+
+/* Window Frame */
+.window-frame {
+    width: 200px;
+    height: 250px;
+    background: linear-gradient(180deg, #3a3530 0%, #2a2520 100%);
+    border-radius: 10px 10px 0 0;
+    margin: 0 auto;
+    position: relative;
+    padding: 15px;
+    box-shadow:
+        inset 0 0 30px rgba(0,0,0,0.5),
+        0 10px 30px rgba(0,0,0,0.3);
+}
+
+.window-light {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    border-radius: 10px 10px 0 0;
+}
+
+.pet-container.at-window {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Desperate Dialogue */
+.dialogue-box.desperate {
+    margin-top: 3rem;
+}
+
+.dialogue.whisper {
+    font-size: 1.4rem;
+    color: var(--text-cold);
+    opacity: 0.7;
+}
+
+.dialogue.breaking {
+    color: var(--accent-dark);
+}
+
+/* ============================================
+   SCENE 5: Turning Point
+   ============================================ */
+
+.scene-5 {
+    background: var(--bg-dark);
+}
+
+/* Darkness Creeping */
+.darkness-creeping {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.shadow-tendril {
+    position: absolute;
+    background: linear-gradient(to center, rgba(0,0,0,0.8), transparent);
+}
+
+.shadow-tendril.left {
+    left: 0;
+    top: 0;
+    width: 100px;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0,0,0,0.6), transparent);
+}
+
+.shadow-tendril.right {
+    right: 0;
+    top: 0;
+    width: 100px;
+    height: 100%;
+    background: linear-gradient(to left, rgba(0,0,0,0.6), transparent);
+}
+
+.shadow-tendril.top {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+
+.shadow-tendril.bottom {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+}
+
+/* Turning Pet */
+.pet-container.turning {
+    filter: grayscale(0.5);
+}
+
+/* Ominous Dialogue */
+.dialogue-box.ominous .dialogue {
+    color: var(--text-dark);
+    font-size: 1.6rem;
+}
+
+.dialogue.slow {
+    animation-duration: 1.5s;
+}
+
+.dialogue.turn {
+    font-size: 1.4rem;
+    opacity: 0.8;
+}
+
+.dialogue.accusation {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-glitch);
+    text-shadow: 0 0 10px rgba(255,50,50,0.5);
+}
+
+/* Screen Shake */
+.scene-5.shaking {
+    animation: screen-shake 0.5s ease-in-out;
+}
+
+@keyframes screen-shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* ============================================
+   SCENE 6: Warning
+   ============================================ */
+
+.scene-6 {
+    background: var(--bg-void);
+}
+
+.void {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+}
+
+/* Warning Text */
+.warning-text {
+    position: relative;
+    z-index: 10;
+}
+
+.glitch-text {
+    font-family: var(--font-body);
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--text-dark);
+    letter-spacing: 0.1em;
+    position: relative;
+    margin: 1rem 0;
+    animation: glitch-flicker 3s infinite;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+.glitch-text::before {
+    color: #ff0000;
+    animation: glitch-1 0.3s infinite;
+}
+
+.glitch-text::after {
+    color: #00ffff;
+    animation: glitch-2 0.3s infinite;
+}
+
+@keyframes glitch-flicker {
+    0%, 90%, 100% { opacity: 1; }
+    92%, 94%, 96%, 98% { opacity: 0.8; }
+    91%, 93%, 95%, 97%, 99% { opacity: 1; }
+}
+
+@keyframes glitch-1 {
+    0%, 100% { opacity: 0; transform: translateX(0); }
+    20% { opacity: 0.8; transform: translateX(-3px); }
+    40% { opacity: 0; }
+}
+
+@keyframes glitch-2 {
+    0%, 100% { opacity: 0; transform: translateX(0); }
+    60% { opacity: 0.8; transform: translateX(3px); }
+    80% { opacity: 0; }
+}
+
+/* Hidden Watcher */
+.hidden-watcher {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+}
+
+.hidden-watcher.visible {
+    opacity: 1;
+}
+
+.watcher-eye {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #ff0000 30%, transparent 70%);
+    border-radius: 50%;
+    animation: watcher-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes watcher-pulse {
+    from { transform: scale(1); filter: blur(0); }
+    to { transform: scale(1.1); filter: blur(2px); }
+}
+
+/* ============================================
+   SCENE 7: The End
+   ============================================ */
+
+.scene-7 {
+    background: #000;
+    min-height: 100vh;
+}
+
+.final-void {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+}
+
+.final-message {
+    position: relative;
+    z-index: 10;
+    padding: 4rem 0;
+}
+
+.final-text {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: #4a4a4a;
+    margin: 1rem 0;
+    opacity: 0;
+    animation: final-fade 2s ease forwards;
+}
+
+.final-text.delay-1 {
+    animation-delay: 2s;
+    color: var(--text-glitch);
+    font-size: 3rem;
+}
+
+@keyframes final-fade {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Jumpscare */
+.jumpscare-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.jumpscare-container.active {
+    animation: jumpscare 0.3s ease forwards;
+}
+
+@keyframes jumpscare {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.glitch-pet {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    animation: glitch-intense 0.1s infinite;
+}
+
+@keyframes glitch-intense {
+    0% { transform: translate(0) skew(0); filter: hue-rotate(0); }
+    20% { transform: translate(-10px, 5px) skew(2deg); filter: hue-rotate(90deg); }
+    40% { transform: translate(10px, -5px) skew(-2deg); filter: hue-rotate(-90deg) invert(1); }
+    60% { transform: translate(-5px, 10px) skew(1deg); filter: hue-rotate(180deg); }
+    80% { transform: translate(5px, -10px) skew(-1deg); filter: hue-rotate(-180deg); }
+    100% { transform: translate(0) skew(0); filter: hue-rotate(0); }
+}
+
+.pet-face.corrupted {
+    width: 200px;
+    height: 150px;
+    background: var(--pet-body-dying);
+    border-radius: 100px 100px 80px 80px;
+    position: relative;
+    margin: 0 auto;
+    filter: saturate(0) contrast(1.5);
+}
+
+.corrupted .pet-eyes.hollow {
+    display: flex;
+    justify-content: space-around;
+    padding: 30px 20px;
+}
+
+.corrupted .eye {
+    width: 50px;
+    height: 50px;
+}
+
+/* ============================================
+   SCENE 8: CTA
+   ============================================ */
+
+.scene-8 {
+    background: linear-gradient(180deg, #0a0908 0%, #1a1815 100%);
+    padding: 4rem 0;
+}
+
+.cta-content {
+    max-width: 500px;
+}
+
+.logo-container {
+    margin-bottom: 3rem;
+}
+
+.logo {
+    font-family: var(--font-horror);
+    font-size: 4rem;
+    font-weight: 400;
+    color: #fff;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0;
+    position: relative;
+}
+
+.logo.glitch-hover {
+    transition: all 0.1s ease;
+}
+
+.logo.glitch-hover:hover {
+    animation: logo-glitch 0.3s ease;
+    text-shadow:
+        2px 2px 0 #ff0000,
+        -2px -2px 0 #00ffff;
+}
+
+@keyframes logo-glitch {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(2px, -2px); }
+    60% { transform: translate(-2px, -2px); }
+    80% { transform: translate(2px, 2px); }
+}
+
+.coming-soon {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--text-cold);
+    letter-spacing: 0.3em;
+    margin-top: 0.5rem;
+}
+
+.cta-question {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--text-dark);
+    margin-bottom: 2.5rem;
+}
+
+/* Email Form */
+.email-form {
+    margin-bottom: 2rem;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 0;
+    max-width: 400px;
+    margin: 0 auto;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.05);
+    transition: all var(--transition-fast);
+}
+
+.input-wrapper:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(255,107,107,0.2);
+}
+
+.email-form input {
+    flex: 1;
+    padding: 1rem 1.2rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: #fff;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.email-form input::placeholder {
+    color: var(--text-cold);
+}
+
+.email-form button {
+    padding: 1rem 1.5rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.email-form button:hover {
+    background: var(--accent-dark);
+}
+
+.form-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-cold);
+    margin-top: 1rem;
+}
+
+/* Waiting Count */
+.waiting-count {
+    font-size: 1rem;
+    color: var(--text-cold);
+    margin-bottom: 3rem;
+}
+
+.count-number {
+    font-weight: 500;
+    color: var(--accent);
+}
+
+/* Share Section */
+.share-section {
+    margin-bottom: 3rem;
+}
+
+.share-prompt {
+    font-size: 0.9rem;
+    color: var(--text-cold);
+    margin-bottom: 1rem;
+}
+
+.share-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.share-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: var(--text-dark);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.share-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.share-btn:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+}
+
+/* Footer */
+.footer {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer p {
+    font-size: 0.8rem;
+    color: var(--text-cold);
+    opacity: 0.6;
+}
+
+/* ============================================
+   SCROLL STOP OVERLAY
+   ============================================ */
+
+.scroll-stop-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 500;
+    transition: opacity 0.5s ease;
+}
+
+.scroll-stop-overlay.visible {
+    opacity: 1;
+}
+
+.watching-eye {
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #ff3333 0%, #990000 50%, transparent 70%);
+    border-radius: 50%;
+    animation: eye-stare 2s ease-in-out infinite;
+}
+
+@keyframes eye-stare {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.stop-message {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--text-glitch);
+    margin-top: 2rem;
+    animation: message-flicker 0.1s infinite;
+}
+
+@keyframes message-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* ============================================
+   GLITCH OVERLAY
+   ============================================ */
+
+.glitch-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0;
+    background: linear-gradient(
+        transparent 0%,
+        rgba(255,0,0,0.1) 50%,
+        transparent 100%
+    );
+    background-size: 100% 4px;
+    animation: scanlines 0.1s linear infinite;
+}
+
+.glitch-overlay.active {
+    opacity: 1;
+}
+
+@keyframes scanlines {
+    from { background-position: 0 0; }
+    to { background-position: 0 4px; }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .subtitle {
+        font-size: 1.5rem;
+    }
+
+    .dialogue {
+        font-size: 1.4rem;
+    }
+
+    .pet {
+        width: 120px;
+        height: 120px;
+    }
+
+    .pet-body {
+        width: 100px;
+        height: 80px;
+    }
+
+    .memory-container {
+        gap: 1rem;
+    }
+
+    .logo {
+        font-size: 3rem;
+    }
+
+    .cta-question {
+        font-size: 1.4rem;
+    }
+
+    .input-wrapper {
+        flex-direction: column;
+        border-radius: 8px;
+    }
+
+    .email-form input {
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .final-text {
+        font-size: 2rem;
+    }
+
+    .final-text.delay-1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .scene-content {
+        padding: 1.5rem;
+    }
+
+    .subtitle {
+        font-size: 1.3rem;
+    }
+
+    .dialogue {
+        font-size: 1.2rem;
+    }
+
+    .pet.mini {
+        width: 60px;
+        height: 60px;
+    }
+
+    .window-frame {
+        width: 150px;
+        height: 200px;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.fade-in {
+    opacity: 0;
+    animation: fade-in 1s ease forwards;
+}
+
+.delay-1 { animation-delay: 0.5s; }
+.delay-2 { animation-delay: 1s; }
+.delay-3 { animation-delay: 1.5s; }
+
+/* Hidden but accessible */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
