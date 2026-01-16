@@ -4,23 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CELLAR — Curated Wine Subscription</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --black: #0D0D0D;
-            --charcoal: #1A1A1A;
-            --wine-dark: #2D1F2D;
-            --wine: #722F37;
-            --wine-light: #8B3A44;
-            --burgundy: #4A1C24;
-            --gold: #C9A962;
-            --gold-dim: rgba(201, 169, 98, 0.4);
-            --cream: #F8F6F1;
-            --ivory: #FFFDF8;
-            --stone: #9A9590;
-            --text: #E8E4DF;
+            --bg: #0c0a09;
+            --surface: #1c1917;
+            --wine: #7f1d1d;
+            --wine-glow: rgba(127, 29, 29, 0.6);
+            --burgundy: #450a0a;
+            --merlot: #991b1b;
+            --gold: #d4a574;
+            --cream: #fef3e2;
+            --stone: #a8a29e;
+            --text: #f5f5f4;
         }
 
         * {
@@ -34,27 +32,45 @@
         }
 
         body {
-            font-family: 'Crimson Pro', 'Noto Sans KR', serif;
-            background: var(--black);
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background: var(--bg);
             color: var(--text);
-            font-weight: 300;
-            line-height: 1.8;
+            overflow-x: hidden;
+            cursor: none;
         }
 
-        ::selection {
-            background: var(--wine);
-            color: var(--cream);
-        }
-
-        /* Texture overlay */
-        body::before {
-            content: '';
+        /* Custom cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--gold);
+            border-radius: 50%;
             position: fixed;
-            inset: 0;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            opacity: 0.02;
             pointer-events: none;
-            z-index: 10000;
+            z-index: 9999;
+            transition: transform 0.15s ease, width 0.2s, height 0.2s, background 0.2s;
+            mix-blend-mode: difference;
+        }
+
+        .cursor.hover {
+            width: 50px;
+            height: 50px;
+            background: var(--gold);
+        }
+
+        .cursor-dot {
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Smooth scroll container */
+        .smooth-scroll {
+            will-change: transform;
         }
 
         /* Navigation */
@@ -63,26 +79,20 @@
             top: 0;
             left: 0;
             right: 0;
-            padding: 1.5rem 4rem;
+            padding: 2rem 4rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 1000;
-            background: linear-gradient(to bottom, rgba(13,13,13,1) 0%, rgba(13,13,13,0) 100%);
-        }
-
-        nav.scrolled {
-            background: rgba(13, 13, 13, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(201, 169, 98, 0.1);
+            z-index: 100;
+            mix-blend-mode: difference;
         }
 
         .logo {
-            font-family: 'Cinzel', serif;
-            font-size: 1.3rem;
-            font-weight: 600;
-            letter-spacing: 0.4em;
-            color: var(--gold);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--text);
             text-decoration: none;
         }
 
@@ -93,364 +103,483 @@
         }
 
         .nav-links a {
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--stone);
+            color: var(--text);
             text-decoration: none;
-            transition: color 0.3s ease;
+            opacity: 0.6;
+            transition: opacity 0.3s;
         }
 
         .nav-links a:hover {
-            color: var(--gold);
+            opacity: 1;
         }
 
-        .nav-cta {
-            padding: 0.8rem 2rem;
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            font-family: 'Cinzel', serif;
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .nav-cta:hover {
-            background: var(--gold);
-            color: var(--black);
-        }
-
-        /* Hero */
+        /* Hero - Horizontal split with liquid animation */
         .hero {
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
             position: relative;
             overflow: hidden;
         }
 
-        .hero-bg {
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse at 30% 70%, rgba(114, 47, 55, 0.4) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 30%, rgba(45, 31, 45, 0.6) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(74, 28, 36, 0.3) 0%, transparent 70%),
-                var(--black);
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 8vw;
+            position: relative;
+            z-index: 2;
         }
 
-        .hero-content {
-            text-align: center;
-            z-index: 1;
-            padding: 2rem;
-            max-width: 900px;
-        }
-
-        .hero-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 2rem;
-            opacity: 0;
-            animation: fadeDown 1s ease 0.2s forwards;
-        }
-
-        .hero-icon svg {
-            width: 100%;
-            height: 100%;
-            stroke: var(--gold);
-            fill: none;
-        }
-
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero-tag {
-            font-family: 'Cinzel', serif;
+        .hero-eyebrow {
             font-size: 0.7rem;
-            font-weight: 500;
-            letter-spacing: 0.5em;
+            font-weight: 600;
+            letter-spacing: 0.3em;
             text-transform: uppercase;
             color: var(--gold);
             margin-bottom: 1.5rem;
-            opacity: 0;
-            animation: fadeUp 1s ease 0.4s forwards;
+            overflow: hidden;
+        }
+
+        .hero-eyebrow span {
+            display: inline-block;
+            transform: translateY(100%);
+            animation: slideUp 0.8s ease forwards;
+            animation-delay: 0.5s;
         }
 
         .hero h1 {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(3rem, 8vw, 6rem);
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(4rem, 10vw, 9rem);
             font-weight: 400;
-            letter-spacing: 0.15em;
-            color: var(--cream);
-            margin-bottom: 1.5rem;
-            opacity: 0;
-            animation: fadeUp 1s ease 0.6s forwards;
+            line-height: 0.95;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
         }
 
-        .hero-subtitle {
-            font-size: 1.4rem;
+        .hero h1 .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .hero h1 .line span {
+            display: inline-block;
+            transform: translateY(100%);
+            animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero h1 .line:nth-child(1) span { animation-delay: 0.2s; }
+        .hero h1 .line:nth-child(2) span { animation-delay: 0.35s; }
+
+        .hero h1 em {
             font-style: italic;
-            color: var(--stone);
-            margin-bottom: 2rem;
-            opacity: 0;
-            animation: fadeUp 1s ease 0.8s forwards;
+            color: var(--gold);
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); }
         }
 
         .hero-desc {
             font-size: 1rem;
+            font-weight: 300;
             color: var(--stone);
-            max-width: 550px;
-            margin: 0 auto 3rem;
+            max-width: 380px;
+            line-height: 1.8;
             opacity: 0;
-            animation: fadeUp 1s ease 1s forwards;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 0.8s;
         }
 
-        .hero-cta {
-            display: inline-block;
-            padding: 1.2rem 4rem;
-            background: var(--wine);
-            color: var(--cream);
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            text-decoration: none;
-            border: 1px solid var(--wine-light);
-            transition: all 0.4s ease;
-            opacity: 0;
-            animation: fadeUp 1s ease 1.2s forwards;
-        }
-
-        .hero-cta:hover {
-            background: var(--wine-light);
-            border-color: var(--gold-dim);
-            box-shadow: 0 0 40px rgba(114, 47, 55, 0.5);
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
+        @keyframes fadeIn {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .scroll-line {
-            position: absolute;
-            bottom: 3rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 1px;
-            height: 60px;
-            background: linear-gradient(to bottom, var(--gold), transparent);
-            animation: scrollPulse 2s infinite;
-        }
-
-        @keyframes scrollPulse {
-            0%, 100% { opacity: 1; height: 60px; }
-            50% { opacity: 0.3; height: 40px; }
-        }
-
-        /* How it works */
-        .process {
-            padding: 10rem 4rem;
-            background: var(--charcoal);
-            position: relative;
-        }
-
-        .process::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 1px;
-            height: 80px;
-            background: linear-gradient(to bottom, transparent, var(--gold-dim));
-        }
-
-        .section-header {
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto 6rem;
-        }
-
-        .section-tag {
-            font-family: 'Cinzel', serif;
-            font-size: 0.65rem;
-            font-weight: 500;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            color: var(--gold);
-            margin-bottom: 1rem;
-        }
-
-        .section-header h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 2.5rem;
-            font-weight: 400;
-            letter-spacing: 0.1em;
-            color: var(--cream);
-            margin-bottom: 1rem;
-        }
-
-        .section-header p {
-            color: var(--stone);
-            font-size: 1rem;
-        }
-
-        .process-steps {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .step {
-            text-align: center;
-            padding: 2rem;
-            position: relative;
-        }
-
-        .step::after {
-            content: '';
-            position: absolute;
-            top: 3rem;
-            right: -1rem;
-            width: 2rem;
-            height: 1px;
-            background: var(--gold-dim);
-        }
-
-        .step:last-child::after {
-            display: none;
-        }
-
-        .step-number {
-            font-family: 'Cinzel', serif;
-            font-size: 3rem;
-            font-weight: 400;
-            color: var(--wine);
-            line-height: 1;
-            margin-bottom: 1.5rem;
-        }
-
-        .step h3 {
-            font-family: 'Cinzel', serif;
-            font-size: 0.9rem;
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 3rem;
+            padding: 1.2rem 0;
+            font-size: 0.8rem;
             font-weight: 600;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            color: var(--cream);
-            margin-bottom: 1rem;
+            color: var(--text);
+            text-decoration: none;
+            border-bottom: 1px solid var(--gold);
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 1s;
+            transition: gap 0.3s ease;
         }
 
-        .step p {
-            font-size: 0.9rem;
+        .hero-cta:hover {
+            gap: 2rem;
+        }
+
+        .hero-cta svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--gold);
+            transition: transform 0.3s;
+        }
+
+        .hero-cta:hover svg {
+            transform: translateX(5px);
+        }
+
+        /* Hero right - Wine glass with liquid animation */
+        .hero-right {
+            position: relative;
+            background: linear-gradient(180deg, var(--burgundy) 0%, var(--bg) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wine-glass {
+            position: relative;
+            width: 200px;
+            height: 350px;
+        }
+
+        .glass-stem {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 120px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border-radius: 4px;
+        }
+
+        .glass-base {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 10px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            border-radius: 50%;
+        }
+
+        .glass-bowl {
+            position: absolute;
+            bottom: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 200px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 0 0 80px 80px;
+            overflow: hidden;
+        }
+
+        .wine-liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(180deg, var(--merlot) 0%, var(--wine) 100%);
+            animation: pourWine 2s ease forwards;
+            animation-delay: 1.2s;
+        }
+
+        @keyframes pourWine {
+            to { height: 70%; }
+        }
+
+        .wine-surface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+            animation: wineWave 3s ease-in-out infinite;
+            animation-delay: 3s;
+        }
+
+        @keyframes wineWave {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(-3px) scaleY(0.8); }
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 3rem;
+            left: 4rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
             color: var(--stone);
         }
 
-        /* Plans */
+        .scroll-line {
+            width: 60px;
+            height: 1px;
+            background: var(--stone);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gold);
+            animation: scrollMove 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Marquee */
+        .marquee-section {
+            padding: 3rem 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+
+        .marquee {
+            display: flex;
+            animation: marquee 30s linear infinite;
+        }
+
+        .marquee-item {
+            flex-shrink: 0;
+            padding: 0 3rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--stone);
+            white-space: nowrap;
+        }
+
+        .marquee-item::after {
+            content: '·';
+            margin-left: 3rem;
+            color: var(--wine);
+        }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* About - Asymmetric layout */
+        .about {
+            padding: 15rem 4rem;
+            position: relative;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .about-left {
+            position: relative;
+        }
+
+        .about-tag {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 2rem;
+        }
+
+        .about-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 400;
+            line-height: 1.2;
+            margin-bottom: 2rem;
+        }
+
+        .about-title em {
+            font-style: italic;
+            display: block;
+            color: var(--stone);
+            font-size: 0.7em;
+            margin-top: 0.5rem;
+        }
+
+        .about-text {
+            font-size: 1rem;
+            font-weight: 300;
+            color: var(--stone);
+            line-height: 2;
+        }
+
+        .about-right {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding-top: 15rem;
+        }
+
+        .about-stat {
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .about-stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 400;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .about-stat-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--stone);
+        }
+
+        /* Floating wine bottle decoration */
+        .float-bottle {
+            position: absolute;
+            right: 10%;
+            top: 20%;
+            width: 40px;
+            height: 150px;
+            border: 1px solid rgba(212, 165, 116, 0.2);
+            border-radius: 5px 5px 20px 20px;
+            animation: floatBottle 6s ease-in-out infinite;
+        }
+
+        @keyframes floatBottle {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* Plans - Cards with reveal */
         .plans {
             padding: 10rem 4rem;
-            background:
-                radial-gradient(ellipse at 50% 0%, rgba(114, 47, 55, 0.2) 0%, transparent 50%),
-                var(--black);
+            background: var(--surface);
+            position: relative;
+        }
+
+        .plans::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 300px;
+            background: radial-gradient(ellipse at 50% 0%, var(--wine-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .plans-header {
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto 6rem;
+        }
+
+        .plans-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .plans-header p {
+            color: var(--stone);
+            font-size: 0.95rem;
         }
 
         .plans-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            max-width: 1100px;
+            gap: 1px;
+            max-width: 1200px;
             margin: 0 auto;
+            background: rgba(255,255,255,0.05);
         }
 
         .plan-card {
-            background: var(--charcoal);
-            border: 1px solid rgba(201, 169, 98, 0.1);
-            padding: 3rem 2rem;
-            text-align: center;
+            background: var(--surface);
+            padding: 3rem;
             position: relative;
-            transition: all 0.4s ease;
-        }
-
-        .plan-card.featured {
-            border-color: var(--gold-dim);
-            transform: scale(1.05);
-        }
-
-        .plan-card.featured::before {
-            content: 'Most Popular';
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--gold);
-            color: var(--black);
-            font-family: 'Cinzel', serif;
-            font-size: 0.6rem;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            padding: 0.4rem 1rem;
+            transition: background 0.5s ease;
         }
 
         .plan-card:hover {
-            border-color: var(--gold-dim);
-            transform: translateY(-5px);
+            background: var(--bg);
         }
 
-        .plan-card.featured:hover {
-            transform: scale(1.05) translateY(-5px);
+        .plan-card.featured::before {
+            content: 'Recommended';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0.5rem;
+            background: var(--wine);
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-align: center;
         }
 
-        .plan-icon {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 1.5rem;
-        }
-
-        .plan-icon svg {
-            width: 100%;
-            height: 100%;
-            stroke: var(--wine-light);
-            fill: none;
+        .plan-card.featured {
+            padding-top: 4.5rem;
         }
 
         .plan-name {
-            font-family: 'Cinzel', serif;
-            font-size: 1.3rem;
-            font-weight: 500;
-            letter-spacing: 0.15em;
-            color: var(--cream);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
             margin-bottom: 0.5rem;
         }
 
         .plan-bottles {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: var(--gold);
-            margin-bottom: 1.5rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
         }
 
         .plan-price {
-            font-family: 'Cinzel', serif;
-            font-size: 2.5rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
             font-weight: 400;
-            color: var(--cream);
             margin-bottom: 0.3rem;
         }
 
         .plan-period {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--stone);
             margin-bottom: 2rem;
         }
@@ -458,24 +587,27 @@
         .plan-features {
             list-style: none;
             margin-bottom: 2rem;
-            text-align: left;
-            padding: 0 1rem;
         }
 
         .plan-features li {
             font-size: 0.85rem;
             color: var(--stone);
-            padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding-left: 1.5rem;
+            position: relative;
         }
 
         .plan-features li::before {
-            content: '✓';
-            color: var(--gold);
-            font-size: 0.8rem;
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--wine);
+            transform: translateY(-50%);
         }
 
         .plan-btn {
@@ -483,315 +615,278 @@
             width: 100%;
             padding: 1rem;
             background: transparent;
-            border: 1px solid var(--wine);
-            color: var(--cream);
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text);
+            font-family: 'Pretendard', sans-serif;
+            font-size: 0.75rem;
             font-weight: 600;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             text-decoration: none;
+            text-align: center;
             transition: all 0.3s ease;
         }
 
         .plan-btn:hover {
             background: var(--wine);
+            border-color: var(--wine);
         }
 
         .plan-card.featured .plan-btn {
             background: var(--wine);
+            border-color: var(--wine);
         }
 
-        .plan-card.featured .plan-btn:hover {
-            background: var(--wine-light);
-        }
-
-        /* Selection */
+        /* Selection - Horizontal scroll */
         .selection {
-            padding: 10rem 4rem;
-            background: var(--wine-dark);
+            padding: 10rem 0;
+            overflow: hidden;
         }
 
-        .selection-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            align-items: center;
+        .selection-header {
+            padding: 0 4rem;
+            margin-bottom: 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
-        .selection-content h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 2.5rem;
+        .selection-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
             font-weight: 400;
-            letter-spacing: 0.1em;
-            color: var(--cream);
-            margin-bottom: 2rem;
         }
 
-        .selection-content p {
-            color: var(--stone);
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .wine-types {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        .wine-type {
-            padding: 1.5rem;
-            border: 1px solid rgba(201, 169, 98, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .wine-type:hover {
-            border-color: var(--gold-dim);
-            background: rgba(201, 169, 98, 0.05);
-        }
-
-        .wine-type h4 {
-            font-family: 'Cinzel', serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            color: var(--gold);
-            margin-bottom: 0.5rem;
-        }
-
-        .wine-type p {
-            font-size: 0.8rem;
-            color: var(--stone);
-            margin: 0;
-        }
-
-        .selection-visual {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+        .selection-nav {
+            display: flex;
             gap: 1rem;
         }
 
+        .selection-nav button {
+            width: 50px;
+            height: 50px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .selection-nav button:hover {
+            background: var(--wine);
+            border-color: var(--wine);
+        }
+
+        .selection-track {
+            display: flex;
+            gap: 2rem;
+            padding: 0 4rem;
+            animation: scrollTrack 40s linear infinite;
+        }
+
+        .selection-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scrollTrack {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
         .wine-card {
-            aspect-ratio: 3/4;
-            background: var(--burgundy);
+            flex-shrink: 0;
+            width: 350px;
+            background: var(--surface);
             position: relative;
             overflow: hidden;
-            transition: transform 0.4s ease;
+            transition: transform 0.5s ease;
         }
 
         .wine-card:hover {
             transform: scale(1.02);
         }
 
-        .wine-card:nth-child(2) {
-            margin-top: 2rem;
+        .wine-card-image {
+            height: 400px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .wine-card::before {
-            content: attr(data-region);
-            position: absolute;
-            bottom: 1rem;
-            left: 1rem;
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
-            letter-spacing: 0.2em;
-            color: var(--gold-dim);
-            text-transform: uppercase;
-        }
-
-        .wine-card-inner {
+        .wine-card-image::before {
+            content: '';
             position: absolute;
             inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Cinzel', serif;
-            font-size: 2rem;
-            font-style: italic;
-            color: rgba(201, 169, 98, 0.2);
+            background: linear-gradient(180deg,
+                transparent 0%,
+                var(--burgundy) 50%,
+                var(--wine) 100%);
+            opacity: 0.8;
         }
 
-        /* Sommelier */
-        .sommelier {
-            padding: 10rem 4rem;
-            background: var(--black);
-        }
-
-        .sommelier-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .quote-mark {
-            font-family: 'Cinzel', serif;
-            font-size: 6rem;
-            color: var(--wine);
-            line-height: 1;
-            margin-bottom: 1rem;
-        }
-
-        .sommelier-quote {
-            font-family: 'Crimson Pro', serif;
-            font-size: 1.8rem;
-            font-style: italic;
-            font-weight: 300;
-            color: var(--cream);
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
-
-        .sommelier-name {
-            font-family: 'Cinzel', serif;
-            font-size: 0.9rem;
-            letter-spacing: 0.2em;
+        .wine-card-region {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
             color: var(--gold);
+        }
+
+        .wine-card-year {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.1);
+            line-height: 1;
+        }
+
+        .wine-card-info {
+            padding: 2rem;
+        }
+
+        .wine-card-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
             margin-bottom: 0.3rem;
         }
 
-        .sommelier-title {
-            font-size: 0.8rem;
+        .wine-card-type {
+            font-size: 0.75rem;
+            color: var(--stone);
+            margin-bottom: 1rem;
+        }
+
+        .wine-card-notes {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .wine-card-note {
+            font-size: 0.65rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 2px;
             color: var(--stone);
         }
 
         /* CTA */
-        .cta-section {
-            padding: 10rem 4rem;
-            background:
-                radial-gradient(ellipse at 50% 100%, rgba(114, 47, 55, 0.3) 0%, transparent 60%),
-                var(--charcoal);
+        .cta {
+            padding: 15rem 4rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .cta-section h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 2.5rem;
+        .cta-bg {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 50%, var(--wine-glow) 0%, transparent 60%);
+            animation: ctaPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes ctaPulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 4rem);
             font-weight: 400;
-            letter-spacing: 0.1em;
-            color: var(--cream);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .cta-section p {
-            color: var(--stone);
+        .cta p {
             font-size: 1rem;
-            max-width: 500px;
+            color: var(--stone);
+            max-width: 400px;
             margin: 0 auto 3rem;
         }
 
         .cta-form {
             display: flex;
-            max-width: 500px;
+            max-width: 450px;
             margin: 0 auto;
-            gap: 1rem;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .cta-input {
             flex: 1;
-            background: var(--black);
-            border: 1px solid rgba(201, 169, 98, 0.2);
-            padding: 1rem 1.5rem;
-            font-family: 'Crimson Pro', serif;
-            font-size: 1rem;
-            color: var(--cream);
+            background: transparent;
+            border: none;
+            padding: 1.2rem 1.5rem;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
             outline: none;
-            transition: border-color 0.3s ease;
         }
 
         .cta-input::placeholder {
             color: var(--stone);
         }
 
-        .cta-input:focus {
-            border-color: var(--gold-dim);
-        }
-
         .cta-btn {
             background: var(--wine);
-            border: 1px solid var(--wine-light);
-            padding: 1rem 2.5rem;
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
+            border: none;
+            padding: 1.2rem 2rem;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 0.75rem;
             font-weight: 600;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--cream);
+            color: var(--text);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.3s;
         }
 
         .cta-btn:hover {
-            background: var(--wine-light);
+            background: var(--merlot);
         }
 
         /* Footer */
         footer {
             padding: 4rem;
-            background: var(--black);
-            border-top: 1px solid rgba(201, 169, 98, 0.1);
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 4rem;
-        }
-
-        .footer-brand .logo {
-            display: block;
-            margin-bottom: 1rem;
-        }
-
-        .footer-brand p {
-            font-size: 0.85rem;
-            color: var(--stone);
-        }
-
-        .footer-column h4 {
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--gold);
-            margin-bottom: 1.5rem;
-        }
-
-        .footer-column a {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--stone);
-            text-decoration: none;
-            margin-bottom: 0.8rem;
-            transition: color 0.3s ease;
-        }
-
-        .footer-column a:hover {
-            color: var(--cream);
-        }
-
-        .footer-bottom {
-            max-width: 1200px;
-            margin: 3rem auto 0;
-            padding-top: 2rem;
             border-top: 1px solid rgba(255,255,255,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .footer-copy {
-            font-size: 0.75rem;
-            color: var(--stone);
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            letter-spacing: 0.3em;
         }
 
-        .age-notice {
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            font-size: 0.75rem;
+            color: var(--stone);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        .footer-age {
             font-size: 0.7rem;
             color: var(--stone);
             padding: 0.5rem 1rem;
@@ -800,328 +895,370 @@
 
         /* Responsive */
         @media (max-width: 1024px) {
-            .process-steps {
-                grid-template-columns: repeat(2, 1fr);
+            .hero {
+                grid-template-columns: 1fr;
             }
 
-            .step::after {
+            .hero-right {
                 display: none;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+
+            .about-right {
+                padding-top: 0;
             }
 
             .plans-grid {
                 grid-template-columns: 1fr;
-                max-width: 400px;
-            }
-
-            .plan-card.featured {
-                transform: none;
-            }
-
-            .selection-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .footer-content {
-                grid-template-columns: 1fr 1fr;
             }
         }
 
         @media (max-width: 768px) {
+            body {
+                cursor: auto;
+            }
+
+            .cursor, .cursor-dot {
+                display: none;
+            }
+
             nav {
-                padding: 1rem 2rem;
+                padding: 1.5rem 2rem;
             }
 
             .nav-links {
                 display: none;
             }
 
-            .hero-content {
-                padding: 2rem 1rem;
+            .hero-left {
+                padding: 8rem 2rem;
             }
 
-            .process,
+            .about,
             .plans,
-            .selection,
-            .sommelier,
-            .cta-section {
-                padding: 6rem 2rem;
+            .cta {
+                padding: 8rem 2rem;
             }
 
-            .process-steps {
-                grid-template-columns: 1fr;
-            }
-
-            .wine-types {
-                grid-template-columns: 1fr;
-            }
-
-            .selection-visual {
-                grid-template-columns: 1fr;
-            }
-
-            .wine-card:nth-child(2) {
-                margin-top: 0;
-            }
-
-            .cta-form {
+            .selection-header {
                 flex-direction: column;
+                align-items: flex-start;
+                gap: 2rem;
             }
 
-            .footer-content {
-                grid-template-columns: 1fr;
+            footer {
+                flex-direction: column;
+                gap: 2rem;
                 text-align: center;
-            }
-
-            .footer-bottom {
-                flex-direction: column;
-                gap: 1rem;
             }
         }
     </style>
 </head>
 <body>
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+
     <nav>
         <a href="#" class="logo">CELLAR</a>
         <ul class="nav-links">
-            <li><a href="#process">서비스 안내</a></li>
-            <li><a href="#plans">구독 플랜</a></li>
-            <li><a href="#selection">와인 셀렉션</a></li>
+            <li><a href="#about">소개</a></li>
+            <li><a href="#plans">구독</a></li>
+            <li><a href="#selection">셀렉션</a></li>
         </ul>
-        <a href="#subscribe" class="nav-cta">구독하기</a>
     </nav>
 
     <section class="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-content">
-            <div class="hero-icon">
-                <svg viewBox="0 0 24 24" stroke-width="1">
-                    <path d="M8 22h8M12 22v-6M12 16c4 0 7-2.5 7-7V3H5v6c0 4.5 3 7 7 7z"/>
-                </svg>
-            </div>
-            <span class="hero-tag">Curated Wine Subscription</span>
-            <h1>CELLAR</h1>
-            <p class="hero-subtitle">Your Personal Wine Journey</p>
+        <div class="hero-left">
+            <div class="hero-eyebrow"><span>Curated Wine Subscription</span></div>
+            <h1>
+                <span class="line"><span>Your</span></span>
+                <span class="line"><span><em>Wine</em> Journey</span></span>
+            </h1>
             <p class="hero-desc">
-                소믈리에가 엄선한 와인을 매달 당신의 문 앞에.
-                취향을 분석하고, 새로운 와인의 세계를 열어드립니다.
+                소믈리에가 엄선한 와인을 매달 문 앞에 배송해 드립니다.
+                당신의 취향을 분석하고, 새로운 와인의 세계를 열어드릴게요.
             </p>
-            <a href="#plans" class="hero-cta">구독 시작하기</a>
+            <a href="#plans" class="hero-cta">
+                구독 시작하기
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+            <div class="hero-scroll">
+                <div class="scroll-line"></div>
+                <span>Scroll to explore</span>
+            </div>
         </div>
-        <div class="scroll-line"></div>
+        <div class="hero-right">
+            <div class="wine-glass">
+                <div class="glass-bowl">
+                    <div class="wine-liquid">
+                        <div class="wine-surface"></div>
+                    </div>
+                </div>
+                <div class="glass-stem"></div>
+                <div class="glass-base"></div>
+            </div>
+        </div>
     </section>
 
-    <section class="process" id="process">
-        <div class="section-header">
-            <span class="section-tag">How It Works</span>
-            <h2>간단한 시작</h2>
-            <p>복잡한 와인 선택, 저희가 대신해 드립니다</p>
+    <div class="marquee-section">
+        <div class="marquee">
+            <span class="marquee-item">Bordeaux</span>
+            <span class="marquee-item">Burgundy</span>
+            <span class="marquee-item">Tuscany</span>
+            <span class="marquee-item">Napa Valley</span>
+            <span class="marquee-item">Rioja</span>
+            <span class="marquee-item">Champagne</span>
+            <span class="marquee-item">Barossa</span>
+            <span class="marquee-item">Mosel</span>
+            <span class="marquee-item">Bordeaux</span>
+            <span class="marquee-item">Burgundy</span>
+            <span class="marquee-item">Tuscany</span>
+            <span class="marquee-item">Napa Valley</span>
+            <span class="marquee-item">Rioja</span>
+            <span class="marquee-item">Champagne</span>
+            <span class="marquee-item">Barossa</span>
+            <span class="marquee-item">Mosel</span>
         </div>
-        <div class="process-steps">
-            <div class="step">
-                <div class="step-number">I</div>
-                <h3>취향 분석</h3>
-                <p>간단한 테스트로 당신의 와인 취향을 파악합니다</p>
+    </div>
+
+    <section class="about" id="about">
+        <div class="float-bottle"></div>
+        <div class="about-grid">
+            <div class="about-left">
+                <span class="about-tag">Our Philosophy</span>
+                <h2 class="about-title">
+                    와인 선택,<br>더 이상 고민하지 마세요
+                    <em>Let us guide your palate</em>
+                </h2>
+                <p class="about-text">
+                    와인 코너 앞에서 어떤 걸 골라야 할지 막막했던 경험, 있으시죠?
+                    CELLAR는 그 고민을 대신해 드립니다. 전문 소믈리에가 200개 이상의
+                    와이너리에서 직접 테이스팅하고 선별한 와인만을 보내드려요.
+                    매달 새로운 발견과 함께, 당신만의 와인 취향을 찾아가는 여정이 시작됩니다.
+                </p>
             </div>
-            <div class="step">
-                <div class="step-number">II</div>
-                <h3>소믈리에 큐레이션</h3>
-                <p>전문 소믈리에가 취향에 맞는 와인을 선별합니다</p>
-            </div>
-            <div class="step">
-                <div class="step-number">III</div>
-                <h3>프리미엄 배송</h3>
-                <p>최적의 온도로 안전하게 문 앞까지 배송됩니다</p>
-            </div>
-            <div class="step">
-                <div class="step-number">IV</div>
-                <h3>테이스팅 노트</h3>
-                <p>와인 스토리와 페어링 가이드를 함께 제공합니다</p>
+            <div class="about-right">
+                <div class="about-stat">
+                    <div class="about-stat-value">200+</div>
+                    <div class="about-stat-label">Partner Wineries</div>
+                </div>
+                <div class="about-stat">
+                    <div class="about-stat-value">15</div>
+                    <div class="about-stat-label">Countries</div>
+                </div>
+                <div class="about-stat">
+                    <div class="about-stat-value">98%</div>
+                    <div class="about-stat-label">Satisfaction Rate</div>
+                </div>
             </div>
         </div>
     </section>
 
     <section class="plans" id="plans">
-        <div class="section-header">
-            <span class="section-tag">Subscription Plans</span>
-            <h2>구독 플랜</h2>
-            <p>당신의 라이프스타일에 맞는 플랜을 선택하세요</p>
+        <div class="plans-header">
+            <span class="about-tag">Subscription Plans</span>
+            <h2>당신에게 맞는 플랜</h2>
+            <p>언제든 변경하거나 취소할 수 있어요</p>
         </div>
         <div class="plans-grid">
             <div class="plan-card">
-                <div class="plan-icon">
-                    <svg viewBox="0 0 24 24" stroke-width="1">
-                        <path d="M8 22h8M12 22v-6M12 16c4 0 7-2.5 7-7V3H5v6c0 4.5 3 7 7 7z"/>
-                    </svg>
-                </div>
                 <h3 class="plan-name">Essential</h3>
-                <p class="plan-bottles">매월 2병</p>
+                <p class="plan-bottles">매달 2병</p>
                 <div class="plan-price">₩79,000</div>
-                <p class="plan-period">월</p>
+                <p class="plan-period">/ month</p>
                 <ul class="plan-features">
                     <li>소믈리에 큐레이션 와인 2병</li>
-                    <li>테이스팅 노트 제공</li>
+                    <li>테이스팅 노트 & 페어링 가이드</li>
                     <li>무료 배송</li>
-                    <li>언제든 구독 변경/취소</li>
+                    <li>언제든 취소 가능</li>
                 </ul>
-                <a href="#subscribe" class="plan-btn">선택하기</a>
+                <a href="#cta" class="plan-btn">선택하기</a>
             </div>
             <div class="plan-card featured">
-                <div class="plan-icon">
-                    <svg viewBox="0 0 24 24" stroke-width="1">
-                        <path d="M8 22h8M12 22v-6M12 16c4 0 7-2.5 7-7V3H5v6c0 4.5 3 7 7 7z"/>
-                    </svg>
-                </div>
                 <h3 class="plan-name">Connoisseur</h3>
-                <p class="plan-bottles">매월 4병</p>
+                <p class="plan-bottles">매달 4병</p>
                 <div class="plan-price">₩149,000</div>
-                <p class="plan-period">월</p>
+                <p class="plan-period">/ month</p>
                 <ul class="plan-features">
-                    <li>프리미엄 큐레이션 4병</li>
-                    <li>상세 테이스팅 노트</li>
+                    <li>프리미엄 셀렉션 4병</li>
                     <li>월간 온라인 테이스팅 클래스</li>
                     <li>소믈리에 1:1 상담</li>
                     <li>한정판 와인 우선 접근</li>
+                    <li>멤버 전용 이벤트 초대</li>
                 </ul>
-                <a href="#subscribe" class="plan-btn">선택하기</a>
+                <a href="#cta" class="plan-btn">선택하기</a>
             </div>
             <div class="plan-card">
-                <div class="plan-icon">
-                    <svg viewBox="0 0 24 24" stroke-width="1">
-                        <path d="M8 22h8M12 22v-6M12 16c4 0 7-2.5 7-7V3H5v6c0 4.5 3 7 7 7z"/>
-                    </svg>
-                </div>
                 <h3 class="plan-name">Collector</h3>
-                <p class="plan-bottles">매월 6병</p>
+                <p class="plan-bottles">매달 6병</p>
                 <div class="plan-price">₩249,000</div>
-                <p class="plan-period">월</p>
+                <p class="plan-period">/ month</p>
                 <ul class="plan-features">
                     <li>그랑크뤼급 포함 6병</li>
-                    <li>프라이빗 테이스팅 이벤트</li>
-                    <li>와이너리 투어 우선권</li>
+                    <li>프라이빗 와이너리 투어 기회</li>
                     <li>전용 셀러 보관 서비스</li>
                     <li>연간 멤버십 기프트</li>
+                    <li>VIP 컨시어지 서비스</li>
                 </ul>
-                <a href="#subscribe" class="plan-btn">선택하기</a>
+                <a href="#cta" class="plan-btn">선택하기</a>
             </div>
         </div>
     </section>
 
     <section class="selection" id="selection">
-        <div class="selection-grid">
-            <div class="selection-content">
-                <span class="section-tag">Wine Selection</span>
-                <h2>세계 각지의 엄선된 와인</h2>
-                <p>
-                    프랑스 보르도부터 이탈리아 토스카나, 미국 나파밸리까지.
-                    전 세계 200개 이상의 와이너리와 직접 파트너십을 맺고
-                    가장 뛰어난 빈티지만을 선별합니다.
-                </p>
-                <p>
-                    매달 새로운 테마와 함께 당신의 입맛을 넓혀드립니다.
-                    클래식한 선택부터 새로운 발견까지, 와인의 여정을 함께하세요.
-                </p>
-                <div class="wine-types">
-                    <div class="wine-type">
-                        <h4>레드 와인</h4>
-                        <p>까베르네, 피노누아, 시라 등</p>
-                    </div>
-                    <div class="wine-type">
-                        <h4>화이트 와인</h4>
-                        <p>샤르도네, 소비뇽 블랑, 리슬링</p>
-                    </div>
-                    <div class="wine-type">
-                        <h4>스파클링</h4>
-                        <p>샴페인, 프로세코, 크레망</p>
-                    </div>
-                    <div class="wine-type">
-                        <h4>내추럴 와인</h4>
-                        <p>오가닉 & 바이오다이나믹</p>
-                    </div>
-                </div>
+        <div class="selection-header">
+            <div>
+                <span class="about-tag">Wine Selection</span>
+                <h2>이번 달 셀렉션</h2>
             </div>
-            <div class="selection-visual">
-                <div class="wine-card" data-region="Bordeaux">
-                    <div class="wine-card-inner">Margaux</div>
-                </div>
-                <div class="wine-card" data-region="Tuscany">
-                    <div class="wine-card-inner">Chianti</div>
-                </div>
-                <div class="wine-card" data-region="Burgundy">
-                    <div class="wine-card-inner">Pinot</div>
-                </div>
-                <div class="wine-card" data-region="Napa Valley">
-                    <div class="wine-card-inner">Opus</div>
-                </div>
+            <div class="selection-nav">
+                <button>←</button>
+                <button>→</button>
             </div>
+        </div>
+        <div class="selection-track">
+            <article class="wine-card">
+                <div class="wine-card-image">
+                    <span class="wine-card-region">Bordeaux, France</span>
+                    <span class="wine-card-year">2019</span>
+                </div>
+                <div class="wine-card-info">
+                    <h3 class="wine-card-name">Château Margaux</h3>
+                    <p class="wine-card-type">Cabernet Sauvignon Blend</p>
+                    <div class="wine-card-notes">
+                        <span class="wine-card-note">Black Currant</span>
+                        <span class="wine-card-note">Cedar</span>
+                        <span class="wine-card-note">Full Body</span>
+                    </div>
+                </div>
+            </article>
+            <article class="wine-card">
+                <div class="wine-card-image">
+                    <span class="wine-card-region">Burgundy, France</span>
+                    <span class="wine-card-year">2020</span>
+                </div>
+                <div class="wine-card-info">
+                    <h3 class="wine-card-name">Domaine Leroy</h3>
+                    <p class="wine-card-type">Pinot Noir</p>
+                    <div class="wine-card-notes">
+                        <span class="wine-card-note">Cherry</span>
+                        <span class="wine-card-note">Earth</span>
+                        <span class="wine-card-note">Elegant</span>
+                    </div>
+                </div>
+            </article>
+            <article class="wine-card">
+                <div class="wine-card-image">
+                    <span class="wine-card-region">Tuscany, Italy</span>
+                    <span class="wine-card-year">2018</span>
+                </div>
+                <div class="wine-card-info">
+                    <h3 class="wine-card-name">Sassicaia</h3>
+                    <p class="wine-card-type">Super Tuscan</p>
+                    <div class="wine-card-notes">
+                        <span class="wine-card-note">Plum</span>
+                        <span class="wine-card-note">Leather</span>
+                        <span class="wine-card-note">Complex</span>
+                    </div>
+                </div>
+            </article>
+            <article class="wine-card">
+                <div class="wine-card-image">
+                    <span class="wine-card-region">Napa Valley, USA</span>
+                    <span class="wine-card-year">2019</span>
+                </div>
+                <div class="wine-card-info">
+                    <h3 class="wine-card-name">Opus One</h3>
+                    <p class="wine-card-type">Cabernet Sauvignon</p>
+                    <div class="wine-card-notes">
+                        <span class="wine-card-note">Blackberry</span>
+                        <span class="wine-card-note">Vanilla</span>
+                        <span class="wine-card-note">Rich</span>
+                    </div>
+                </div>
+            </article>
+            <article class="wine-card">
+                <div class="wine-card-image">
+                    <span class="wine-card-region">Bordeaux, France</span>
+                    <span class="wine-card-year">2019</span>
+                </div>
+                <div class="wine-card-info">
+                    <h3 class="wine-card-name">Château Margaux</h3>
+                    <p class="wine-card-type">Cabernet Sauvignon Blend</p>
+                    <div class="wine-card-notes">
+                        <span class="wine-card-note">Black Currant</span>
+                        <span class="wine-card-note">Cedar</span>
+                        <span class="wine-card-note">Full Body</span>
+                    </div>
+                </div>
+            </article>
+            <article class="wine-card">
+                <div class="wine-card-image">
+                    <span class="wine-card-region">Burgundy, France</span>
+                    <span class="wine-card-year">2020</span>
+                </div>
+                <div class="wine-card-info">
+                    <h3 class="wine-card-name">Domaine Leroy</h3>
+                    <p class="wine-card-type">Pinot Noir</p>
+                    <div class="wine-card-notes">
+                        <span class="wine-card-note">Cherry</span>
+                        <span class="wine-card-note">Earth</span>
+                        <span class="wine-card-note">Elegant</span>
+                    </div>
+                </div>
+            </article>
         </div>
     </section>
 
-    <section class="sommelier">
-        <div class="sommelier-content">
-            <div class="quote-mark">"</div>
-            <p class="sommelier-quote">
-                와인은 단순한 음료가 아닙니다. 그 한 잔에는 땅의 이야기,
-                시간의 흐름, 그리고 만든 이의 철학이 담겨 있습니다.
-                CELLAR는 그 특별한 순간을 당신의 일상으로 가져다 드립니다.
-            </p>
-            <p class="sommelier-name">김현우</p>
-            <p class="sommelier-title">Head Sommelier, CELLAR</p>
+    <section class="cta" id="cta">
+        <div class="cta-bg"></div>
+        <div class="cta-content">
+            <span class="about-tag">Start Today</span>
+            <h2>와인 여정을 시작하세요</h2>
+            <p>첫 구독 시 10% 할인과 함께 웰컴 기프트를 드려요</p>
+            <form class="cta-form" onsubmit="return false;">
+                <input type="email" class="cta-input" placeholder="이메일을 입력하세요">
+                <button type="submit" class="cta-btn">시작하기</button>
+            </form>
         </div>
-    </section>
-
-    <section class="cta-section" id="subscribe">
-        <span class="section-tag">Join CELLAR</span>
-        <h2>와인 여정을 시작하세요</h2>
-        <p>
-            첫 구독 시 특별 할인과 함께 환영 기프트를 드립니다.
-            언제든 취소 가능합니다.
-        </p>
-        <form class="cta-form" onsubmit="return false;">
-            <input type="email" class="cta-input" placeholder="이메일을 입력하세요">
-            <button type="submit" class="cta-btn">시작하기</button>
-        </form>
     </section>
 
     <footer>
-        <div class="footer-content">
-            <div class="footer-brand">
-                <a href="#" class="logo">CELLAR</a>
-                <p>소믈리에가 큐레이션하는 프리미엄 와인 구독 서비스</p>
-            </div>
-            <div class="footer-column">
-                <h4>서비스</h4>
-                <a href="#">구독 플랜</a>
-                <a href="#">기프트 카드</a>
-                <a href="#">기업 선물</a>
-            </div>
-            <div class="footer-column">
-                <h4>고객지원</h4>
-                <a href="#">자주 묻는 질문</a>
-                <a href="#">배송 안내</a>
-                <a href="#">문의하기</a>
-            </div>
-            <div class="footer-column">
-                <h4>소셜</h4>
-                <a href="#">Instagram</a>
-                <a href="#">YouTube</a>
-                <a href="#">Blog</a>
-            </div>
+        <span class="footer-logo">CELLAR</span>
+        <div class="footer-links">
+            <a href="#">이용약관</a>
+            <a href="#">개인정보처리방침</a>
+            <a href="#">Instagram</a>
         </div>
-        <div class="footer-bottom">
-            <span class="footer-copy">© 2024 CELLAR. All rights reserved.</span>
-            <span class="age-notice">19세 미만 구매 불가</span>
-        </div>
+        <span class="footer-age">19세 미만 구매불가</span>
     </footer>
 
     <script>
-        // Nav scroll effect
-        window.addEventListener('scroll', () => {
-            document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 50);
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorDot = document.querySelector('.cursor-dot');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX - 10 + 'px';
+            cursor.style.top = e.clientY - 10 + 'px';
+            cursorDot.style.left = e.clientX - 2 + 'px';
+            cursorDot.style.top = e.clientY - 2 + 'px';
         });
 
-        // Form submission
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // Form
         document.querySelector('.cta-btn').addEventListener('click', () => {
-            alert('감사합니다!\n곧 이메일로 안내를 보내드리겠습니다.');
+            alert('감사합니다! 곧 안내 메일을 보내드릴게요.');
         });
     </script>
 </body>
