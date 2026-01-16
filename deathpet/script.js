@@ -368,7 +368,7 @@
             btn.addEventListener('click', () => {
                 const platform = btn.dataset.platform;
                 const url = window.location.href;
-                const text = '이거 보고 잠 못잤다... 끝까지 스크롤 해봐';
+                const text = '끝까지 스크롤해봐';
 
                 if (platform === 'twitter') {
                     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
