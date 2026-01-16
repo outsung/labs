@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMMUNE — Private Gathering Space</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Syne:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --dark: #111111;
+            --charcoal: #1A1A1A;
+            --graphite: #2A2A2A;
+            --silver: #888888;
+            --light: #E5E5E5;
+            --white: #FAFAFA;
+            --accent: #C9A962;
+            --accent-dim: rgba(201, 169, 98, 0.3);
+            --purple: #6B5B95;
+            --wine: #722F37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--black);
+            color: var(--light);
+            font-weight: 300;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        /* Grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(10,10,10,0.9) 0%, transparent 100%);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.4em;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--silver);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-cta {
+            padding: 0.7rem 1.8rem;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(107, 91, 149, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(201, 169, 98, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(114, 47, 55, 0.15) 0%, transparent 50%),
+                var(--black);
+        }
+
+        .hero-lines {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            opacity: 0.1;
+        }
+
+        .hero-line {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            animation: linePulse 4s ease-in-out infinite;
+        }
+
+        .hero-line:nth-child(1) { left: 20%; animation-delay: 0s; }
+        .hero-line:nth-child(2) { left: 40%; animation-delay: 1s; }
+        .hero-line:nth-child(3) { left: 60%; animation-delay: 2s; }
+        .hero-line:nth-child(4) { left: 80%; animation-delay: 3s; }
+
+        @keyframes linePulse {
+            0%, 100% { opacity: 0.1; transform: scaleY(0.5); }
+            50% { opacity: 0.3; transform: scaleY(1); }
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 1;
+            padding: 2rem;
+        }
+
+        .hero-tag {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.3s forwards;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3.5rem, 10vw, 8rem);
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.5s forwards;
+        }
+
+        .hero-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--silver);
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.7s forwards;
+        }
+
+        .hero-desc {
+            font-size: 0.95rem;
+            color: var(--silver);
+            max-width: 500px;
+            margin: 0 auto 3rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.9s forwards;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 1.2rem 3.5rem;
+            background: var(--accent);
+            color: var(--black);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            opacity: 0;
+            animation: fadeUp 1s ease 1.1s forwards;
+        }
+
+        .hero-cta:hover {
+            background: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(201, 169, 98, 0.3);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: var(--silver);
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .scroll-hint::after {
+            content: '';
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.5); opacity: 0.5; }
+        }
+
+        /* About */
+        .about {
+            padding: 10rem 4rem;
+            background: var(--dark);
+            position: relative;
+        }
+
+        .about-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8rem;
+            align-items: center;
+        }
+
+        .about-content {
+            padding-right: 2rem;
+        }
+
+        .section-tag {
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .about h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 400;
+            color: var(--white);
+            margin-bottom: 2rem;
+            line-height: 1.3;
+        }
+
+        .about p {
+            color: var(--silver);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .about-visual {
+            position: relative;
+            aspect-ratio: 4/5;
+        }
+
+        .about-image {
+            width: 100%;
+            height: 100%;
+            background: var(--charcoal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(135deg, var(--purple) 0%, transparent 50%),
+                linear-gradient(225deg, var(--wine) 0%, transparent 50%);
+            opacity: 0.5;
+        }
+
+        .about-image::after {
+            content: 'COMMUNE';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-style: italic;
+            color: var(--white);
+            opacity: 0.1;
+            letter-spacing: 0.3em;
+        }
+
+        .about-frame {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            right: -2rem;
+            bottom: -2rem;
+            border: 1px solid var(--accent-dim);
+            z-index: -1;
+        }
+
+        /* Features */
+        .features {
+            padding: 10rem 4rem;
+            background: var(--black);
+        }
+
+        .features-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 6rem;
+        }
+
+        .features-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        .features-header p {
+            color: var(--silver);
+            font-size: 0.95rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--charcoal);
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--purple));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: var(--graphite);
+        }
+
+        .feature-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-style: italic;
+            color: var(--accent-dim);
+            line-height: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: var(--silver);
+            line-height: 1.8;
+        }
+
+        /* Spaces */
+        .spaces {
+            padding: 10rem 4rem;
+            background: var(--dark);
+        }
+
+        .spaces-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            max-width: 1400px;
+            margin: 0 auto 5rem;
+        }
+
+        .spaces-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--white);
+        }
+
+        .spaces-link {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: gap 0.3s ease;
+        }
+
+        .spaces-link:hover {
+            gap: 1.5rem;
+        }
+
+        .spaces-link-line {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .spaces-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .space-card {
+            position: relative;
+            aspect-ratio: 16/10;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .space-bg {
+            position: absolute;
+            inset: 0;
+            background: var(--charcoal);
+            transition: transform 0.6s ease;
+        }
+
+        .space-card:nth-child(1) .space-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .space-card:nth-child(2) .space-bg {
+            background: linear-gradient(135deg, #2d132c 0%, #1a1a2e 100%);
+        }
+
+        .space-card:nth-child(3) .space-bg {
+            background: linear-gradient(135deg, #1e3d59 0%, #1a1a2e 100%);
+        }
+
+        .space-card:nth-child(4) .space-bg {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%);
+        }
+
+        .space-card:hover .space-bg {
+            transform: scale(1.05);
+        }
+
+        .space-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.4);
+            transition: background 0.4s ease;
+        }
+
+        .space-card:hover .space-overlay {
+            background: rgba(10, 10, 10, 0.2);
+        }
+
+        .space-content {
+            position: absolute;
+            inset: 0;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            z-index: 1;
+        }
+
+        .space-tag {
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.8rem;
+        }
+
+        .space-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .space-info {
+            font-size: 0.8rem;
+            color: var(--silver);
+            margin-bottom: 1.5rem;
+        }
+
+        .space-details {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .space-detail {
+            font-size: 0.7rem;
+            color: var(--silver);
+        }
+
+        .space-detail span {
+            color: var(--white);
+            font-weight: 500;
+        }
+
+        /* Upcoming */
+        .upcoming {
+            padding: 10rem 4rem;
+            background: var(--black);
+        }
+
+        .upcoming-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 5rem;
+        }
+
+        .upcoming-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        .events-list {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .event-item {
+            display: grid;
+            grid-template-columns: 120px 1fr auto;
+            gap: 3rem;
+            padding: 2.5rem 0;
+            border-bottom: 1px solid var(--charcoal);
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .event-item:hover {
+            padding-left: 1rem;
+            border-color: var(--accent-dim);
+        }
+
+        .event-date {
+            text-align: center;
+        }
+
+        .event-day {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--white);
+            line-height: 1;
+        }
+
+        .event-month {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .event-info h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .event-info p {
+            font-size: 0.85rem;
+            color: var(--silver);
+        }
+
+        .event-meta {
+            text-align: right;
+        }
+
+        .event-spots {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.3rem;
+        }
+
+        .event-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--white);
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 10rem 4rem;
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(201, 169, 98, 0.1) 0%, transparent 60%),
+                var(--dark);
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            color: var(--silver);
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto 3rem;
+        }
+
+        .cta-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            gap: 1rem;
+        }
+
+        .cta-input {
+            flex: 1;
+            background: var(--charcoal);
+            border: 1px solid var(--graphite);
+            padding: 1rem 1.5rem;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.9rem;
+            color: var(--white);
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .cta-input::placeholder {
+            color: var(--silver);
+        }
+
+        .cta-input:focus {
+            border-color: var(--accent);
+        }
+
+        .cta-btn {
+            background: var(--accent);
+            border: none;
+            padding: 1rem 2.5rem;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--black);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cta-btn:hover {
+            background: var(--white);
+        }
+
+        /* Contact */
+        .contact {
+            padding: 8rem 4rem;
+            background: var(--charcoal);
+        }
+
+        .contact-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-block h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-block p {
+            font-size: 0.9rem;
+            color: var(--silver);
+            line-height: 2;
+        }
+
+        .contact-block a {
+            color: var(--silver);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-block a:hover {
+            color: var(--accent);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            border: 1px solid var(--graphite);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--silver);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem 4rem;
+            background: var(--black);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--charcoal);
+        }
+
+        .footer-logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: var(--white);
+        }
+
+        .footer-copy {
+            font-size: 0.7rem;
+            color: var(--silver);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            font-size: 0.7rem;
+            color: var(--silver);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .spaces-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                letter-spacing: 0.1em;
+            }
+
+            .about,
+            .features,
+            .spaces,
+            .upcoming,
+            .cta-section,
+            .contact {
+                padding: 6rem 2rem;
+            }
+
+            .event-item {
+                grid-template-columns: 80px 1fr;
+                gap: 1.5rem;
+            }
+
+            .event-meta {
+                grid-column: 2;
+                text-align: left;
+            }
+
+            .cta-form {
+                flex-direction: column;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .footer-links {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo">COMMUNE</a>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#spaces">Spaces</a></li>
+            <li><a href="#events">Events</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <a href="#reserve" class="nav-cta">Reserve</a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-lines">
+            <div class="hero-line"></div>
+            <div class="hero-line"></div>
+            <div class="hero-line"></div>
+            <div class="hero-line"></div>
+        </div>
+        <div class="hero-content">
+            <span class="hero-tag">Private Gathering Space</span>
+            <h1>COMMUNE</h1>
+            <p class="hero-subtitle">Where Like-Minds Converge</p>
+            <p class="hero-desc">
+                취향과 감각이 통하는 사람들을 위한 프라이빗 공간.
+                음악, 대화, 그리고 특별한 순간을 공유하세요.
+            </p>
+            <a href="#spaces" class="hero-cta">Explore Spaces</a>
+        </div>
+        <div class="scroll-hint">Scroll</div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="about-grid">
+            <div class="about-content">
+                <span class="section-tag">Our Philosophy</span>
+                <h2>진정한 연결이 만들어지는 공간</h2>
+                <p>
+                    COMMUNE은 단순한 공간 대여 서비스가 아닙니다.
+                    우리는 취향이 맞는 사람들이 모여 진정한 교감을 나눌 수 있는
+                    특별한 순간을 큐레이션합니다.
+                </p>
+                <p>
+                    각 공간은 고유한 분위기와 사운드 시스템을 갖추고 있으며,
+                    프라이빗한 환경에서 음악을 즐기고, 깊은 대화를 나누고,
+                    새로운 영감을 얻을 수 있습니다.
+                </p>
+                <p>
+                    멤버십 기반의 운영으로 진정으로 공간의 가치를 이해하는
+                    분들만 함께합니다.
+                </p>
+            </div>
+            <div class="about-visual">
+                <div class="about-image"></div>
+                <div class="about-frame"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="features-header">
+            <span class="section-tag">Why Commune</span>
+            <h2>특별한 경험</h2>
+            <p>평범한 모임을 비범한 순간으로 만들어 드립니다</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-number">01</div>
+                <h3 class="feature-title">Curated Spaces</h3>
+                <p class="feature-desc">
+                    각 공간은 독특한 컨셉과 분위기를 가지고 있습니다.
+                    재즈 라운지부터 일렉트로닉 스튜디오까지,
+                    당신의 취향에 맞는 공간을 선택하세요.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-number">02</div>
+                <h3 class="feature-title">Premium Sound</h3>
+                <p class="feature-desc">
+                    하이엔드 오디오 시스템과 음향 설계로
+                    최상의 사운드 경험을 제공합니다.
+                    음악을 제대로 느끼실 수 있습니다.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-number">03</div>
+                <h3 class="feature-title">Private & Intimate</h3>
+                <p class="feature-desc">
+                    완벽한 프라이버시가 보장되는 공간에서
+                    방해받지 않고 온전히 모임에 집중할 수 있습니다.
+                    당신만의 시간을 만끽하세요.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="spaces" id="spaces">
+        <div class="spaces-header">
+            <div>
+                <span class="section-tag">Our Spaces</span>
+                <h2>큐레이션 스페이스</h2>
+            </div>
+            <a href="#" class="spaces-link">
+                View All
+                <span class="spaces-link-line"></span>
+            </a>
+        </div>
+        <div class="spaces-grid">
+            <article class="space-card">
+                <div class="space-bg"></div>
+                <div class="space-overlay"></div>
+                <div class="space-content">
+                    <span class="space-tag">Jazz & Vinyl</span>
+                    <h3 class="space-name">Midnight Blue</h3>
+                    <p class="space-info">재즈와 바이닐 컬렉션이 있는 아늑한 라운지</p>
+                    <div class="space-details">
+                        <span class="space-detail"><span>8명</span> 수용</span>
+                        <span class="space-detail"><span>성수동</span></span>
+                        <span class="space-detail"><span>₩150,000</span> / 3h</span>
+                    </div>
+                </div>
+            </article>
+            <article class="space-card">
+                <div class="space-bg"></div>
+                <div class="space-overlay"></div>
+                <div class="space-content">
+                    <span class="space-tag">Electronic</span>
+                    <h3 class="space-name">Pulse Room</h3>
+                    <p class="space-info">프로페셔널 DJ 장비와 사운드 시스템</p>
+                    <div class="space-details">
+                        <span class="space-detail"><span>15명</span> 수용</span>
+                        <span class="space-detail"><span>한남동</span></span>
+                        <span class="space-detail"><span>₩250,000</span> / 3h</span>
+                    </div>
+                </div>
+            </article>
+            <article class="space-card">
+                <div class="space-bg"></div>
+                <div class="space-overlay"></div>
+                <div class="space-content">
+                    <span class="space-tag">Acoustic</span>
+                    <h3 class="space-name">The Attic</h3>
+                    <p class="space-info">어쿠스틱 공연과 친밀한 모임을 위한 공간</p>
+                    <div class="space-details">
+                        <span class="space-detail"><span>12명</span> 수용</span>
+                        <span class="space-detail"><span>연남동</span></span>
+                        <span class="space-detail"><span>₩180,000</span> / 3h</span>
+                    </div>
+                </div>
+            </article>
+            <article class="space-card">
+                <div class="space-bg"></div>
+                <div class="space-overlay"></div>
+                <div class="space-content">
+                    <span class="space-tag">Listening Bar</span>
+                    <h3 class="space-name">Analog</h3>
+                    <p class="space-info">빈티지 오디오와 위스키 바</p>
+                    <div class="space-details">
+                        <span class="space-detail"><span>6명</span> 수용</span>
+                        <span class="space-detail"><span>이태원</span></span>
+                        <span class="space-detail"><span>₩200,000</span> / 3h</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="upcoming" id="events">
+        <div class="upcoming-header">
+            <span class="section-tag">Upcoming</span>
+            <h2>예정된 모임</h2>
+        </div>
+        <div class="events-list">
+            <div class="event-item">
+                <div class="event-date">
+                    <div class="event-day">24</div>
+                    <div class="event-month">Jan</div>
+                </div>
+                <div class="event-info">
+                    <h3>Vinyl Night: Jazz Standards</h3>
+                    <p>Midnight Blue · 재즈 바이닐 리스닝 세션</p>
+                </div>
+                <div class="event-meta">
+                    <div class="event-spots">4 spots left</div>
+                    <div class="event-price">₩45,000</div>
+                </div>
+            </div>
+            <div class="event-item">
+                <div class="event-date">
+                    <div class="event-day">31</div>
+                    <div class="event-month">Jan</div>
+                </div>
+                <div class="event-info">
+                    <h3>Deep House Session</h3>
+                    <p>Pulse Room · 게스트 DJ와 함께하는 밤</p>
+                </div>
+                <div class="event-meta">
+                    <div class="event-spots">8 spots left</div>
+                    <div class="event-price">₩55,000</div>
+                </div>
+            </div>
+            <div class="event-item">
+                <div class="event-date">
+                    <div class="event-day">07</div>
+                    <div class="event-month">Feb</div>
+                </div>
+                <div class="event-info">
+                    <h3>Whiskey & Conversation</h3>
+                    <p>Analog · 싱글몰트 테이스팅과 깊은 대화</p>
+                </div>
+                <div class="event-meta">
+                    <div class="event-spots">2 spots left</div>
+                    <div class="event-price">₩80,000</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section" id="reserve">
+        <span class="section-tag">Join Us</span>
+        <h2>당신만의 모임을 시작하세요</h2>
+        <p>
+            멤버가 되시면 모든 공간 예약과 프라이빗 이벤트 참여가 가능합니다.
+            대기자 명단에 등록해 주세요.
+        </p>
+        <form class="cta-form" onsubmit="return false;">
+            <input type="email" class="cta-input" placeholder="이메일을 입력하세요">
+            <button type="submit" class="cta-btn">Join Waitlist</button>
+        </form>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="contact-grid">
+            <div class="contact-block">
+                <h3>Location</h3>
+                <p>
+                    서울특별시 성동구<br>
+                    성수이로 88, 3층<br>
+                    (방문은 예약제로 운영)
+                </p>
+            </div>
+            <div class="contact-block">
+                <h3>Contact</h3>
+                <p>
+                    <a href="mailto:hello@commune.kr">hello@commune.kr</a><br>
+                    <a href="tel:02-1234-5678">02-1234-5678</a><br>
+                    화—일 18:00—02:00
+                </p>
+            </div>
+            <div class="contact-block">
+                <h3>Follow</h3>
+                <div class="social-links">
+                    <a href="#" class="social-link">IG</a>
+                    <a href="#" class="social-link">TW</a>
+                    <a href="#" class="social-link">YT</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logo">COMMUNE</div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Membership</a>
+        </div>
+        <span class="footer-copy">© 2024 Commune. All rights reserved.</span>
+    </footer>
+
+    <script>
+        // Smooth reveal on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .space-card, .event-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Nav background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(10, 10, 10, 0.95)';
+                nav.style.backdropFilter = 'blur(20px)';
+            } else {
+                nav.style.background = 'linear-gradient(to bottom, rgba(10,10,10,0.9) 0%, transparent 100%)';
+                nav.style.backdropFilter = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
