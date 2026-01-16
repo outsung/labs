@@ -1,11 +1,4 @@
-/* ============================================
-   DEATHPET - Analog Horror / VHS Aesthetic
-   ============================================ */
-
-@font-face {
-    font-family: 'Pixel';
-    src: local('VT323');
-}
+/* DEATHPET - Dialogue-focused VHS Horror */
 
 :root {
     --bg: #0a0a0a;
@@ -13,16 +6,14 @@
     --screen-glow: #3d5a1f;
     --pixel-on: #8bac0f;
     --pixel-off: #0f380f;
-    --text: #c8c8c8;
-    --text-dim: #5a5a5a;
+    --text: #e0e0e0;
+    --text-dim: #666;
     --error: #ff3333;
-    --vhs-blue: #0055aa;
 
-    --font-main: 'VT323', monospace;
-    --font-mono: 'Share Tech Mono', monospace;
+    --font-pixel: 'VT323', monospace;
+    --font-korean: 'Noto Sans KR', sans-serif;
 }
 
-/* Reset */
 *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -31,21 +22,16 @@
 
 html {
     font-size: 16px;
-    scroll-behavior: auto;
 }
 
 body {
-    font-family: var(--font-main);
+    font-family: var(--font-korean);
     background: var(--bg);
     color: var(--text);
     overflow-x: hidden;
-    cursor: default;
 }
 
-/* ============================================
-   VHS / CRT OVERLAY EFFECTS
-   ============================================ */
-
+/* VHS Overlays */
 .crt-overlay {
     position: fixed;
     top: 0;
@@ -54,29 +40,7 @@ body {
     height: 100%;
     pointer-events: none;
     z-index: 1000;
-    background:
-        radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 90%, rgba(0,0,0,0.6) 100%);
-}
-
-.crt-overlay::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        to bottom,
-        transparent 50%,
-        rgba(0, 0, 0, 0.1) 51%
-    );
-    background-size: 100% 4px;
-    animation: crt-flicker 0.1s infinite;
-}
-
-@keyframes crt-flicker {
-    0%, 100% { opacity: 0.95; }
-    50% { opacity: 1; }
+    background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%);
 }
 
 .scanlines {
@@ -89,8 +53,8 @@ body {
     z-index: 999;
     background: repeating-linear-gradient(
         0deg,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.15) 1px,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
         transparent 1px,
         transparent 2px
     );
@@ -104,14 +68,13 @@ body {
     height: 100%;
     pointer-events: none;
     z-index: 998;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E");
     animation: noise-move 0.5s steps(10) infinite;
 }
 
 @keyframes noise-move {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(-10%, -10%); }
+    to { transform: translate(-10%, -10%); }
 }
 
 .vignette {
@@ -122,36 +85,7 @@ body {
     height: 100%;
     pointer-events: none;
     z-index: 997;
-    box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
-}
-
-/* Tracking Error */
-.tracking-error {
-    position: fixed;
-    left: 0;
-    width: 100%;
-    height: 30px;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,0.1) 20%,
-        rgba(0,100,200,0.2) 40%,
-        rgba(255,0,0,0.1) 60%,
-        transparent
-    );
-    z-index: 1001;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-100%);
-}
-
-.tracking-error.active {
-    animation: tracking-glitch 0.1s linear;
-}
-
-@keyframes tracking-glitch {
-    0% { opacity: 1; top: 0; }
-    100% { opacity: 0; top: 100%; }
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.9);
 }
 
 /* Timestamp */
@@ -159,7 +93,7 @@ body {
     position: fixed;
     bottom: 30px;
     right: 30px;
-    font-family: var(--font-mono);
+    font-family: var(--font-pixel);
     font-size: 1.2rem;
     color: var(--text);
     z-index: 100;
@@ -171,7 +105,6 @@ body {
 
 .rec {
     color: #ff3333;
-    font-weight: bold;
 }
 
 .rec-dot {
@@ -179,18 +112,19 @@ body {
     height: 10px;
     background: #ff3333;
     border-radius: 50%;
-    animation: rec-blink 1s ease-in-out infinite;
+    animation: blink 1s infinite;
 }
 
-@keyframes rec-blink {
+@keyframes blink {
     0%, 50%, 100% { opacity: 1; }
     25%, 75% { opacity: 0.3; }
 }
 
-/* ============================================
-   SCENE LAYOUT
-   ============================================ */
+.tracking-error {
+    display: none;
+}
 
+/* Scene Layout */
 .tape {
     width: 100%;
 }
@@ -200,359 +134,127 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
 }
 
 .scene-inner {
     text-align: center;
     padding: 2rem;
-    max-width: 600px;
-    width: 100%;
 }
 
-/* ============================================
-   SCENE 1: BOOT SEQUENCE
-   ============================================ */
-
+/* Boot */
 .boot-sequence {
-    text-align: left;
-    background: #000;
-    padding: 2rem;
-    border: 1px solid #333;
+    font-family: var(--font-pixel);
     font-size: 1.4rem;
-    max-width: 400px;
-    margin: 0 auto;
+    color: var(--pixel-on);
+    text-align: left;
+    max-width: 300px;
 }
 
 .boot-line {
-    opacity: 0;
     margin-bottom: 0.5rem;
-    color: var(--pixel-on);
-    animation: boot-appear 0.1s ease forwards;
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
 }
 
 .boot-line:nth-child(1) { animation-delay: 0.5s; }
 .boot-line:nth-child(2) { animation-delay: 1s; }
-.boot-line:nth-child(3) { animation-delay: 1.5s; }
-.boot-line:nth-child(4) { animation-delay: 2s; }
-.boot-line:nth-child(6) { animation-delay: 4s; }
-
-@keyframes boot-appear {
-    to { opacity: 1; }
-}
 
 .loading-bar {
     width: 100%;
-    height: 20px;
+    height: 16px;
     background: var(--pixel-off);
-    margin: 1rem 0;
+    margin-top: 1rem;
     opacity: 0;
-    animation: boot-appear 0.1s ease 2.5s forwards;
+    animation: fadeIn 0.3s ease 1.5s forwards;
 }
 
 .loading-fill {
     height: 100%;
     width: 0%;
     background: var(--pixel-on);
-    animation: loading 1.5s steps(10) 2.5s forwards;
+    animation: load 1s steps(10) 1.5s forwards;
 }
 
-@keyframes loading {
+@keyframes load {
     to { width: 100%; }
 }
 
-.blink {
-    animation: boot-appear 0.1s ease 4s forwards, blink-text 1s steps(1) infinite 4s;
+@keyframes fadeIn {
+    to { opacity: 1; }
 }
 
-@keyframes blink-text {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-}
-
-/* ============================================
-   TAMAGOTCHI DEVICE
-   ============================================ */
-
-.tamagotchi-device {
-    display: inline-block;
-    margin-bottom: 2rem;
-}
-
-.device-shell {
-    background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
-    padding: 20px;
-    border-radius: 30px 30px 50px 50px;
-    box-shadow:
-        0 10px 30px rgba(0,0,0,0.8),
-        inset 0 2px 0 rgba(255,255,255,0.1);
-    position: relative;
-}
-
-.device-shell::before {
-    content: '';
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 8px;
-    background: #222;
-    border-radius: 4px;
-}
-
-.device-screen {
-    width: 160px;
-    height: 140px;
-    background: var(--screen-bg);
-    border: 4px solid #1a1a1a;
-    border-radius: 8px;
+/* Dialogue Frame */
+.dialogue-frame {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    position: relative;
-    box-shadow:
-        inset 0 0 30px rgba(0,0,0,0.5),
-        0 0 10px var(--screen-glow);
+    gap: 2rem;
 }
 
-.device-screen::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%);
-    pointer-events: none;
+.dialogue-frame.corrupted {
+    filter: saturate(0.3);
 }
 
-.device-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.device-buttons .btn {
-    width: 20px;
-    height: 20px;
-    background: #1a1a1a;
-    border-radius: 50%;
-    box-shadow: inset 0 -2px 0 rgba(255,255,255,0.1);
-}
-
-/* Device States */
-.device-shell.dusty {
-    filter: sepia(0.3) brightness(0.7);
-}
-
-.device-shell.dusty::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.8'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
-    pointer-events: none;
-    border-radius: 30px 30px 50px 50px;
-}
-
-.device-screen.dim {
-    filter: brightness(0.5);
-}
-
-.device-screen.static-bg {
-    animation: static-flicker 0.1s steps(2) infinite;
-}
-
-@keyframes static-flicker {
-    0% { filter: brightness(1); }
-    50% { filter: brightness(0.9) contrast(1.1); }
-}
-
-/* ============================================
-   PIXEL ART PET
-   ============================================ */
-
+/* Pixel Canvas */
 .pixel-canvas {
-    width: 80px;
-    height: 80px;
+    width: 96px;
+    height: 96px;
     display: grid;
     grid-template-columns: repeat(16, 1fr);
     grid-template-rows: repeat(16, 1fr);
     image-rendering: pixelated;
-}
-
-.pixel-canvas.large {
-    width: 200px;
-    height: 200px;
+    opacity: 0.8;
 }
 
 .pixel {
     background: var(--pixel-off);
-    transition: background 0.1s;
 }
 
 .pixel.on {
     background: var(--pixel-on);
 }
 
-.pixel.glitch {
-    animation: pixel-glitch 0.2s steps(1) infinite;
-}
-
-@keyframes pixel-glitch {
-    0%, 100% { background: var(--pixel-on); }
-    25% { background: var(--error); }
-    50% { background: var(--pixel-off); }
-    75% { background: #00ffff; }
-}
-
-/* Glitching Canvas */
 .pixel-canvas.glitching {
-    animation: canvas-glitch 0.3s steps(1) infinite;
+    animation: glitch 0.2s steps(1) infinite;
 }
 
-@keyframes canvas-glitch {
+@keyframes glitch {
     0%, 100% { transform: translate(0); filter: none; }
     20% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
-    40% { transform: translate(2px, -1px); }
-    60% { transform: translate(-1px, -2px); filter: hue-rotate(-90deg); }
-    80% { transform: translate(1px, 2px); }
+    40% { transform: translate(2px, -1px); filter: invert(1); }
+    60% { transform: translate(-1px, -1px); filter: hue-rotate(-90deg); }
+    80% { transform: translate(1px, 1px); }
 }
 
-/* Screen Text */
-.screen-text {
-    font-family: var(--font-main);
-    font-size: 0.9rem;
-    color: var(--pixel-on);
-    margin-top: 10px;
-    text-transform: uppercase;
-}
-
-.blink-slow {
-    animation: blink-text 2s steps(1) infinite;
-}
-
-/* Status Icons */
-.status-icons {
-    display: flex;
-    gap: 5px;
-    margin-top: 8px;
-}
-
-.heart {
-    width: 12px;
-    height: 12px;
-    position: relative;
-}
-
-.heart::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: var(--pixel-on);
-    clip-path: polygon(50% 100%, 0% 35%, 25% 0%, 50% 20%, 75% 0%, 100% 35%);
-}
-
-.heart.empty::before {
-    background: var(--pixel-off);
-    border: 1px solid var(--pixel-on);
-    clip-path: none;
-}
-
-/* ============================================
-   CAPTIONS & TEXT
-   ============================================ */
-
-.caption {
+/* Dialogue Text */
+.dialogue {
+    font-family: var(--font-korean);
     font-size: 1.4rem;
-    line-height: 2;
-    color: var(--text-dim);
-}
-
-.caption p {
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    line-height: 1.8;
     opacity: 0;
-    animation: fade-in 1s ease forwards;
+    animation: fadeIn 1s ease 0.3s forwards;
 }
 
-.caption p:nth-child(2) { animation-delay: 0.5s; }
-.caption p:nth-child(3) { animation-delay: 1s; }
-
-.caption .sub {
-    font-size: 1.1rem;
-    color: var(--text-dim);
+.dialogue.final {
+    font-weight: 400;
 }
 
-.caption .happy {
-    color: var(--pixel-on);
+/* Dark Scenes */
+.scene-dark {
+    background: #000;
 }
 
-/* Single Line Text */
-.single-line {
-    font-size: 1.5rem;
-    color: var(--text-dim);
-    margin-top: 2rem;
-    opacity: 0;
-    animation: fade-in 1.5s ease 0.5s forwards;
-}
-
-.single-line.whisper {
-    font-size: 1.3rem;
-    color: var(--error);
-    letter-spacing: 0.05em;
-}
-
-@keyframes fade-in {
-    to { opacity: 1; }
-}
-
-/* Date Scroll */
-.date-scroll {
-    margin-bottom: 2rem;
-}
-
-.date-item {
-    font-family: var(--font-mono);
+.time-skip {
+    font-family: var(--font-pixel);
     font-size: 2rem;
     color: var(--text-dim);
-    margin: 0.5rem 0;
-    opacity: 0;
-    animation: date-appear 0.5s ease forwards;
+    letter-spacing: 0.1em;
 }
 
-.date-item:nth-child(1) { animation-delay: 0.2s; }
-.date-item:nth-child(2) { animation-delay: 0.6s; }
-.date-item:nth-child(3) { animation-delay: 1.0s; }
-.date-item:nth-child(4) { animation-delay: 1.4s; }
-.date-item:nth-child(5) { animation-delay: 1.8s; }
-
-@keyframes date-appear {
-    0% { opacity: 0; transform: translateY(-10px); }
-    100% { opacity: 0.5; transform: translateY(0); }
-}
-
-/* Year Display */
-.year-display {
-    margin-bottom: 2rem;
-}
-
-.big-year {
-    font-family: var(--font-mono);
-    font-size: 6rem;
-    font-weight: bold;
-    color: var(--text);
-    letter-spacing: 0.2em;
-}
-
-/* ============================================
-   GLITCH TEXT EFFECT
-   ============================================ */
-
+/* Glitch Text */
 .glitch-text {
     position: relative;
 }
@@ -564,274 +266,58 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
     opacity: 0.8;
 }
 
 .glitch-text::before {
     color: #ff0000;
-    animation: glitch-1 0.3s infinite;
+    animation: glitch-text 0.3s infinite;
     clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
 }
 
 .glitch-text::after {
     color: #00ffff;
-    animation: glitch-2 0.3s infinite;
+    animation: glitch-text 0.3s infinite reverse;
     clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
 }
 
-@keyframes glitch-1 {
+@keyframes glitch-text {
     0%, 100% { transform: translate(0); }
-    20% { transform: translate(-3px, 2px); }
-    40% { transform: translate(3px, -2px); }
-    60% { transform: translate(-2px, -1px); }
-    80% { transform: translate(2px, 1px); }
+    20% { transform: translate(-2px, 1px); }
+    40% { transform: translate(2px, -1px); }
+    60% { transform: translate(-1px, -1px); }
+    80% { transform: translate(1px, 1px); }
 }
 
-@keyframes glitch-2 {
-    0%, 100% { transform: translate(0); }
-    20% { transform: translate(3px, -2px); }
-    40% { transform: translate(-3px, 2px); }
-    60% { transform: translate(2px, 1px); }
-    80% { transform: translate(-2px, -1px); }
-}
-
-/* ============================================
-   TERMINAL WINDOW
-   ============================================ */
-
-.terminal-window {
-    background: #0a0a0a;
-    border: 1px solid #333;
-    border-radius: 4px;
-    max-width: 450px;
-    margin: 0 auto;
-    text-align: left;
-    overflow: hidden;
-}
-
-.terminal-header {
-    background: #1a1a1a;
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    color: var(--text-dim);
-    border-bottom: 1px solid #333;
-}
-
-.terminal-body {
-    padding: 1rem;
-    font-family: var(--font-mono);
-    font-size: 1rem;
-    line-height: 1.8;
-}
-
-.term-line {
-    opacity: 0;
-    color: var(--pixel-on);
-}
-
-.term-line.visible {
-    opacity: 1;
-}
-
-.term-line .error-text {
-    color: var(--error);
-}
-
-.term-line.msg {
-    color: var(--text);
-    margin-top: 0.5rem;
-}
-
-/* ============================================
-   SCENE 9: STARE
-   ============================================ */
-
-.stare-frame {
-    margin-bottom: 2rem;
-}
-
-.whisper-text {
-    font-size: 1.6rem;
-    color: var(--text-dim);
-}
-
-.whisper-text p {
-    opacity: 0;
-    animation: whisper-appear 2s ease forwards;
-}
-
-.whisper-text .delayed {
-    animation-delay: 2s;
-}
-
-.whisper-text .delayed-2 {
-    animation-delay: 4s;
-    color: var(--error);
-}
-
-@keyframes whisper-appear {
-    0% { opacity: 0; }
-    50% { opacity: 0.5; }
-    100% { opacity: 0.7; }
-}
-
-/* ============================================
-   SCENE 10: ERROR FLOOD
-   ============================================ */
-
-.error-flood {
-    font-family: var(--font-main);
-    font-size: 1.4rem;
-    color: var(--error);
-    text-align: center;
-    max-width: 350px;
-    margin: 0 auto;
-}
-
-.error-flood p {
-    opacity: 0;
-    animation: error-appear 0.3s ease forwards;
-    margin: 0.3rem 0;
-}
-
-.error-flood p:nth-child(1) { animation-delay: 0.1s; }
-.error-flood p:nth-child(2) { animation-delay: 0.3s; }
-.error-flood p:nth-child(3) { animation-delay: 0.5s; }
-.error-flood p:nth-child(4) { animation-delay: 0.7s; }
-.error-flood p:nth-child(5) { animation-delay: 0.9s; }
-.error-flood p:nth-child(6) { animation-delay: 1.1s; }
-.error-flood p:nth-child(7) { animation-delay: 1.3s; }
-
-@keyframes error-appear {
-    0% { opacity: 0; transform: translateX(-20px); }
-    100% { opacity: 1; transform: translateX(0); }
-}
-
-/* Subliminal Flash */
-.subliminal-flash {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    z-index: 2000;
-    opacity: 0;
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.subliminal-flash.active {
-    animation: subliminal 0.15s ease;
-}
-
-@keyframes subliminal {
-    0% { opacity: 0; }
-    30% { opacity: 1; }
-    100% { opacity: 0; }
-}
-
-.subliminal-flash .flash-content {
-    width: 300px;
-    height: 300px;
-}
-
-/* ============================================
-   SCENE 11: FINAL MESSAGE
-   ============================================ */
-
-.scene-11 {
-    background: #000;
-}
-
-.final-words {
-    padding: 4rem 0;
-}
-
-.final-line {
-    font-size: 2.5rem;
-    color: #3a3a3a;
-    margin: 1rem 0;
-    opacity: 0;
-    animation: final-appear 3s ease forwards;
-}
-
-.final-line.delayed {
-    animation-delay: 3s;
-}
-
-.final-line.threat {
-    color: var(--error);
-    font-size: 3rem;
-}
-
-@keyframes final-appear {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-}
-
-/* ============================================
-   SCENE 12: CTA
-   ============================================ */
-
-.cta-scene {
-    background: linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+/* CTA */
+.scene-cta {
+    background: linear-gradient(180deg, #000 0%, #0a0a0a 100%);
 }
 
 .logo {
-    font-family: var(--font-main);
-    font-size: 4rem;
+    font-family: var(--font-pixel);
+    font-size: 3.5rem;
     font-weight: normal;
     color: var(--text);
-    letter-spacing: 0.3em;
+    letter-spacing: 0.2em;
     margin-bottom: 0.5rem;
-    position: relative;
 }
 
-.logo::before,
-.logo::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    opacity: 0;
-}
-
-.logo:hover::before {
-    color: #ff0000;
-    animation: glitch-1 0.2s infinite;
-    opacity: 0.7;
-}
-
-.logo:hover::after {
-    color: #00ffff;
-    animation: glitch-2 0.2s infinite;
-    opacity: 0.7;
+.logo:hover {
+    animation: glitch-text 0.2s infinite;
 }
 
 .tagline {
-    font-family: var(--font-mono);
+    font-family: var(--font-pixel);
     font-size: 1rem;
     color: var(--text-dim);
-    letter-spacing: 0.5em;
-    margin-bottom: 0.5rem;
-}
-
-.year {
-    font-family: var(--font-mono);
-    font-size: 1.2rem;
-    color: var(--error);
+    letter-spacing: 0.3em;
     margin-bottom: 3rem;
 }
 
-/* Signup Form */
 .signup-form {
     display: flex;
-    max-width: 400px;
+    max-width: 350px;
     margin: 0 auto 1rem;
     border: 1px solid #333;
 }
@@ -839,7 +325,7 @@ body {
 .signup-form input {
     flex: 1;
     padding: 1rem;
-    font-family: var(--font-mono);
+    font-family: var(--font-pixel);
     font-size: 1rem;
     background: transparent;
     border: none;
@@ -853,13 +339,13 @@ body {
 
 .signup-form button {
     padding: 1rem 1.5rem;
-    font-family: var(--font-main);
+    font-family: var(--font-pixel);
     font-size: 1rem;
     background: var(--text);
     color: #000;
     border: none;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s;
 }
 
 .signup-form button:hover {
@@ -868,6 +354,7 @@ body {
 }
 
 .count-text {
+    font-family: var(--font-pixel);
     font-size: 0.9rem;
     color: var(--text-dim);
     margin-bottom: 2rem;
@@ -877,17 +364,15 @@ body {
     color: var(--pixel-on);
 }
 
-/* Share Buttons */
 .share-row {
     display: flex;
     justify-content: center;
     gap: 1rem;
-    margin-bottom: 3rem;
 }
 
 .share-btn {
     padding: 0.8rem 2rem;
-    font-family: var(--font-main);
+    font-family: var(--font-pixel);
     font-size: 1rem;
     background: transparent;
     color: var(--text-dim);
@@ -901,16 +386,7 @@ body {
     border-color: var(--text);
 }
 
-.found-note {
-    font-size: 0.8rem;
-    color: #333;
-    margin-top: 4rem;
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-
+/* Responsive */
 @media (max-width: 600px) {
     .timestamp {
         bottom: 15px;
@@ -918,40 +394,17 @@ body {
         font-size: 1rem;
     }
 
-    .boot-sequence {
-        font-size: 1.1rem;
-        padding: 1.5rem;
-    }
-
-    .device-screen {
-        width: 140px;
-        height: 120px;
-    }
-
-    .pixel-canvas {
-        width: 60px;
-        height: 60px;
-    }
-
-    .pixel-canvas.large {
-        width: 150px;
-        height: 150px;
-    }
-
-    .big-year {
-        font-size: 4rem;
+    .dialogue {
+        font-size: 1.2rem;
     }
 
     .logo {
         font-size: 2.5rem;
     }
 
-    .final-line {
-        font-size: 1.8rem;
-    }
-
-    .final-line.threat {
-        font-size: 2.2rem;
+    .pixel-canvas {
+        width: 80px;
+        height: 80px;
     }
 
     .signup-form {
@@ -961,45 +414,4 @@ body {
     .signup-form button {
         border-top: 1px solid #333;
     }
-}
-
-/* ============================================
-   SPECIAL STATES
-   ============================================ */
-
-/* Corrupted Device */
-.tamagotchi-device.corrupted .device-shell {
-    animation: device-shake 0.1s infinite;
-}
-
-@keyframes device-shake {
-    0%, 100% { transform: translate(0); }
-    25% { transform: translate(-1px, 1px); }
-    50% { transform: translate(1px, -1px); }
-    75% { transform: translate(-1px, -1px); }
-}
-
-/* Scene in view */
-.scene.in-view .caption p,
-.scene.in-view .term-line,
-.scene.in-view .date-item,
-.scene.in-view .boot-line,
-.scene.in-view .error-flood p,
-.scene.in-view .final-line,
-.scene.in-view .whisper-text p {
-    animation-play-state: running;
-}
-
-/* Screen Flicker */
-.screen-flicker {
-    animation: screen-flicker-anim 4s infinite;
-}
-
-@keyframes screen-flicker-anim {
-    0%, 100% { opacity: 1; }
-    92% { opacity: 1; }
-    93% { opacity: 0.8; }
-    94% { opacity: 1; }
-    95% { opacity: 0.9; }
-    96% { opacity: 1; }
 }
