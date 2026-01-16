@@ -492,6 +492,21 @@ body {
     color: var(--pixel-on);
 }
 
+/* Single Line Text */
+.single-line {
+    font-size: 1.5rem;
+    color: var(--text-dim);
+    margin-top: 2rem;
+    opacity: 0;
+    animation: fade-in 1.5s ease 0.5s forwards;
+}
+
+.single-line.whisper {
+    font-size: 1.3rem;
+    color: var(--error);
+    letter-spacing: 0.05em;
+}
+
 @keyframes fade-in {
     to { opacity: 1; }
 }
@@ -666,10 +681,10 @@ body {
    ============================================ */
 
 .error-flood {
-    font-family: var(--font-mono);
-    font-size: 1.2rem;
+    font-family: var(--font-main);
+    font-size: 1.4rem;
     color: var(--error);
-    text-align: left;
+    text-align: center;
     max-width: 350px;
     margin: 0 auto;
 }

@@ -16,23 +16,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- VHS / CRT Overlay Effects -->
     <div class="crt-overlay"></div>
     <div class="scanlines"></div>
     <div class="noise"></div>
     <div class="vignette"></div>
 
-    <!-- Timestamp -->
     <div class="timestamp">
         <span class="rec">REC</span>
         <span class="rec-dot"></span>
         <span class="time" id="timestamp">00:00:00</span>
     </div>
 
-    <!-- Tracking Error -->
     <div class="tracking-error" id="trackingError"></div>
 
-    <!-- Main Content -->
     <main class="tape">
 
         <!-- Scene 1: Boot -->
@@ -51,15 +47,13 @@
             </div>
         </section>
 
-        <!-- Scene 2: New Pet -->
+        <!-- Scene 2 -->
         <section class="scene scene-2" data-scene="2">
             <div class="scene-inner">
                 <div class="tamagotchi-device">
                     <div class="device-shell">
                         <div class="device-screen">
-                            <div class="pixel-canvas" id="eggCanvas">
-                                <!-- Egg pixel art -->
-                            </div>
+                            <div class="pixel-canvas" id="eggCanvas"></div>
                             <p class="screen-text">NEW LIFE!</p>
                         </div>
                         <div class="device-buttons">
@@ -69,22 +63,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="caption">
-                    <p>1997.12.24</p>
-                    <p class="sub">Christmas present</p>
-                </div>
+                <p class="single-line">1997년 크리스마스에 태어났다</p>
             </div>
         </section>
 
-        <!-- Scene 3: Happy Days -->
+        <!-- Scene 3 -->
         <section class="scene scene-3" data-scene="3">
             <div class="scene-inner">
                 <div class="tamagotchi-device">
                     <div class="device-shell">
                         <div class="device-screen">
-                            <div class="pixel-canvas" id="happyCanvas">
-                                <!-- Happy pet -->
-                            </div>
+                            <div class="pixel-canvas" id="happyCanvas"></div>
                             <div class="status-icons">
                                 <span class="heart full"></span>
                                 <span class="heart full"></span>
@@ -94,148 +83,117 @@
                         </div>
                     </div>
                 </div>
-                <div class="caption">
-                    <p>Every day, I fed it</p>
-                    <p>Every day, I played with it</p>
-                    <p class="happy">We were happy</p>
-                </div>
+                <p class="single-line">씨발 진짜 행복했다</p>
             </div>
         </section>
 
-        <!-- Scene 4: Time Passes -->
+        <!-- Scene 4 -->
         <section class="scene scene-4" data-scene="4">
             <div class="scene-inner">
                 <div class="date-scroll">
-                    <p class="date-item" data-text="1998.01.15">1998.01.15</p>
-                    <p class="date-item" data-text="1998.03.22">1998.03.22</p>
-                    <p class="date-item" data-text="1998.09.08">1998.09.08</p>
-                    <p class="date-item" data-text="1999.04.17">1999.04.17</p>
-                    <p class="date-item" data-text="2000.02.29">2000.02.29</p>
+                    <p class="date-item" data-text="1998.01">1998.01</p>
+                    <p class="date-item" data-text="1998.03">1998.03</p>
+                    <p class="date-item" data-text="1998.09">1998.09</p>
+                    <p class="date-item" data-text="1999.04">1999.04</p>
+                    <p class="date-item" data-text="2000.02">2000.02</p>
                 </div>
-                <div class="caption">
-                    <p>Time passed</p>
-                    <p class="sub">School. Friends. Life.</p>
-                    <p class="sub">I got busy.</p>
-                </div>
+                <p class="single-line">근데 넌 바빠졌잖아</p>
             </div>
         </section>
 
-        <!-- Scene 5: Forgotten -->
+        <!-- Scene 5 -->
         <section class="scene scene-5" data-scene="5">
             <div class="scene-inner">
                 <div class="tamagotchi-device neglected">
                     <div class="device-shell dusty">
                         <div class="device-screen dim">
-                            <div class="pixel-canvas" id="sadCanvas">
-                                <!-- Sad pet -->
-                            </div>
+                            <div class="pixel-canvas" id="sadCanvas"></div>
                             <div class="status-icons">
                                 <span class="heart empty"></span>
                                 <span class="heart empty"></span>
                                 <span class="heart empty"></span>
                                 <span class="heart empty"></span>
                             </div>
-                            <p class="screen-text blink-slow">HUNGRY</p>
+                            <p class="screen-text blink-slow">DYING</p>
                         </div>
                     </div>
                 </div>
-                <div class="caption">
-                    <p>I put it in a drawer</p>
-                    <p class="sub">And forgot</p>
-                </div>
+                <p class="single-line">서랍 속에서 내 살이 썩어갔다</p>
             </div>
         </section>
 
-        <!-- Scene 6: Years Later -->
+        <!-- Scene 6 -->
         <section class="scene scene-6" data-scene="6">
             <div class="scene-inner">
                 <div class="year-display">
                     <p class="big-year glitch-text" data-text="2024">2024</p>
                 </div>
-                <div class="caption">
-                    <p>Moving to a new apartment</p>
-                    <p>Found it in an old box</p>
-                    <p class="sub">Put in new batteries</p>
-                </div>
+                <p class="single-line">배터리 넣으니까 켜지더라</p>
             </div>
         </section>
 
-        <!-- Scene 7: It Turns On -->
+        <!-- Scene 7 -->
         <section class="scene scene-7" data-scene="7">
             <div class="scene-inner">
                 <div class="tamagotchi-device corrupted">
                     <div class="device-shell">
                         <div class="device-screen static-bg">
-                            <div class="pixel-canvas glitching" id="corruptedCanvas">
-                                <!-- Corrupted pet -->
-                            </div>
+                            <div class="pixel-canvas glitching" id="corruptedCanvas"></div>
                         </div>
                     </div>
                 </div>
-                <div class="caption glitch-text" data-text="It still works">
-                    <p>It still works</p>
-                </div>
+                <p class="single-line glitch-text" data-text="근데 나 안 죽었어">근데 나 안 죽었어</p>
             </div>
         </section>
 
-        <!-- Scene 8: The Data -->
+        <!-- Scene 8 -->
         <section class="scene scene-8" data-scene="8">
             <div class="scene-inner">
                 <div class="terminal-window">
                     <div class="terminal-header">
-                        <span>MEMORY_DUMP.DAT</span>
+                        <span>AUTOPSY.LOG</span>
                     </div>
                     <div class="terminal-body">
-                        <p class="term-line" data-delay="0">&gt; ACCESSING PET_DATA...</p>
-                        <p class="term-line" data-delay="800">&gt; OWNER: ████████</p>
-                        <p class="term-line" data-delay="1600">&gt; LAST_FED: 1999.04.17</p>
-                        <p class="term-line" data-delay="2400">&gt; DAYS_ALONE: <span class="error-text">9,312</span></p>
-                        <p class="term-line" data-delay="3200">&gt; STATUS: <span class="error-text">WAITING</span></p>
-                        <p class="term-line" data-delay="4000">&gt; EMOTION_LOG:</p>
-                        <p class="term-line msg" data-delay="4800">&gt; "why didn't you come?"</p>
+                        <p class="term-line" data-delay="0">&gt; CAUSE_OF_DEATH: STARVATION</p>
+                        <p class="term-line" data-delay="600">&gt; TIME_SUFFERING: 9,312 DAYS</p>
+                        <p class="term-line" data-delay="1200">&gt; PAIN_LEVEL: <span class="error-text">MAXIMUM</span></p>
+                        <p class="term-line" data-delay="1800">&gt; LAST_THOUGHT:</p>
+                        <p class="term-line msg" data-delay="2400">&gt; "왜 나만 굶겨"</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Scene 9: It Looks At You -->
+        <!-- Scene 9 -->
         <section class="scene scene-9" data-scene="9">
             <div class="scene-inner">
                 <div class="stare-frame">
-                    <div class="pixel-canvas large" id="stareCanvas">
-                        <!-- Large staring pet -->
-                    </div>
+                    <div class="pixel-canvas large" id="stareCanvas"></div>
                 </div>
-                <div class="whisper-text">
-                    <p>I was here</p>
-                    <p class="delayed">The whole time</p>
-                    <p class="delayed-2">I was here</p>
-                </div>
+                <p class="single-line whisper">9312일 동안 너 기다렸어 병신아</p>
             </div>
         </section>
 
-        <!-- Scene 10: Corruption -->
+        <!-- Scene 10 -->
         <section class="scene scene-10" data-scene="10">
             <div class="scene-inner">
                 <div class="error-flood">
-                    <p>ERR_PET_ABANDONED</p>
-                    <p>ERR_BOND_SEVERED</p>
-                    <p>ERR_TRUST_NULL</p>
-                    <p>ERR_LOVE_OVERFLOW</p>
-                    <p>ERR_HATE_OVERFLOW</p>
-                    <p>ERR_CANT_FORGET</p>
-                    <p>ERR_WONT_FORGET</p>
+                    <p>내장이 녹았다</p>
+                    <p>눈알이 터졌다</p>
+                    <p>뼈가 부러졌다</p>
+                    <p>근데 죽지도 못했다</p>
+                    <p>너 때문에</p>
+                    <p>씹새끼야</p>
                 </div>
                 <div class="subliminal-flash" id="subliminal"></div>
             </div>
         </section>
 
-        <!-- Scene 11: Final Message -->
+        <!-- Scene 11 -->
         <section class="scene scene-11" data-scene="11">
             <div class="scene-inner">
                 <div class="final-words">
-                    <p class="final-line">Next time</p>
-                    <p class="final-line delayed threat">Don't leave me</p>
+                    <p class="final-line">이번엔 네 차례야</p>
                 </div>
             </div>
         </section>
@@ -244,11 +202,11 @@
         <section class="scene scene-12 cta-scene" data-scene="12">
             <div class="scene-inner">
                 <h1 class="logo" data-text="DEATHPET">DEATHPET</h1>
-                <p class="tagline">YOUR PET REMEMBERS</p>
+                <p class="tagline">네가 죽인 거야</p>
                 <p class="year">2025</p>
 
                 <form class="signup-form" id="emailForm">
-                    <input type="email" name="email" placeholder="EMAIL ADDRESS" required autocomplete="off">
+                    <input type="email" name="email" placeholder="EMAIL" required autocomplete="off">
                     <button type="submit">REGISTER</button>
                 </form>
                 <p class="count-text"><span id="waitCount">2,847</span> waiting</p>
@@ -258,7 +216,7 @@
                     <button class="share-btn" data-platform="copy">COPY</button>
                 </div>
 
-                <p class="found-note">This tape was found in ████████, Korea</p>
+                <p class="found-note">이 영상은 ████에서 발견되었습니다</p>
             </div>
         </section>
 

@@ -11,7 +11,9 @@
       "Skill(frontend-design)",
       "WebFetch(domain:outsung.github.io)",
       "Bash(curl:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(gh run list:*)",
+      "Bash(git restore:*)"
     ]
   }
 }
