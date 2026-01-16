@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JERRY — Botanical Atelier</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --dark-green: #1A2E1A;
+            --forest: #2D4A2D;
+            --sage: #6B7F5E;
+            --olive: #8B956D;
+            --cream: #FAF9F6;
+            --off-white: #F5F4F0;
+            --warm-gray: #E8E6E1;
+            --gold: #B8956B;
+            --gold-light: #D4BC94;
+            --text: #2C2C2C;
+            --text-light: #6B6B6B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            font-weight: 300;
+            line-height: 1.7;
+            letter-spacing: 0.02em;
+        }
+
+        ::selection {
+            background: var(--dark-green);
+            color: var(--cream);
+        }
+
+        /* Typography */
+        .serif {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+        }
+
+        .sans {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: transparent;
+            transition: all 0.4s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(250, 249, 246, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--warm-gray);
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--dark-green);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text);
+            text-decoration: none;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--cream);
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 6rem;
+            position: relative;
+        }
+
+        .hero-tag {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.3s forwards;
+        }
+
+        .hero h1 {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+            font-size: clamp(3rem, 5vw, 4.5rem);
+            font-weight: 300;
+            line-height: 1.1;
+            color: var(--dark-green);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.5s forwards;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--sage);
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: var(--text-light);
+            max-width: 400px;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.7s forwards;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--dark-green);
+            text-decoration: none;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.9s forwards;
+            transition: gap 0.3s ease;
+        }
+
+        .hero-cta:hover {
+            gap: 1.5rem;
+        }
+
+        .hero-cta span {
+            width: 60px;
+            height: 1px;
+            background: var(--dark-green);
+            transition: width 0.3s ease;
+        }
+
+        .hero-cta:hover span {
+            width: 80px;
+        }
+
+        .hero-visual {
+            background: var(--dark-green);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+            mix-blend-mode: luminosity;
+        }
+
+        .hero-visual::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--dark-green) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .hero-visual-text {
+            position: absolute;
+            bottom: 4rem;
+            right: 4rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 8rem;
+            font-weight: 300;
+            color: rgba(250, 249, 246, 0.1);
+            line-height: 1;
+            z-index: 2;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* About */
+        .about {
+            padding: 10rem 4rem;
+            background: var(--off-white);
+        }
+
+        .about-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8rem;
+            align-items: center;
+        }
+
+        .about-image-wrapper {
+            position: relative;
+        }
+
+        .about-image {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: var(--warm-gray);
+            position: relative;
+        }
+
+        .about-image::before {
+            content: 'JERRY';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem;
+            font-weight: 300;
+            color: var(--sage);
+            letter-spacing: 0.5em;
+            opacity: 0.3;
+        }
+
+        .about-image-frame {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            right: -2rem;
+            bottom: -2rem;
+            border: 1px solid var(--gold);
+            z-index: -1;
+        }
+
+        .about-content {
+            padding: 2rem 0;
+        }
+
+        .section-tag {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .about h2 {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: var(--dark-green);
+            margin-bottom: 2rem;
+            line-height: 1.3;
+        }
+
+        .about p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .signature {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-style: italic;
+            color: var(--sage);
+            margin-top: 2rem;
+        }
+
+        /* Philosophy */
+        .philosophy {
+            padding: 10rem 4rem;
+            background: var(--dark-green);
+            color: var(--cream);
+            text-align: center;
+        }
+
+        .philosophy-inner {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .philosophy h2 {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 300;
+            line-height: 1.4;
+            margin-bottom: 3rem;
+        }
+
+        .philosophy h2 em {
+            font-style: italic;
+            color: var(--gold-light);
+        }
+
+        .philosophy p {
+            font-size: 0.9rem;
+            color: rgba(250, 249, 246, 0.7);
+            letter-spacing: 0.05em;
+        }
+
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: var(--gold);
+            margin: 3rem auto;
+        }
+
+        /* Quiz Section */
+        .quiz-section {
+            padding: 10rem 4rem;
+            background: var(--cream);
+        }
+
+        .quiz-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 5rem;
+        }
+
+        .quiz-header h2 {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: var(--dark-green);
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-header p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .quiz-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--off-white);
+            padding: 4rem;
+            border: 1px solid var(--warm-gray);
+        }
+
+        .quiz-progress-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .progress-segment {
+            flex: 1;
+            height: 2px;
+            background: var(--warm-gray);
+            transition: background 0.5s ease;
+        }
+
+        .progress-segment.active {
+            background: var(--gold);
+        }
+
+        .progress-segment.completed {
+            background: var(--dark-green);
+        }
+
+        .quiz-question {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--dark-green);
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            background: transparent;
+            border: 1px solid var(--warm-gray);
+            padding: 1.2rem 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 0.03em;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--sage);
+            background: rgba(107, 127, 94, 0.05);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--dark-green);
+            background: var(--dark-green);
+            color: var(--cream);
+        }
+
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--warm-gray);
+        }
+
+        .quiz-btn {
+            background: transparent;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-btn:hover:not(:disabled) {
+            color: var(--dark-green);
+        }
+
+        .quiz-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .quiz-btn-line {
+            width: 30px;
+            height: 1px;
+            background: currentColor;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-btn:hover:not(:disabled) .quiz-btn-line {
+            width: 45px;
+        }
+
+        /* Result */
+        .result-container {
+            display: none;
+            text-align: center;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .result-tag {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .result-name {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--dark-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-latin {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--sage);
+            margin-bottom: 2rem;
+        }
+
+        .result-description {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            max-width: 500px;
+            margin: 0 auto 2rem;
+        }
+
+        .result-traits {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .trait {
+            text-align: center;
+        }
+
+        .trait-label {
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 0.3rem;
+        }
+
+        .trait-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            color: var(--dark-green);
+        }
+
+        .restart-btn {
+            background: transparent;
+            border: 1px solid var(--dark-green);
+            padding: 1rem 2.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--dark-green);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            background: var(--dark-green);
+            color: var(--cream);
+        }
+
+        /* Collection */
+        .collection {
+            padding: 10rem 4rem;
+            background: var(--off-white);
+        }
+
+        .collection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            max-width: 1400px;
+            margin: 0 auto 5rem;
+        }
+
+        .collection-header h2 {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: var(--dark-green);
+        }
+
+        .collection-link {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .collection-link:hover {
+            color: var(--dark-green);
+        }
+
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .plant-card {
+            background: var(--cream);
+            border: 1px solid var(--warm-gray);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .plant-card:hover {
+            border-color: var(--sage);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(26, 46, 26, 0.1);
+        }
+
+        .plant-image {
+            aspect-ratio: 1;
+            background: var(--warm-gray);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .plant-image::before {
+            content: attr(data-plant);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            color: var(--sage);
+            opacity: 0.4;
+        }
+
+        .plant-card:hover .plant-image::before {
+            opacity: 0.6;
+        }
+
+        .plant-info {
+            padding: 2rem;
+        }
+
+        .plant-category {
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+        }
+
+        .plant-name {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--dark-green);
+            margin-bottom: 0.3rem;
+        }
+
+        .plant-latin {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--sage);
+            margin-bottom: 1rem;
+        }
+
+        .plant-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .meta-item {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            letter-spacing: 0.05em;
+        }
+
+        .plant-price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--warm-gray);
+        }
+
+        .plant-price {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--dark-green);
+        }
+
+        .add-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--dark-green);
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn::before,
+        .add-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--dark-green);
+            transition: background 0.3s ease;
+        }
+
+        .add-btn::before {
+            width: 12px;
+            height: 1px;
+        }
+
+        .add-btn::after {
+            width: 1px;
+            height: 12px;
+        }
+
+        .add-btn:hover {
+            background: var(--dark-green);
+        }
+
+        .add-btn:hover::before,
+        .add-btn:hover::after {
+            background: var(--cream);
+        }
+
+        /* Contact */
+        .contact {
+            padding: 10rem 4rem;
+            background: var(--dark-green);
+            color: var(--cream);
+        }
+
+        .contact-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8rem;
+        }
+
+        .contact-content h2 {
+            font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+            font-size: 2.8rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+
+        .contact-content p {
+            color: rgba(250, 249, 246, 0.7);
+            font-size: 0.95rem;
+            margin-bottom: 3rem;
+            max-width: 400px;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .contact-label {
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            width: 80px;
+        }
+
+        .contact-value {
+            font-size: 0.9rem;
+            color: var(--cream);
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(250, 249, 246, 0.3);
+            padding: 1rem 0;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: var(--cream);
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(250, 249, 246, 0.5);
+        }
+
+        .form-input:focus {
+            border-color: var(--gold-light);
+        }
+
+        .submit-btn {
+            align-self: flex-start;
+            background: transparent;
+            border: 1px solid var(--cream);
+            padding: 1rem 3rem;
+            margin-top: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--cream);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: var(--cream);
+            color: var(--dark-green);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--black);
+            color: var(--cream);
+            padding: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            letter-spacing: 0.3em;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .footer-links a {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(250, 249, 246, 0.5);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--cream);
+        }
+
+        .footer-copy {
+            font-size: 0.7rem;
+            color: rgba(250, 249, 246, 0.3);
+        }
+
+        /* Cart */
+        .cart-btn {
+            position: fixed;
+            bottom: 3rem;
+            right: 3rem;
+            width: 60px;
+            height: 60px;
+            background: var(--dark-green);
+            border: none;
+            cursor: pointer;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .cart-btn:hover {
+            background: var(--forest);
+            transform: scale(1.05);
+        }
+
+        .cart-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--cream);
+            fill: none;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 22px;
+            height: 22px;
+            background: var(--gold);
+            color: var(--black);
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-visual {
+                display: none;
+            }
+
+            .hero-content {
+                padding: 8rem 4rem;
+            }
+
+            .about-container,
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+
+            .collection-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content,
+            .about,
+            .philosophy,
+            .quiz-section,
+            .collection,
+            .contact {
+                padding: 6rem 2rem;
+            }
+
+            .quiz-container {
+                padding: 2rem;
+            }
+
+            .collection-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .collection-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo">JERRY</a>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#quiz">Consultation</a></li>
+            <li><a href="#collection">Collection</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-tag">Botanical Atelier</span>
+            <h1>당신의 공간에<br><em>생명</em>을 들이다</h1>
+            <p class="hero-desc">
+                제리 보태니컬 아뜰리에는 도시 속 작은 공간에 어울리는
+                엄선된 식물을 큐레이션합니다. 당신만을 위한 초록을 만나보세요.
+            </p>
+            <a href="#quiz" class="hero-cta">
+                나의 식물 찾기
+                <span></span>
+            </a>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-visual-text">J</div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="about-container">
+            <div class="about-image-wrapper">
+                <div class="about-image"></div>
+                <div class="about-image-frame"></div>
+            </div>
+            <div class="about-content">
+                <span class="section-tag">About Jerry</span>
+                <h2>식물과 사람 사이,<br>진정한 연결을 만듭니다</h2>
+                <p>
+                    식물은 단순한 인테리어 소품이 아닙니다.
+                    함께 호흡하고, 함께 자라는 동반자입니다.
+                </p>
+                <p>
+                    제리 보태니컬 아뜰리에는 각 고객의 생활 환경과 취향을
+                    세심하게 분석하여, 오래도록 함께할 수 있는
+                    완벽한 식물 파트너를 찾아드립니다.
+                </p>
+                <p>
+                    모든 식물은 국내 최고의 농장에서 건강하게 재배되며,
+                    전문가의 손길로 관리된 프리미엄 개체만을 엄선합니다.
+                </p>
+                <p class="signature">— Jerry</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="philosophy">
+        <div class="philosophy-inner">
+            <span class="section-tag">Philosophy</span>
+            <div class="divider"></div>
+            <h2>
+                "작은 공간에도 <em>자연</em>은<br>
+                충분히 깃들 수 있습니다"
+            </h2>
+            <p>
+                바쁜 일상 속에서도 식물과 함께하는 순간은
+                우리에게 고요한 위안을 선사합니다.
+            </p>
+        </div>
+    </section>
+
+    <section class="quiz-section" id="quiz">
+        <div class="quiz-header">
+            <span class="section-tag">Personal Consultation</span>
+            <h2>나에게 맞는 식물 찾기</h2>
+            <p>
+                몇 가지 질문에 답해주시면, 당신의 라이프스타일에
+                완벽하게 어울리는 식물을 추천해 드립니다.
+            </p>
+        </div>
+
+        <div class="quiz-container">
+            <div id="quiz-content">
+                <div class="quiz-progress-bar" id="progress-bar"></div>
+                <p class="quiz-question" id="question-text"></p>
+                <div class="quiz-options" id="options-container"></div>
+                <div class="quiz-nav">
+                    <button class="quiz-btn" id="prev-btn" disabled>
+                        <span class="quiz-btn-line"></span>
+                        이전
+                    </button>
+                    <button class="quiz-btn" id="next-btn">
+                        다음
+                        <span class="quiz-btn-line"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="result-container" id="result-container">
+                <span class="result-tag">Your Perfect Match</span>
+                <h3 class="result-name" id="result-name"></h3>
+                <p class="result-latin" id="result-latin"></p>
+                <p class="result-description" id="result-desc"></p>
+                <div class="result-traits" id="result-traits"></div>
+                <button class="restart-btn" onclick="restartQuiz()">다시 시작</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="collection" id="collection">
+        <div class="collection-header">
+            <div>
+                <span class="section-tag">Curated Selection</span>
+                <h2>이달의 컬렉션</h2>
+            </div>
+            <a href="#" class="collection-link">
+                전체 보기
+                <span class="quiz-btn-line"></span>
+            </a>
+        </div>
+
+        <div class="collection-grid">
+            <article class="plant-card" onclick="addToCart('몬스테라 델리시오사', 89000)">
+                <div class="plant-image" data-plant="Monstera"></div>
+                <div class="plant-info">
+                    <span class="plant-category">Statement Plant</span>
+                    <h3 class="plant-name">몬스테라 델리시오사</h3>
+                    <p class="plant-latin">Monstera deliciosa</p>
+                    <div class="plant-meta">
+                        <span class="meta-item">반양지</span>
+                        <span class="meta-item">주 1회 관수</span>
+                        <span class="meta-item">공기정화</span>
+                    </div>
+                    <div class="plant-price-row">
+                        <span class="plant-price">₩89,000</span>
+                        <button class="add-btn" aria-label="장바구니 추가"></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="plant-card" onclick="addToCart('필로덴드론 버킨', 65000)">
+                <div class="plant-image" data-plant="Philodendron"></div>
+                <div class="plant-info">
+                    <span class="plant-category">Designer's Pick</span>
+                    <h3 class="plant-name">필로덴드론 버킨</h3>
+                    <p class="plant-latin">Philodendron birkin</p>
+                    <div class="plant-meta">
+                        <span class="meta-item">반음지</span>
+                        <span class="meta-item">주 1회 관수</span>
+                        <span class="meta-item">컴팩트</span>
+                    </div>
+                    <div class="plant-price-row">
+                        <span class="plant-price">₩65,000</span>
+                        <button class="add-btn" aria-label="장바구니 추가"></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="plant-card" onclick="addToCart('스투키', 45000)">
+                <div class="plant-image" data-plant="Stuckyi"></div>
+                <div class="plant-info">
+                    <span class="plant-category">Best for Beginners</span>
+                    <h3 class="plant-name">스투키</h3>
+                    <p class="plant-latin">Sansevieria cylindrica</p>
+                    <div class="plant-meta">
+                        <span class="meta-item">양지/반음지</span>
+                        <span class="meta-item">월 1회 관수</span>
+                        <span class="meta-item">야간 산소</span>
+                    </div>
+                    <div class="plant-price-row">
+                        <span class="plant-price">₩45,000</span>
+                        <button class="add-btn" aria-label="장바구니 추가"></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="plant-card" onclick="addToCart('칼라테아 오르비폴리아', 78000)">
+                <div class="plant-image" data-plant="Calathea"></div>
+                <div class="plant-info">
+                    <span class="plant-category">Artistic Pattern</span>
+                    <h3 class="plant-name">칼라테아 오르비폴리아</h3>
+                    <p class="plant-latin">Calathea orbifolia</p>
+                    <div class="plant-meta">
+                        <span class="meta-item">반음지</span>
+                        <span class="meta-item">주 2회 관수</span>
+                        <span class="meta-item">습도 선호</span>
+                    </div>
+                    <div class="plant-price-row">
+                        <span class="plant-price">₩78,000</span>
+                        <button class="add-btn" aria-label="장바구니 추가"></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="plant-card" onclick="addToCart('피쿠스 움베르타', 120000)">
+                <div class="plant-image" data-plant="Ficus"></div>
+                <div class="plant-info">
+                    <span class="plant-category">Tree Collection</span>
+                    <h3 class="plant-name">피쿠스 움베르타</h3>
+                    <p class="plant-latin">Ficus umbellata</p>
+                    <div class="plant-meta">
+                        <span class="meta-item">양지</span>
+                        <span class="meta-item">주 1회 관수</span>
+                        <span class="meta-item">대형</span>
+                    </div>
+                    <div class="plant-price-row">
+                        <span class="plant-price">₩120,000</span>
+                        <button class="add-btn" aria-label="장바구니 추가"></button>
+                    </div>
+                </div>
+            </article>
+
+            <article class="plant-card" onclick="addToCart('호야 카르노사', 55000)">
+                <div class="plant-image" data-plant="Hoya"></div>
+                <div class="plant-info">
+                    <span class="plant-category">Hanging Beauty</span>
+                    <h3 class="plant-name">호야 카르노사</h3>
+                    <p class="plant-latin">Hoya carnosa</p>
+                    <div class="plant-meta">
+                        <span class="meta-item">반양지</span>
+                        <span class="meta-item">격주 관수</span>
+                        <span class="meta-item">행잉</span>
+                    </div>
+                    <div class="plant-price-row">
+                        <span class="plant-price">₩55,000</span>
+                        <button class="add-btn" aria-label="장바구니 추가"></button>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="contact-container">
+            <div class="contact-content">
+                <span class="section-tag">Get in Touch</span>
+                <h2>방문 및 문의</h2>
+                <p>
+                    제리 보태니컬 아뜰리에는 사전 예약제로 운영됩니다.
+                    1:1 컨설팅을 통해 당신만을 위한 맞춤 식물을 추천해 드립니다.
+                </p>
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <span class="contact-label">Address</span>
+                        <span class="contact-value">서울시 성수동 연무장길 72, 2층</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-label">Hours</span>
+                        <span class="contact-value">화—토 11:00—19:00 (예약제)</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-label">Phone</span>
+                        <span class="contact-value">02-1234-5678</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-label">Email</span>
+                        <span class="contact-value">hello@jerry-botanical.kr</span>
+                    </div>
+                </div>
+            </div>
+            <form class="contact-form" onsubmit="return false;">
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="성함">
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-input" placeholder="이메일">
+                </div>
+                <div class="form-group">
+                    <input type="tel" class="form-input" placeholder="연락처">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="문의 내용">
+                </div>
+                <button type="submit" class="submit-btn">문의하기</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">JERRY</div>
+            <div class="footer-links">
+                <a href="#">Instagram</a>
+                <a href="#">Kakao Channel</a>
+                <a href="#">Blog</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <span class="footer-copy">© 2024 Jerry Botanical Atelier</span>
+        </div>
+    </footer>
+
+    <button class="cart-btn" onclick="showCart()">
+        <svg viewBox="0 0 24 24" stroke-width="1.5">
+            <path d="M6 6h15l-1.5 9h-12z"/>
+            <circle cx="9" cy="20" r="1"/>
+            <circle cx="18" cy="20" r="1"/>
+            <path d="M6 6L5 3H2"/>
+        </svg>
+        <span class="cart-count" id="cart-count">0</span>
+    </button>
+
+    <script>
+        // Quiz Data
+        const quizData = [
+            {
+                question: "식물 관리에 얼마나 시간을 투자할 수 있으신가요?",
+                options: [
+                    "거의 신경 쓰기 어렵습니다",
+                    "일주일에 한 번 정도 가능합니다",
+                    "매일 조금씩 돌볼 수 있습니다",
+                    "식물 돌보는 것이 취미입니다"
+                ]
+            },
+            {
+                question: "공간에 자연광이 얼마나 들어오나요?",
+                options: [
+                    "거의 들어오지 않습니다",
+                    "은은한 간접광이 있습니다",
+                    "밝은 간접광이 풍부합니다",
+                    "직사광선이 들어옵니다"
+                ]
+            },
+            {
+                question: "어떤 분위기의 식물을 원하시나요?",
+                options: [
+                    "미니멀하고 세련된 느낌",
+                    "자연스럽고 풍성한 느낌",
+                    "유니크하고 개성있는 느낌",
+                    "고급스럽고 우아한 느낌"
+                ]
+            },
+            {
+                question: "이전에 식물을 키워본 경험이 있으신가요?",
+                options: [
+                    "처음 도전합니다",
+                    "몇 번 시도했지만 실패했습니다",
+                    "몇 가지를 키우고 있습니다",
+                    "다양한 식물을 관리해 왔습니다"
+                ]
+            }
+        ];
+
+        const plantResults = [
+            {
+                name: "스투키",
+                latin: "Sansevieria cylindrica",
+                description: "관리가 거의 필요 없는 스투키는 바쁜 현대인에게 완벽한 파트너입니다. 한 달에 한 번 물을 주는 것만으로 건강하게 자라며, 밤에 산소를 방출하여 침실에도 적합합니다.",
+                traits: [
+                    { label: "관수", value: "월 1회" },
+                    { label: "난이도", value: "매우 쉬움" },
+                    { label: "환경", value: "어디서나" }
+                ]
+            },
+            {
+                name: "필로덴드론 버킨",
+                latin: "Philodendron birkin",
+                description: "우아한 줄무늬가 특징인 필로덴드론 버킨은 인테리어 포인트로 완벽합니다. 적당한 관리로 아름다운 잎을 유지하며, 공기 정화 능력도 뛰어납니다.",
+                traits: [
+                    { label: "관수", value: "주 1회" },
+                    { label: "난이도", value: "쉬움" },
+                    { label: "환경", value: "반음지" }
+                ]
+            },
+            {
+                name: "칼라테아 오르비폴리아",
+                latin: "Calathea orbifolia",
+                description: "예술 작품 같은 잎 패턴을 가진 칼라테아는 개성있는 공간을 원하는 분께 추천드립니다. 습도를 좋아하여 욕실이나 주방 근처에 두시면 좋습니다.",
+                traits: [
+                    { label: "관수", value: "주 2회" },
+                    { label: "난이도", value: "중간" },
+                    { label: "환경", value: "반음지/습함" }
+                ]
+            },
+            {
+                name: "몬스테라 델리시오사",
+                latin: "Monstera deliciosa",
+                description: "고급스러운 분위기를 연출하는 몬스테라는 공간의 품격을 높여줍니다. 빠른 성장으로 보람을 느끼실 수 있으며, 관리 난이도도 적당합니다.",
+                traits: [
+                    { label: "관수", value: "주 1회" },
+                    { label: "난이도", value: "쉬움" },
+                    { label: "환경", value: "반양지" }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answers = [];
+        let cart = [];
+
+        function initQuiz() {
+            renderProgress();
+            renderQuestion();
+        }
+
+        function renderProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.innerHTML = '';
+
+            quizData.forEach((_, index) => {
+                const segment = document.createElement('div');
+                segment.className = 'progress-segment';
+                if (index === currentQuestion) segment.classList.add('active');
+                if (index < currentQuestion) segment.classList.add('completed');
+                progressBar.appendChild(segment);
+            });
+        }
+
+        function renderQuestion() {
+            const questionEl = document.getElementById('question-text');
+            const optionsEl = document.getElementById('options-container');
+
+            questionEl.textContent = quizData[currentQuestion].question;
+            optionsEl.innerHTML = '';
+
+            quizData[currentQuestion].options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option';
+                btn.textContent = option;
+                if (answers[currentQuestion] === index) {
+                    btn.classList.add('selected');
+                }
+                btn.onclick = () => selectOption(index);
+                optionsEl.appendChild(btn);
+            });
+
+            document.getElementById('prev-btn').disabled = currentQuestion === 0;
+            document.getElementById('next-btn').innerHTML =
+                currentQuestion === quizData.length - 1
+                    ? '결과 보기 <span class="quiz-btn-line"></span>'
+                    : '다음 <span class="quiz-btn-line"></span>';
+        }
+
+        function selectOption(index) {
+            answers[currentQuestion] = index;
+            renderQuestion();
+        }
+
+        document.getElementById('prev-btn').onclick = () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderProgress();
+                renderQuestion();
+            }
+        };
+
+        document.getElementById('next-btn').onclick = () => {
+            if (answers[currentQuestion] === undefined) {
+                return;
+            }
+
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                renderProgress();
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        };
+
+        function showResult() {
+            const score = answers.reduce((sum, a) => sum + a, 0);
+            const resultIndex = Math.min(Math.floor(score / 4), plantResults.length - 1);
+            const result = plantResults[resultIndex];
+
+            document.getElementById('quiz-content').style.display = 'none';
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.classList.add('show');
+
+            document.getElementById('result-name').textContent = result.name;
+            document.getElementById('result-latin').textContent = result.latin;
+            document.getElementById('result-desc').textContent = result.description;
+
+            const traitsEl = document.getElementById('result-traits');
+            traitsEl.innerHTML = '';
+            result.traits.forEach(trait => {
+                const div = document.createElement('div');
+                div.className = 'trait';
+                div.innerHTML = `
+                    <div class="trait-label">${trait.label}</div>
+                    <div class="trait-value">${trait.value}</div>
+                `;
+                traitsEl.appendChild(div);
+            });
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            answers = [];
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-container').classList.remove('show');
+            renderProgress();
+            renderQuestion();
+        }
+
+        // Cart
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            document.getElementById('cart-count').textContent = cart.length;
+        }
+
+        function showCart() {
+            if (cart.length === 0) {
+                alert('장바구니가 비어있습니다.');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const items = cart.map(item => `${item.name}: ₩${item.price.toLocaleString()}`).join('\n');
+            alert(`장바구니\n\n${items}\n\n총액: ₩${total.toLocaleString()}\n\n구매 문의는 연락처로 연락 주세요.`);
+        }
+
+        // Nav scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Initialize
+        initQuiz();
+    </script>
+</body>
+</html>
