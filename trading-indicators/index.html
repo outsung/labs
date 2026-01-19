@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VORTEX | 프리미엄 트레이딩 보조지표</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.cdnfonts.com/css/monument-extended');
+
+        :root {
+            --bg-primary: #050508;
+            --bg-secondary: #0a0a0f;
+            --bg-card: rgba(15, 15, 25, 0.6);
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #555570;
+            --accent-cyan: #00d4ff;
+            --accent-cyan-dim: #0099cc;
+            --accent-gold: #ffd700;
+            --accent-green: #00ff88;
+            --accent-red: #ff3366;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(10, 10, 20, 0.85);
+            --gradient-hero: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 212, 255, 0.15), transparent);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan-dim);
+            border-radius: 3px;
+        }
+
+        /* Typography */
+        .font-display {
+            font-family: 'Monument Extended', sans-serif;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .grid-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        .floating-chart {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 300px;
+            opacity: 0.15;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: var(--accent-cyan);
+            stroke-width: 2;
+            filter: drop-shadow(0 0 10px var(--accent-cyan));
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.3), transparent 70%);
+            top: -200px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.2), transparent 70%);
+            bottom: 20%;
+            left: -150px;
+            animation-delay: -4s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 8, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 15px 60px;
+            background: rgba(5, 5, 8, 0.95);
+        }
+
+        .logo {
+            font-family: 'Monument Extended', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-cyan);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            padding: 12px 28px;
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .nav-cta:hover::before {
+            left: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 20px 80px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-hero);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .hero h1 {
+            font-family: 'Monument Extended', sans-serif;
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero h1 span {
+            display: block;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 50%, var(--accent-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 50px;
+            font-weight: 300;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .btn-primary {
+            padding: 18px 40px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-cyan-dim));
+            border: none;
+            color: var(--bg-primary);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 18px 40px;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            padding: 60px 20px;
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Monument Extended', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--text-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-top: 8px;
+        }
+
+        /* Features Section */
+        .section {
+            padding: 120px 60px;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-tag {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-family: 'Monument Extended', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 50px 40px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), transparent);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        /* Indicators Section */
+        .indicators-section {
+            background: linear-gradient(180deg, var(--bg-primary), var(--bg-secondary));
+        }
+
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .indicator-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .indicator-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .indicator-card:hover {
+            transform: scale(1.02);
+            border-color: rgba(0, 212, 255, 0.4);
+        }
+
+        .indicator-card:hover::after {
+            opacity: 1;
+        }
+
+        .indicator-preview {
+            height: 200px;
+            background: linear-gradient(135deg, #0a0a15, #0f0f20);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .indicator-preview svg {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 120px;
+        }
+
+        .indicator-preview .price-line {
+            fill: none;
+            stroke: var(--text-muted);
+            stroke-width: 1.5;
+        }
+
+        .indicator-preview .indicator-line {
+            fill: none;
+            stroke: var(--accent-cyan);
+            stroke-width: 2;
+            filter: drop-shadow(0 0 8px var(--accent-cyan));
+        }
+
+        .indicator-preview .signal-dot {
+            fill: var(--accent-green);
+            filter: drop-shadow(0 0 6px var(--accent-green));
+        }
+
+        .indicator-preview .signal-dot.sell {
+            fill: var(--accent-red);
+            filter: drop-shadow(0 0 6px var(--accent-red));
+        }
+
+        .indicator-content {
+            padding: 35px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .indicator-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--accent-cyan);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .indicator-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .indicator-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        .indicator-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .indicator-feature {
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .indicator-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .indicator-price {
+            font-family: 'Monument Extended', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .indicator-price span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 400;
+        }
+
+        .btn-indicator {
+            padding: 14px 30px;
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-indicator:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            background: var(--bg-secondary);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent-cyan);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured::before {
+            content: '인기';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 20px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-cyan-dim));
+            color: var(--bg-primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+        }
+
+        .pricing-card:hover {
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+
+        .pricing-name {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .pricing-price {
+            font-family: 'Monument Extended', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .pricing-card.featured .pricing-price {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pricing-period {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 40px;
+        }
+
+        .pricing-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        .pricing-features li.disabled {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .pricing-features li.disabled::before {
+            content: '✕';
+            color: var(--text-muted);
+        }
+
+        .btn-pricing {
+            width: 100%;
+            padding: 18px;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card.featured .btn-pricing {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-cyan-dim));
+            border: none;
+            color: var(--bg-primary);
+        }
+
+        .btn-pricing:hover {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .pricing-card.featured .btn-pricing:hover {
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Testimonials */
+        .testimonials-section {
+            background: var(--bg-primary);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 40px;
+        }
+
+        .testimonial-rating {
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+        }
+
+        .testimonial-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .author-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .author-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background: var(--bg-secondary);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 25px 0;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--accent-cyan);
+        }
+
+        .faq-icon {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            padding-bottom: 25px;
+        }
+
+        .faq-answer p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 150px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1), transparent 60%);
+            pointer-events: none;
+        }
+
+        .cta-section h2 {
+            font-family: 'Monument Extended', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .cta-section p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 50px;
+            position: relative;
+        }
+
+        /* Footer */
+        footer {
+            padding: 80px 60px 40px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 60px;
+            max-width: 1400px;
+            margin: 0 auto 60px;
+        }
+
+        .footer-brand .logo {
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            max-width: 300px;
+        }
+
+        .footer-links h4 {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-bottom {
+            padding-top: 40px;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-bottom p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .social-links a {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            nav {
+                padding: 20px 30px;
+            }
+
+            .section {
+                padding: 80px 30px;
+            }
+
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 40px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .features-grid,
+            .indicators-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="grid-lines"></div>
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <svg class="floating-chart" viewBox="0 0 1200 300" preserveAspectRatio="none">
+            <path class="chart-line" d="M0,250 Q100,200 200,220 T400,180 T600,200 T800,150 T1000,170 T1200,120" />
+        </svg>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">VORTEX</div>
+        <ul class="nav-links">
+            <li><a href="#features">기능</a></li>
+            <li><a href="#indicators">보조지표</a></li>
+            <li><a href="#pricing">요금제</a></li>
+            <li><a href="#faq">FAQ</a></li>
+        </ul>
+        <button class="nav-cta">시작하기</button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="badge-dot"></span>
+            실시간 트레이딩 신호 제공중
+        </div>
+        <h1>
+            <span>TRADE</span>
+            <span>SMARTER</span>
+        </h1>
+        <p class="hero-subtitle">
+            기관급 알고리즘 기반 보조지표로 당신의 트레이딩을 한 단계 업그레이드하세요.
+            정확한 진입과 청산 타이밍을 제공합니다.
+        </p>
+        <div class="hero-buttons">
+            <button class="btn-primary">무료 체험 시작</button>
+            <button class="btn-secondary">데모 영상 보기</button>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-number">87.3%</div>
+            <div class="stat-label">평균 승률</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">12,847</div>
+            <div class="stat-label">활성 사용자</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">실시간 알림</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">15+</div>
+            <div class="stat-label">보조지표</div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <div class="section-header">
+            <p class="section-tag">Features</p>
+            <h2 class="section-title">왜 VORTEX인가</h2>
+            <p class="section-desc">
+                수년간의 연구와 백테스팅을 거쳐 개발된 프리미엄 보조지표 시스템
+            </p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon">⚡</div>
+                <h3>실시간 신호</h3>
+                <p>밀리초 단위의 지연시간으로 시장 움직임에 즉각 대응할 수 있는 실시간 매매 신호를 제공합니다.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🎯</div>
+                <h3>정밀한 진입점</h3>
+                <p>머신러닝 기반 분석으로 최적의 진입 타이밍과 손절/익절 레벨을 자동으로 계산합니다.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">📊</div>
+                <h3>다중 시간프레임</h3>
+                <p>1분봉부터 일봉까지 모든 시간프레임에서 동시 분석하여 최적의 트레이딩 기회를 포착합니다.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🔔</div>
+                <h3>스마트 알림</h3>
+                <p>텔레그램, 디스코드, 이메일을 통한 즉각적인 매매 신호 알림으로 기회를 놓치지 마세요.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🛡️</div>
+                <h3>리스크 관리</h3>
+                <p>자동화된 포지션 사이징과 손실 제한 기능으로 자산을 안전하게 보호합니다.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">📈</div>
+                <h3>성과 분석</h3>
+                <p>상세한 트레이딩 통계와 분석 리포트로 전략을 지속적으로 개선할 수 있습니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Indicators Section -->
+    <section class="section indicators-section" id="indicators">
+        <div class="section-header">
+            <p class="section-tag">Indicators</p>
+            <h2 class="section-title">프리미엄 보조지표</h2>
+            <p class="section-desc">
+                전문 트레이더들이 선택한 검증된 보조지표 컬렉션
+            </p>
+        </div>
+        <div class="indicators-grid">
+            <!-- Indicator 1 -->
+            <div class="indicator-card reveal">
+                <div class="indicator-preview">
+                    <svg viewBox="0 0 400 120">
+                        <path class="price-line" d="M0,80 Q50,60 100,70 T200,50 T300,60 T400,40" />
+                        <path class="indicator-line" d="M0,90 Q50,70 100,75 T200,55 T300,65 T400,45" />
+                        <circle class="signal-dot" cx="100" cy="75" r="5" />
+                        <circle class="signal-dot sell" cx="250" cy="58" r="5" />
+                        <circle class="signal-dot" cx="380" cy="47" r="5" />
+                    </svg>
+                </div>
+                <div class="indicator-content">
+                    <span class="indicator-tag">Best Seller</span>
+                    <h3>VORTEX Momentum Pro</h3>
+                    <p>다중 모멘텀 지표를 결합한 고급 트렌드 추종 시스템. 강력한 추세 포착과 정확한 진입/청산 신호를 제공합니다.</p>
+                    <div class="indicator-features">
+                        <span class="indicator-feature">트렌드 감지</span>
+                        <span class="indicator-feature">다이버전스 알림</span>
+                        <span class="indicator-feature">오토 S/L</span>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-price">₩299,000 <span>/평생</span></div>
+                        <button class="btn-indicator">상세보기</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicator 2 -->
+            <div class="indicator-card reveal">
+                <div class="indicator-preview">
+                    <svg viewBox="0 0 400 120">
+                        <path class="price-line" d="M0,60 L50,80 L100,40 L150,70 L200,30 L250,55 L300,45 L350,65 L400,50" />
+                        <path class="indicator-line" d="M0,100 Q100,90 200,85 T400,70" style="stroke: var(--accent-gold);" />
+                        <circle class="signal-dot" cx="100" cy="40" r="5" />
+                        <circle class="signal-dot" cx="200" cy="30" r="5" />
+                    </svg>
+                </div>
+                <div class="indicator-content">
+                    <span class="indicator-tag">Scalping</span>
+                    <h3>Smart Scalper X</h3>
+                    <p>초단타 트레이딩에 최적화된 스캘핑 전용 지표. 빠른 진입과 정확한 청산으로 소액 수익을 누적합니다.</p>
+                    <div class="indicator-features">
+                        <span class="indicator-feature">1분봉 최적화</span>
+                        <span class="indicator-feature">노이즈 필터</span>
+                        <span class="indicator-feature">볼륨 분석</span>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-price">₩199,000 <span>/평생</span></div>
+                        <button class="btn-indicator">상세보기</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicator 3 -->
+            <div class="indicator-card reveal">
+                <div class="indicator-preview">
+                    <svg viewBox="0 0 400 120">
+                        <rect x="0" y="70" width="400" height="40" fill="rgba(0, 255, 136, 0.1)" />
+                        <rect x="0" y="20" width="400" height="30" fill="rgba(255, 51, 102, 0.1)" />
+                        <path class="price-line" d="M0,55 Q100,35 200,60 T400,45" />
+                        <line x1="150" y1="20" x2="150" y2="110" stroke="var(--accent-cyan)" stroke-width="1" stroke-dasharray="4" />
+                        <line x1="300" y1="20" x2="300" y2="110" stroke="var(--accent-cyan)" stroke-width="1" stroke-dasharray="4" />
+                    </svg>
+                </div>
+                <div class="indicator-content">
+                    <span class="indicator-tag">Support/Resistance</span>
+                    <h3>Zone Detector Pro</h3>
+                    <p>AI 기반 지지/저항 구간 자동 탐지. 핵심 가격대를 실시간으로 분석하여 최적의 매매 구간을 표시합니다.</p>
+                    <div class="indicator-features">
+                        <span class="indicator-feature">자동 구간 탐지</span>
+                        <span class="indicator-feature">강도 표시</span>
+                        <span class="indicator-feature">브레이크아웃 알림</span>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-price">₩249,000 <span>/평생</span></div>
+                        <button class="btn-indicator">상세보기</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicator 4 -->
+            <div class="indicator-card reveal">
+                <div class="indicator-preview">
+                    <svg viewBox="0 0 400 120">
+                        <path class="price-line" d="M0,80 Q80,60 160,75 T320,55 T400,65" />
+                        <path class="indicator-line" d="M0,40 L100,60 L200,45 L300,55 L400,35" style="stroke: var(--accent-green);" />
+                        <path class="indicator-line" d="M0,95 L100,85 L200,90 L300,80 L400,85" style="stroke: var(--accent-red);" />
+                    </svg>
+                </div>
+                <div class="indicator-content">
+                    <span class="indicator-tag">Volume</span>
+                    <h3>Volume Flow Master</h3>
+                    <p>기관 수급을 추적하는 고급 볼륨 분석 도구. 스마트머니의 움직임을 포착하여 트렌드 전환점을 예측합니다.</p>
+                    <div class="indicator-features">
+                        <span class="indicator-feature">기관 추적</span>
+                        <span class="indicator-feature">수급 분석</span>
+                        <span class="indicator-feature">축적/분산</span>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-price">₩349,000 <span>/평생</span></div>
+                        <button class="btn-indicator">상세보기</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicator 5 -->
+            <div class="indicator-card reveal">
+                <div class="indicator-preview">
+                    <svg viewBox="0 0 400 120">
+                        <path class="price-line" d="M0,60 C50,40 100,80 150,55 C200,30 250,70 300,50 C350,30 400,60 400,60" />
+                        <ellipse cx="150" cy="55" rx="30" ry="20" fill="none" stroke="var(--accent-cyan)" stroke-width="1.5" opacity="0.6" />
+                        <ellipse cx="300" cy="50" rx="25" ry="18" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" opacity="0.6" />
+                    </svg>
+                </div>
+                <div class="indicator-content">
+                    <span class="indicator-tag">Pattern</span>
+                    <h3>Pattern Scanner AI</h3>
+                    <p>머신러닝 기반 차트 패턴 자동 인식. 헤드앤숄더, 이중바닥 등 50가지 이상의 패턴을 실시간 탐지합니다.</p>
+                    <div class="indicator-features">
+                        <span class="indicator-feature">50+ 패턴</span>
+                        <span class="indicator-feature">목표가 계산</span>
+                        <span class="indicator-feature">신뢰도 점수</span>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-price">₩399,000 <span>/평생</span></div>
+                        <button class="btn-indicator">상세보기</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicator 6 -->
+            <div class="indicator-card reveal">
+                <div class="indicator-preview">
+                    <svg viewBox="0 0 400 120">
+                        <defs>
+                            <linearGradient id="bandGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="var(--accent-cyan)" stop-opacity="0.3" />
+                                <stop offset="100%" stop-color="var(--accent-cyan)" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M0,30 Q100,20 200,35 T400,25 L400,90 Q300,100 200,85 T0,95 Z" fill="url(#bandGradient)" />
+                        <path class="price-line" d="M0,60 Q100,50 200,65 T400,55" />
+                    </svg>
+                </div>
+                <div class="indicator-content">
+                    <span class="indicator-tag">Volatility</span>
+                    <h3>Volatility Band Plus</h3>
+                    <p>동적 변동성 밴드 시스템. 시장 변동성에 따라 자동 조절되는 밴드로 과매수/과매도 구간을 정확히 포착합니다.</p>
+                    <div class="indicator-features">
+                        <span class="indicator-feature">동적 밴드</span>
+                        <span class="indicator-feature">스퀴즈 감지</span>
+                        <span class="indicator-feature">확장 알림</span>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-price">₩279,000 <span>/평생</span></div>
+                        <button class="btn-indicator">상세보기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="section pricing-section" id="pricing">
+        <div class="section-header">
+            <p class="section-tag">Pricing</p>
+            <h2 class="section-title">멤버십 요금제</h2>
+            <p class="section-desc">
+                모든 보조지표를 한 번에 이용할 수 있는 올인원 멤버십
+            </p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card reveal">
+                <div class="pricing-name">Starter</div>
+                <div class="pricing-price">₩49,000</div>
+                <div class="pricing-period">월간 구독</div>
+                <ul class="pricing-features">
+                    <li>기본 보조지표 3종</li>
+                    <li>실시간 알림 (이메일)</li>
+                    <li>기본 고객 지원</li>
+                    <li class="disabled">프리미엄 보조지표</li>
+                    <li class="disabled">1:1 트레이딩 코칭</li>
+                </ul>
+                <button class="btn-pricing">시작하기</button>
+            </div>
+            <div class="pricing-card featured reveal">
+                <div class="pricing-name">Professional</div>
+                <div class="pricing-price">₩149,000</div>
+                <div class="pricing-period">월간 구독</div>
+                <ul class="pricing-features">
+                    <li>모든 보조지표 15종</li>
+                    <li>실시간 알림 (텔레그램/디스코드)</li>
+                    <li>우선 고객 지원</li>
+                    <li>프리미엄 전략 가이드</li>
+                    <li class="disabled">1:1 트레이딩 코칭</li>
+                </ul>
+                <button class="btn-pricing">시작하기</button>
+            </div>
+            <div class="pricing-card reveal">
+                <div class="pricing-name">Enterprise</div>
+                <div class="pricing-price">₩499,000</div>
+                <div class="pricing-period">월간 구독</div>
+                <ul class="pricing-features">
+                    <li>모든 보조지표 + 베타 액세스</li>
+                    <li>커스텀 알림 설정</li>
+                    <li>전담 매니저 배정</li>
+                    <li>전략 커스터마이징</li>
+                    <li>주간 1:1 트레이딩 코칭</li>
+                </ul>
+                <button class="btn-pricing">문의하기</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section testimonials-section">
+        <div class="section-header">
+            <p class="section-tag">Testimonials</p>
+            <h2 class="section-title">사용자 후기</h2>
+            <p class="section-desc">
+                VORTEX와 함께 성과를 만들어가는 트레이더들
+            </p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card reveal">
+                <div class="testimonial-rating">★★★★★</div>
+                <p class="testimonial-text">
+                    "Momentum Pro 지표 하나로 승률이 30% 이상 개선됐습니다. 진입 타이밍이 정말 정확해요. 이제 감으로 하던 트레이딩은 상상도 못합니다."
+                </p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">K</div>
+                    <div class="author-info">
+                        <h4>김준혁</h4>
+                        <p>개인 투자자 · 3년차</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card reveal">
+                <div class="testimonial-rating">★★★★★</div>
+                <p class="testimonial-text">
+                    "Zone Detector의 지지/저항 구간이 놀라울 정도로 정확합니다. 덕분에 손절 라인 설정이 훨씬 수월해졌어요."
+                </p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">P</div>
+                    <div class="author-info">
+                        <h4>박서연</h4>
+                        <p>전업 트레이더 · 5년차</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card reveal">
+                <div class="testimonial-rating">★★★★★</div>
+                <p class="testimonial-text">
+                    "여러 지표 서비스를 써봤지만 VORTEX만큼 체계적이고 신뢰할 수 있는 곳은 없었습니다. 고객 지원도 최고예요."
+                </p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">L</div>
+                    <div class="author-info">
+                        <h4>이민수</h4>
+                        <p>퀀트 트레이더 · 7년차</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section faq-section" id="faq">
+        <div class="section-header">
+            <p class="section-tag">FAQ</p>
+            <h2 class="section-title">자주 묻는 질문</h2>
+        </div>
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-question">
+                    어떤 거래소/플랫폼에서 사용할 수 있나요?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>VORTEX 보조지표는 TradingView 플랫폼에서 작동합니다. 바이낸스, 업비트, 빗썸 등 TradingView에 연동된 모든 거래소에서 사용 가능합니다. 주식, 코인, 선물 등 모든 자산군을 지원합니다.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    환불 정책은 어떻게 되나요?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>구매 후 7일 이내에 환불을 요청하시면 전액 환불해 드립니다. 단, 평생 라이선스 제품의 경우 첫 사용 전에만 환불이 가능합니다.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    초보자도 사용할 수 있나요?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>물론입니다. 모든 보조지표에는 상세한 사용 가이드와 영상 튜토리얼이 포함되어 있습니다. Professional 이상 멤버십에서는 기초부터 고급까지 전략 가이드를 제공합니다.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    업데이트는 무료인가요?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>네, 한 번 구매하시면 해당 지표의 모든 업데이트를 평생 무료로 받으실 수 있습니다. 새로운 기능 추가, 성능 개선, 버그 수정 등 모든 업데이트가 포함됩니다.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    여러 기기에서 사용할 수 있나요?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>기본 라이선스는 1개의 TradingView 계정에서 사용 가능합니다. 추가 기기나 계정이 필요하시면 멀티 라이선스를 할인된 가격으로 구매하실 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2 class="reveal">트레이딩의 새로운 기준</h2>
+        <p class="reveal">지금 시작하세요. 첫 7일은 무료입니다.</p>
+        <div class="hero-buttons reveal">
+            <button class="btn-primary">무료 체험 시작</button>
+            <button class="btn-secondary">상담 신청</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">VORTEX</div>
+                <p>기관급 알고리즘 기반 프리미엄 트레이딩 보조지표. 더 스마트한 트레이딩을 위한 첫 걸음.</p>
+            </div>
+            <div class="footer-links">
+                <h4>제품</h4>
+                <ul>
+                    <li><a href="#">보조지표</a></li>
+                    <li><a href="#">요금제</a></li>
+                    <li><a href="#">업데이트</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>지원</h4>
+                <ul>
+                    <li><a href="#">사용 가이드</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">문의하기</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>회사</h4>
+                <ul>
+                    <li><a href="#">소개</a></li>
+                    <li><a href="#">이용약관</a></li>
+                    <li><a href="#">개인정보처리방침</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 VORTEX. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#">𝕏</a>
+                <a href="#">📱</a>
+                <a href="#">💬</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll reveal animation
+        const reveals = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const revealTop = el.getBoundingClientRect().top;
+                const revealPoint = 150;
+
+                if (revealTop < windowHeight - revealPoint) {
+                    el.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+
+        // Nav scroll effect
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // FAQ accordion
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            question.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+
+                faqItems.forEach(i => i.classList.remove('active'));
+
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animated chart line
+        const chartPath = document.querySelector('.chart-line');
+        if (chartPath) {
+            const animateChart = () => {
+                const points = [];
+                for (let i = 0; i <= 12; i++) {
+                    const x = i * 100;
+                    const y = 150 + Math.sin(Date.now() / 1000 + i) * 50 + Math.random() * 20;
+                    points.push(`${i === 0 ? 'M' : 'L'}${x},${y}`);
+                }
+                chartPath.setAttribute('d', points.join(' '));
+                requestAnimationFrame(animateChart);
+            };
+            animateChart();
+        }
+    </script>
+</body>
+</html>
