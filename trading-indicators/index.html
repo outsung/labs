@@ -6,25 +6,26 @@
     <title>VORTEX | 프리미엄 트레이딩 보조지표</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.cdnfonts.com/css/monument-extended');
-
         :root {
-            --bg-primary: #050508;
-            --bg-secondary: #0a0a0f;
-            --bg-card: rgba(15, 15, 25, 0.6);
-            --text-primary: #f0f0f5;
-            --text-secondary: #8888a0;
-            --text-muted: #555570;
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --bg-card: rgba(20, 20, 30, 0.6);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
             --accent-cyan: #00d4ff;
-            --accent-cyan-dim: #0099cc;
-            --accent-gold: #ffd700;
-            --accent-green: #00ff88;
-            --accent-red: #ff3366;
-            --border-subtle: rgba(255, 255, 255, 0.06);
-            --glass-bg: rgba(10, 10, 20, 0.85);
-            --gradient-hero: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 212, 255, 0.15), transparent);
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-gold: #f59e0b;
+            --glow-cyan: rgba(0, 212, 255, 0.4);
+            --glow-purple: rgba(168, 85, 247, 0.3);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 212, 255, 0.3);
         }
 
         * {
@@ -38,101 +39,83 @@
         }
 
         body {
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-cyan-dim);
-            border-radius: 3px;
-        }
-
-        /* Typography */
-        .font-display {
-            font-family: 'Monument Extended', sans-serif;
-        }
-
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+        body.loading {
             overflow: hidden;
         }
 
-        .grid-lines {
-            position: absolute;
-            width: 100%;
+        /* Preloader */
+        .preloader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preloader-logo {
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .preloader-logo span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: letterIn 0.5s ease forwards;
+        }
+
+        .preloader-logo span:nth-child(1) { animation-delay: 0.1s; }
+        .preloader-logo span:nth-child(2) { animation-delay: 0.15s; }
+        .preloader-logo span:nth-child(3) { animation-delay: 0.2s; }
+        .preloader-logo span:nth-child(4) { animation-delay: 0.25s; }
+        .preloader-logo span:nth-child(5) { animation-delay: 0.3s; }
+        .preloader-logo span:nth-child(6) { animation-delay: 0.35s; }
+
+        @keyframes letterIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .preloader-bar {
+            width: 200px;
+            height: 3px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .preloader-bar-fill {
             height: 100%;
-            background-image:
-                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            animation: gridMove 20s linear infinite;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 2px;
+            animation: barFill 1.8s ease 0.5s forwards;
         }
 
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(60px, 60px); }
+        @keyframes barFill {
+            to { width: 100%; }
         }
 
-        .floating-chart {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 300px;
-            opacity: 0.15;
-        }
-
-        .chart-line {
-            fill: none;
-            stroke: var(--accent-cyan);
-            stroke-width: 2;
-            filter: drop-shadow(0 0 10px var(--accent-cyan));
-        }
-
-        .glow-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: orbFloat 8s ease-in-out infinite;
-        }
-
-        .orb-1 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.3), transparent 70%);
-            top: -200px;
-            right: -100px;
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.2), transparent 70%);
-            bottom: 20%;
-            left: -150px;
-            animation-delay: -4s;
-        }
-
-        @keyframes orbFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -30px) scale(1.1); }
+        .preloader.loaded {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
         }
 
         /* Navigation */
@@ -142,27 +125,26 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            padding: 20px 60px;
+            padding: 16px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(5, 5, 8, 0.8);
+            background: rgba(10, 10, 15, 0.8);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-subtle);
-            transition: all 0.3s ease;
         }
 
-        nav.scrolled {
-            padding: 15px 60px;
-            background: rgba(5, 5, 8, 0.95);
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 50px;
         }
 
         .logo {
-            font-family: 'Monument Extended', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 800;
             letter-spacing: 0.1em;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -170,7 +152,7 @@
 
         .nav-links {
             display: flex;
-            gap: 40px;
+            gap: 35px;
             list-style: none;
         }
 
@@ -179,64 +161,47 @@
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
-            letter-spacing: 0.05em;
             transition: color 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: var(--accent-cyan);
-            transition: width 0.3s ease;
         }
 
         .nav-links a:hover {
             color: var(--text-primary);
         }
 
-        .nav-links a:hover::after {
-            width: 100%;
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .nav-cta {
-            padding: 12px 28px;
-            background: transparent;
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            font-family: 'Noto Sans KR', sans-serif;
-            font-size: 0.85rem;
+        .nav-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
             font-weight: 600;
-            letter-spacing: 0.1em;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
-        .nav-cta::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
-            transition: left 0.5s ease;
+        .nav-btn-ghost {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
         }
 
-        .nav-cta:hover {
-            background: var(--accent-cyan);
+        .nav-btn-ghost:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
             color: var(--bg-primary);
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
         }
 
-        .nav-cta:hover::before {
-            left: 100%;
+        .nav-btn-primary:hover {
+            box-shadow: 0 0 30px var(--glow-cyan);
+            transform: translateY(-2px);
         }
 
         /* Hero Section */
@@ -249,647 +214,833 @@
             text-align: center;
             padding: 120px 20px 80px;
             position: relative;
+            overflow: hidden;
         }
 
-        .hero::before {
-            content: '';
+        .hero-bg {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--gradient-hero);
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 212, 255, 0.15), transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 50%, rgba(168, 85, 247, 0.1), transparent 50%),
+                radial-gradient(ellipse 50% 30% at 20% 80%, rgba(236, 72, 153, 0.08), transparent 50%);
             pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
         }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-            background: var(--glass-bg);
-            border: 1px solid var(--border-subtle);
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
             border-radius: 50px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-            backdrop-filter: blur(10px);
-            animation: fadeInUp 0.8s ease-out;
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            margin-bottom: 30px;
         }
 
-        .badge-dot {
-            width: 6px;
-            height: 6px;
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
             background: var(--accent-green);
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .hero-stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .hero-stars svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-gold);
+        }
+
+        .hero-rating-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .hero-rating-text strong {
+            color: var(--text-primary);
         }
 
         .hero h1 {
-            font-family: 'Monument Extended', sans-serif;
-            font-size: clamp(3rem, 10vw, 7rem);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
             font-weight: 800;
-            line-height: 1;
-            margin-bottom: 30px;
-            animation: fadeInUp 0.8s ease-out 0.2s both;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            letter-spacing: -0.02em;
         }
 
-        .hero h1 span {
-            display: block;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 50%, var(--accent-gold) 100%);
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .hero-subtitle {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: var(--text-secondary);
             max-width: 600px;
-            margin-bottom: 50px;
-            font-weight: 300;
-            animation: fadeInUp 0.8s ease-out 0.4s both;
+            margin: 0 auto 40px;
+            line-height: 1.7;
         }
 
         .hero-buttons {
             display: flex;
-            gap: 20px;
-            animation: fadeInUp 0.8s ease-out 0.6s both;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 50px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         .btn-primary {
-            padding: 18px 40px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-cyan-dim));
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             border: none;
             color: var(--bg-primary);
-            font-family: 'Noto Sans KR', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4);
+            box-shadow: 0 10px 40px var(--glow-cyan);
+            transform: translateY(-3px);
         }
 
         .btn-secondary {
-            padding: 18px 40px;
             background: transparent;
             border: 1px solid var(--border-subtle);
             color: var(--text-primary);
-            font-family: 'Noto Sans KR', sans-serif;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
 
         .btn-secondary:hover {
-            border-color: var(--text-secondary);
-            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.05);
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn svg {
+            width: 18px;
+            height: 18px;
         }
 
-        /* Stats Bar */
-        .stats-bar {
+        .hero-stats {
             display: flex;
             justify-content: center;
-            gap: 80px;
-            padding: 60px 20px;
+            gap: 50px;
+            padding-top: 40px;
             border-top: 1px solid var(--border-subtle);
-            border-bottom: 1px solid var(--border-subtle);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
         }
 
-        .stat-item {
+        .hero-stat {
             text-align: center;
         }
 
-        .stat-number {
-            font-family: 'Monument Extended', sans-serif;
-            font-size: 3rem;
+        .hero-stat-value {
+            font-size: 2rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--text-primary));
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .stat-label {
+        .hero-stat-label {
             font-size: 0.85rem;
             color: var(--text-muted);
-            letter-spacing: 0.1em;
-            margin-top: 8px;
+            margin-top: 5px;
         }
 
-        /* Exchange Links Section */
-        .exchanges-section {
-            padding: 60px 20px;
-            background: var(--bg-secondary);
+        /* Partners Section */
+        .partners {
+            padding: 40px 0;
+            border-top: 1px solid var(--border-subtle);
             border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-secondary);
         }
 
-        .exchanges-header {
+        .partners-label {
             text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .exchanges-header p {
+            font-size: 0.8rem;
             color: var(--text-muted);
-            font-size: 0.9rem;
             letter-spacing: 0.1em;
+            margin-bottom: 25px;
         }
 
-        .exchanges-grid {
+        .partners-logos {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 50px;
+            gap: 60px;
             flex-wrap: wrap;
-            max-width: 1200px;
-            margin: 0 auto;
+            padding: 0 40px;
         }
 
-        .exchange-link {
+        .partner-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 16px 28px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-size: 1rem;
+            gap: 10px;
+            font-size: 1.1rem;
             font-weight: 600;
-            letter-spacing: 0.05em;
-            transition: all 0.3s ease;
+            color: var(--text-muted);
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
         }
 
-        .exchange-link:hover {
-            border-color: var(--accent-cyan);
+        .partner-logo:hover {
+            opacity: 1;
+        }
+
+        .partner-logo svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* Chart Preview Section */
+        .chart-preview {
+            padding: 100px 40px;
+            position: relative;
+        }
+
+        .chart-preview-bg {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 100% 50% at 50% 100%, rgba(0, 212, 255, 0.08), transparent);
+            pointer-events: none;
+        }
+
+        .chart-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .chart-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .chart-pair {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chart-pair-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .chart-pair-change {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .chart-pair-change.positive {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+        }
+
+        .chart-window {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-tertiary);
+        }
+
+        .chart-timeframes {
+            display: flex;
+            gap: 5px;
+        }
+
+        .chart-tf {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chart-tf.active {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        .chart-tf:hover:not(.active) {
             color: var(--text-primary);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        .exchange-link svg {
+        .chart-indicators {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chart-indicator-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .chart-indicator-tag .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .chart-indicator-tag .dot.cyan { background: var(--accent-cyan); }
+        .chart-indicator-tag .dot.purple { background: var(--accent-purple); }
+        .chart-indicator-tag .dot.green { background: var(--accent-green); }
+
+        .chart-canvas {
+            height: 450px;
+            position: relative;
+            padding: 20px;
+        }
+
+        .chart-canvas svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-signals {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .chart-signal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .chart-signal.buy {
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .chart-signal.sell {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .chart-signal-icon {
             width: 24px;
             height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-signal.buy .chart-signal-icon {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--accent-green);
+        }
+
+        .chart-signal.sell .chart-signal-icon {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
         }
 
         /* Features Section */
-        .section {
-            padding: 120px 60px;
-            position: relative;
+        .features {
+            padding: 120px 40px;
+            background: var(--bg-secondary);
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 80px;
+            max-width: 700px;
+            margin: 0 auto 80px;
         }
 
         .section-tag {
-            font-size: 0.75rem;
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
             color: var(--accent-cyan);
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
+            letter-spacing: 0.05em;
             margin-bottom: 20px;
         }
 
         .section-title {
-            font-family: 'Monument Extended', sans-serif;
-            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-size: clamp(2rem, 4vw, 3rem);
             font-weight: 800;
             margin-bottom: 20px;
+            letter-spacing: -0.02em;
         }
 
         .section-desc {
+            font-size: 1.1rem;
             color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-            font-weight: 300;
+            line-height: 1.7;
         }
 
-        /* Feature Cards */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            max-width: 1400px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
         .feature-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            padding: 50px 40px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            border-radius: 16px;
+            padding: 35px 30px;
+            transition: all 0.3s ease;
         }
 
         .feature-card:hover {
+            border-color: var(--border-glow);
             transform: translateY(-5px);
-            border-color: rgba(0, 212, 255, 0.3);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
         .feature-icon {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), transparent);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            margin-bottom: 30px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(168, 85, 247, 0.1));
+            border-radius: 12px;
+            margin-bottom: 20px;
         }
 
         .feature-icon svg {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             stroke: var(--accent-cyan);
-            fill: none;
-            stroke-width: 1.5;
         }
 
         .feature-card h3 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.8;
-        }
-
-        /* Indicators Section */
-        .indicators-section {
-            background: linear-gradient(180deg, var(--bg-primary), var(--bg-secondary));
-        }
-
-        .indicators-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 40px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .indicator-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            overflow: hidden;
-            transition: all 0.4s ease;
-            position: relative;
-        }
-
-        .indicator-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .indicator-card:hover {
-            transform: scale(1.02);
-            border-color: rgba(0, 212, 255, 0.4);
-        }
-
-        .indicator-card:hover::after {
-            opacity: 1;
-        }
-
-        .indicator-preview {
-            height: 200px;
-            background: linear-gradient(135deg, #0a0a15, #0f0f20);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .indicator-preview svg {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            height: 120px;
-        }
-
-        .indicator-preview .price-line {
-            fill: none;
-            stroke: var(--text-muted);
-            stroke-width: 1.5;
-        }
-
-        .indicator-preview .indicator-line {
-            fill: none;
-            stroke: var(--accent-cyan);
-            stroke-width: 2;
-            filter: drop-shadow(0 0 8px var(--accent-cyan));
-        }
-
-        .indicator-preview .signal-dot {
-            fill: var(--accent-green);
-            filter: drop-shadow(0 0 6px var(--accent-green));
-        }
-
-        .indicator-preview .signal-dot.sell {
-            fill: var(--accent-red);
-            filter: drop-shadow(0 0 6px var(--accent-red));
-        }
-
-        .indicator-content {
-            padding: 35px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .indicator-tag {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            color: var(--accent-cyan);
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-        }
-
-        .indicator-content h3 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 12px;
         }
 
-        .indicator-content p {
+        .feature-card p {
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 25px;
-            line-height: 1.7;
+            line-height: 1.6;
         }
 
-        .indicator-features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        /* Before/After Section */
+        .comparison {
+            padding: 120px 40px;
         }
 
-        .indicator-feature {
-            padding: 6px 14px;
-            background: rgba(255, 255, 255, 0.03);
+        .comparison-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .comparison-card {
+            background: var(--bg-secondary);
             border: 1px solid var(--border-subtle);
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .comparison-card.before {
+            opacity: 0.7;
+        }
+
+        .comparison-card.after {
+            border-color: var(--border-glow);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .comparison-label {
+            padding: 15px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .comparison-card.before .comparison-label {
+            color: var(--text-muted);
+        }
+
+        .comparison-card.after .comparison-label {
+            color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .comparison-chart {
+            height: 300px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .comparison-chart svg {
+            width: 100%;
+            height: 100%;
         }
 
         /* Pricing Section */
-        .pricing-section {
+        .pricing {
+            padding: 120px 40px;
             background: var(--bg-secondary);
+        }
+
+        .pricing-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 60px;
+        }
+
+        .pricing-toggle-label {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
+
+        .pricing-toggle-label.active {
+            color: var(--text-primary);
+        }
+
+        .pricing-toggle-switch {
+            width: 56px;
+            height: 30px;
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .pricing-toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 50%;
+            top: 2px;
+            left: 3px;
+            transition: transform 0.3s ease;
+        }
+
+        .pricing-toggle-switch.yearly::after {
+            transform: translateX(25px);
+        }
+
+        .pricing-save {
+            padding: 4px 10px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-green);
         }
 
         .pricing-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
         .pricing-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            padding: 50px 40px;
-            text-align: center;
+            border-radius: 20px;
+            padding: 40px 35px;
             position: relative;
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
         }
 
         .pricing-card.featured {
             border-color: var(--accent-cyan);
-            transform: scale(1.05);
+            background: linear-gradient(180deg, rgba(0, 212, 255, 0.05), transparent);
         }
 
         .pricing-card.featured::before {
-            content: 'BEST';
+            content: 'BEST VALUE';
             position: absolute;
             top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 6px 20px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-cyan-dim));
-            color: var(--bg-primary);
-            font-size: 0.75rem;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 6px;
+            font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 0.1em;
-        }
-
-        .pricing-card:hover {
-            border-color: rgba(0, 212, 255, 0.5);
+            color: var(--bg-primary);
         }
 
         .pricing-name {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            margin-bottom: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
         }
 
         .pricing-price {
-            font-family: 'Monument Extended', sans-serif;
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 10px;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin-bottom: 8px;
         }
 
-        .pricing-card.featured .pricing-price {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+        .pricing-currency {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .pricing-amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .pricing-card.featured .pricing-amount {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .pricing-period {
-            color: var(--text-muted);
             font-size: 0.9rem;
-            margin-bottom: 30px;
-        }
-
-        .pricing-indicator-count {
-            display: inline-block;
-            padding: 10px 25px;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            color: var(--accent-cyan);
-            font-size: 1.1rem;
-            font-weight: 700;
+            color: var(--text-muted);
             margin-bottom: 30px;
         }
 
         .pricing-features {
             list-style: none;
-            text-align: left;
-            margin-bottom: 40px;
+            margin-bottom: 35px;
         }
 
         .pricing-features li {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 12px;
+            padding: 10px 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        .pricing-features li .check {
-            color: var(--accent-cyan);
-            font-weight: bold;
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-features li svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .pricing-features li svg.check {
+            stroke: var(--accent-green);
+        }
+
+        .pricing-features li svg.x {
+            stroke: var(--text-muted);
         }
 
         .pricing-features li.disabled {
             color: var(--text-muted);
-            text-decoration: line-through;
         }
 
-        .pricing-features li.disabled .check {
-            color: var(--text-muted);
-        }
-
-        .btn-pricing {
+        .pricing-btn {
             width: 100%;
-            padding: 18px;
-            background: transparent;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-primary);
-            font-family: 'Noto Sans KR', sans-serif;
+            padding: 16px;
+            border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .pricing-card.featured .btn-pricing {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-cyan-dim));
+        .pricing-card:not(.featured) .pricing-btn {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+        }
+
+        .pricing-card:not(.featured) .pricing-btn:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .pricing-card.featured .pricing-btn {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             border: none;
             color: var(--bg-primary);
         }
 
-        .btn-pricing:hover {
-            background: var(--text-primary);
-            color: var(--bg-primary);
-        }
-
-        .pricing-card.featured .btn-pricing:hover {
-            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4);
+        .pricing-card.featured .pricing-btn:hover {
+            box-shadow: 0 10px 30px var(--glow-cyan);
+            transform: translateY(-2px);
         }
 
         /* Testimonials */
-        .testimonials-section {
-            background: var(--bg-primary);
+        .testimonials {
+            padding: 120px 40px;
         }
 
         .testimonials-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
         .testimonial-card {
-            background: var(--bg-card);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-subtle);
-            padding: 40px;
+            border-radius: 16px;
+            padding: 30px;
         }
 
-        .testimonial-rating {
-            color: var(--accent-gold);
-            font-size: 1.2rem;
+        .testimonial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 20px;
-            letter-spacing: 4px;
-        }
-
-        .testimonial-text {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            line-height: 1.8;
-            margin-bottom: 30px;
-            font-style: italic;
         }
 
         .testimonial-author {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
-        .author-avatar {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+        .testimonial-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 1.2rem;
-        }
-
-        .author-info h4 {
             font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 4px;
         }
 
-        .author-info p {
+        .testimonial-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .testimonial-role {
             font-size: 0.8rem;
             color: var(--text-muted);
         }
 
-        /* FAQ Section */
-        .faq-section {
+        .testimonial-stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .testimonial-stars svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--accent-gold);
+        }
+
+        .testimonial-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* FAQ */
+        .faq {
+            padding: 120px 40px;
             background: var(--bg-secondary);
         }
 
@@ -905,17 +1056,16 @@
         .faq-question {
             width: 100%;
             padding: 25px 0;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-family: 'Noto Sans KR', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-align: left;
-            cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
             transition: color 0.3s ease;
         }
 
@@ -924,100 +1074,124 @@
         }
 
         .faq-icon {
-            font-size: 1.5rem;
-            color: var(--accent-cyan);
+            width: 24px;
+            height: 24px;
+            position: relative;
+        }
+
+        .faq-icon::before,
+        .faq-icon::after {
+            content: '';
+            position: absolute;
+            background: var(--accent-cyan);
             transition: transform 0.3s ease;
         }
 
-        .faq-item.active .faq-icon {
-            transform: rotate(45deg);
+        .faq-icon::before {
+            width: 14px;
+            height: 2px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .faq-icon::after {
+            width: 2px;
+            height: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .faq-item.active .faq-icon::after {
+            transform: translate(-50%, -50%) rotate(90deg);
         }
 
         .faq-answer {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
+            transition: max-height 0.3s ease;
         }
 
         .faq-item.active .faq-answer {
             max-height: 200px;
-            padding-bottom: 25px;
         }
 
         .faq-answer p {
+            padding-bottom: 25px;
             color: var(--text-secondary);
-            line-height: 1.8;
+            line-height: 1.7;
         }
 
-        /* CTA Section */
-        .cta-section {
-            padding: 150px 60px;
+        /* CTA */
+        .cta {
+            padding: 120px 40px;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        .cta-section::before {
-            content: '';
+        .cta-bg {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.1), transparent 60%);
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0, 212, 255, 0.1), transparent),
+                radial-gradient(ellipse 40% 30% at 30% 70%, rgba(168, 85, 247, 0.08), transparent);
             pointer-events: none;
         }
 
-        .cta-section h2 {
-            font-family: 'Monument Extended', sans-serif;
-            font-size: clamp(2rem, 5vw, 4rem);
-            font-weight: 800;
-            margin-bottom: 30px;
+        .cta-content {
             position: relative;
+            z-index: 1;
         }
 
-        .cta-section p {
+        .cta h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+
+        .cta p {
+            font-size: 1.15rem;
             color: var(--text-secondary);
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 50px;
-            position: relative;
+            max-width: 500px;
+            margin: 0 auto 40px;
         }
 
         /* Footer */
         footer {
-            padding: 80px 60px 40px;
-            background: var(--bg-primary);
+            padding: 60px 40px 30px;
             border-top: 1px solid var(--border-subtle);
         }
 
         .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
             display: grid;
             grid-template-columns: 2fr repeat(3, 1fr);
             gap: 60px;
-            max-width: 1400px;
-            margin: 0 auto 60px;
+            margin-bottom: 50px;
         }
 
         .footer-brand .logo {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: inline-block;
         }
 
         .footer-brand p {
-            color: var(--text-muted);
             font-size: 0.9rem;
-            line-height: 1.8;
-            max-width: 300px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            max-width: 280px;
         }
 
         .footer-links h4 {
             font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
             color: var(--text-primary);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 25px;
         }
 
         .footer-links ul {
@@ -1025,7 +1199,7 @@
         }
 
         .footer-links li {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .footer-links a {
@@ -1040,90 +1214,98 @@
         }
 
         .footer-bottom {
-            padding-top: 40px;
-            border-top: 1px solid var(--border-subtle);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1400px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-subtle);
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        .footer-bottom p {
-            color: var(--text-muted);
+        .footer-copy {
             font-size: 0.85rem;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 20px;
-        }
-
-        .social-links a {
             color: var(--text-muted);
-            transition: color 0.3s ease;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-socials a {
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
         }
 
-        .social-links a:hover {
-            color: var(--accent-cyan);
+        .footer-socials a:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
         }
 
-        .social-links svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* Scroll Animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
+        .footer-socials svg {
+            width: 18px;
+            height: 18px;
         }
 
         /* Responsive */
         @media (max-width: 1024px) {
-            nav {
-                padding: 20px 30px;
+            .features-grid,
+            .pricing-grid,
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
-            .section {
-                padding: 80px 30px;
-            }
-
-            .stats-bar {
-                flex-wrap: wrap;
-                gap: 40px;
+            .comparison-grid {
+                grid-template-columns: 1fr;
             }
 
             .footer-content {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 768px) {
-            .nav-links {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-links, .nav-btn-ghost {
                 display: none;
             }
 
-            .hero h1 {
-                font-size: 2.5rem;
+            .hero {
+                padding: 100px 20px 60px;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .partners-logos {
+                gap: 30px;
             }
 
             .features-grid,
-            .indicators-grid {
+            .pricing-grid,
+            .testimonials-grid {
                 grid-template-columns: 1fr;
             }
 
             .pricing-card.featured {
-                transform: none;
+                order: -1;
+            }
+
+            .chart-canvas {
+                height: 300px;
             }
 
             .footer-content {
@@ -1136,364 +1318,276 @@
                 gap: 20px;
                 text-align: center;
             }
-
-            .exchanges-grid {
-                gap: 20px;
-            }
-
-            .exchange-link {
-                padding: 12px 20px;
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Preloader */
-        .preloader {
-            position: fixed;
-            inset: 0;
-            background: var(--bg-primary);
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .preloader::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 80% 50% at 50% 30%, rgba(0, 212, 255, 0.1), transparent),
-                radial-gradient(ellipse 60% 40% at 70% 70%, rgba(255, 215, 0, 0.05), transparent);
-        }
-
-        .preloader-content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }
-
-        .preloader-logo {
-            font-family: 'Monument Extended', sans-serif;
-            font-size: clamp(3rem, 10vw, 7rem);
-            font-weight: 800;
-            letter-spacing: 0.15em;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .preloader-logo span {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(100%) rotateX(-90deg);
-            animation: letterReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .preloader-logo span:nth-child(1) { animation-delay: 0.1s; }
-        .preloader-logo span:nth-child(2) { animation-delay: 0.15s; }
-        .preloader-logo span:nth-child(3) { animation-delay: 0.2s; }
-        .preloader-logo span:nth-child(4) { animation-delay: 0.25s; }
-        .preloader-logo span:nth-child(5) { animation-delay: 0.3s; }
-        .preloader-logo span:nth-child(6) { animation-delay: 0.35s; }
-
-        @keyframes letterReveal {
-            to {
-                opacity: 1;
-                transform: translateY(0) rotateX(0);
-            }
-        }
-
-        .preloader-line {
-            width: 200px;
-            height: 2px;
-            background: var(--border-subtle);
-            margin: 40px auto 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .preloader-line::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
-            animation: lineProgress 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
-        }
-
-        @keyframes lineProgress {
-            to { width: 100%; }
-        }
-
-        .preloader-text {
-            margin-top: 20px;
-            font-size: 0.75rem;
-            letter-spacing: 0.3em;
-            color: var(--text-muted);
-            opacity: 0;
-            animation: fadeIn 0.5s ease 0.6s forwards;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        .preloader.loaded {
-            animation: preloaderExit 1s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-        }
-
-        .preloader.loaded .preloader-content {
-            animation: contentExit 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-        }
-
-        @keyframes contentExit {
-            to {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-        }
-
-        @keyframes preloaderExit {
-            0% {
-                clip-path: inset(0 0 0 0);
-            }
-            100% {
-                clip-path: inset(0 0 100% 0);
-            }
-        }
-
-        /* Glitch effect on preloader */
-        .preloader-logo::before,
-        .preloader-logo::after {
-            content: 'VORTEX';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .preloader-logo::before {
-            animation: glitch1 2s infinite linear 1s;
-            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
-        }
-
-        .preloader-logo::after {
-            animation: glitch2 2s infinite linear 1s;
-            clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
-        }
-
-        @keyframes glitch1 {
-            0%, 90%, 100% { transform: translate(0); }
-            92% { transform: translate(-3px, 1px); }
-            94% { transform: translate(3px, -1px); }
-            96% { transform: translate(-2px, 0); }
-            98% { transform: translate(2px, 1px); }
-        }
-
-        @keyframes glitch2 {
-            0%, 90%, 100% { transform: translate(0); }
-            91% { transform: translate(3px, 0); }
-            93% { transform: translate(-3px, 1px); }
-            95% { transform: translate(2px, -1px); }
-            97% { transform: translate(-2px, 0); }
-        }
-
-        /* Hide body overflow during preloader */
-        body.loading {
-            overflow: hidden;
         }
     </style>
 </head>
 <body class="loading">
     <!-- Preloader -->
     <div class="preloader">
-        <div class="preloader-content">
-            <div class="preloader-logo">
-                <span>V</span><span>O</span><span>R</span><span>T</span><span>E</span><span>X</span>
-            </div>
-            <div class="preloader-line"></div>
-            <p class="preloader-text">LOADING</p>
+        <div class="preloader-logo">
+            <span>V</span><span>O</span><span>R</span><span>T</span><span>E</span><span>X</span>
         </div>
-    </div>
-
-    <!-- Animated Background -->
-    <div class="bg-animation">
-        <div class="grid-lines"></div>
-        <div class="glow-orb orb-1"></div>
-        <div class="glow-orb orb-2"></div>
-        <svg class="floating-chart" viewBox="0 0 1200 300" preserveAspectRatio="none">
-            <path class="chart-line" d="M0,250 Q100,200 200,220 T400,180 T600,200 T800,150 T1000,170 T1200,120" />
-        </svg>
+        <div class="preloader-bar">
+            <div class="preloader-bar-fill"></div>
+        </div>
     </div>
 
     <!-- Navigation -->
     <nav>
-        <div class="logo">VORTEX</div>
-        <ul class="nav-links">
-            <li><a href="#features">기능</a></li>
-            <li><a href="#indicators">보조지표</a></li>
-            <li><a href="#pricing">요금제</a></li>
-            <li><a href="#faq">FAQ</a></li>
-        </ul>
-        <button class="nav-cta">시작하기</button>
+        <div class="nav-left">
+            <div class="logo">VORTEX</div>
+            <ul class="nav-links">
+                <li><a href="#features">기능</a></li>
+                <li><a href="#pricing">요금제</a></li>
+                <li><a href="#testimonials">후기</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn nav-btn-ghost">로그인</button>
+            <button class="nav-btn nav-btn-primary">무료 체험</button>
+        </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-badge">
-            <span class="badge-dot"></span>
-            실시간 트레이딩 신호 제공중
-        </div>
-        <h1>
-            <span>TRADE</span>
-            <span>SMARTER</span>
-        </h1>
-        <p class="hero-subtitle">
-            기관급 알고리즘 기반 보조지표로 당신의 트레이딩을 한 단계 업그레이드하세요.
-            정확한 진입과 청산 타이밍을 제공합니다.
-        </p>
-        <div class="hero-buttons">
-            <button class="btn-primary">무료 체험 시작</button>
-            <button class="btn-secondary">데모 영상 보기</button>
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                실시간 신호 제공 중
+            </div>
+            <div class="hero-rating">
+                <div class="hero-stars">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <span class="hero-rating-text"><strong>4.9/5</strong> (3,200+ 리뷰)</span>
+            </div>
+            <h1>
+                스마트머니처럼<br>
+                <span class="gradient">트레이딩하세요</span>
+            </h1>
+            <p class="hero-subtitle">
+                기관급 알고리즘 기반 보조지표로 정확한 매매 신호를 받아보세요.
+                10,000명 이상의 트레이더가 신뢰하는 프리미엄 솔루션.
+            </p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary">
+                    7일 무료 체험 시작
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                <button class="btn btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/>
+                    </svg>
+                    데모 영상
+                </button>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value" data-target="87" data-suffix="%">0%</div>
+                    <div class="hero-stat-label">평균 승률</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" data-target="10847" data-format="comma">0</div>
+                    <div class="hero-stat-label">활성 사용자</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" data-target="2.4" data-suffix="M+">0M+</div>
+                    <div class="hero-stat-label">분석된 신호</div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Stats Bar -->
-    <div class="stats-bar">
-        <div class="stat-item">
-            <div class="stat-number" data-target="87.3" data-suffix="%">0%</div>
-            <div class="stat-label">평균 승률</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number" data-target="12847" data-format="comma">0</div>
-            <div class="stat-label">활성 사용자</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number" data-target="24" data-suffix="/7">0/7</div>
-            <div class="stat-label">실시간 알림</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number" data-target="15" data-suffix="+">0+</div>
-            <div class="stat-label">보조지표</div>
-        </div>
-    </div>
-
-    <!-- Exchange Links Section -->
-    <section class="exchanges-section">
-        <div class="exchanges-header">
-            <p>지원 거래소에서 바로 트레이딩하세요</p>
-        </div>
-        <div class="exchanges-grid">
-            <a href="https://www.binance.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
-                <svg viewBox="0 0 24 24" fill="var(--accent-gold)">
-                    <path d="M12 2L6.5 7.5L8.62 9.62L12 6.24L15.38 9.62L17.5 7.5L12 2ZM2 12L4.12 9.88L6.24 12L4.12 14.12L2 12ZM12 22L6.5 16.5L8.62 14.38L12 17.76L15.38 14.38L17.5 16.5L12 22ZM22 12L19.88 14.12L17.76 12L19.88 9.88L22 12ZM12 9.76L9.76 12L12 14.24L14.24 12L12 9.76Z"/>
-                </svg>
+    <!-- Partners -->
+    <section class="partners">
+        <p class="partners-label">POWERED BY</p>
+        <div class="partners-logos">
+            <div class="partner-logo">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                TradingView
+            </div>
+            <div class="partner-logo">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L6.5 7.5L8.62 9.62L12 6.24L15.38 9.62L17.5 7.5L12 2ZM2 12L4.12 9.88L6.24 12L4.12 14.12L2 12ZM12 22L6.5 16.5L8.62 14.38L12 17.76L15.38 14.38L17.5 16.5L12 22ZM22 12L19.88 14.12L17.76 12L19.88 9.88L22 12ZM12 9.76L9.76 12L12 14.24L14.24 12L12 9.76Z"/></svg>
                 Binance
-            </a>
-            <a href="https://upbit.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
-                <svg viewBox="0 0 24 24" fill="var(--accent-cyan)">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                </svg>
-                Upbit
-            </a>
-            <a href="https://www.bithumb.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
-                <svg viewBox="0 0 24 24" fill="var(--accent-red)">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-                Bithumb
-            </a>
-            <a href="https://www.bybit.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
-                <svg viewBox="0 0 24 24" fill="var(--accent-gold)">
-                    <path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z"/>
-                </svg>
+            </div>
+            <div class="partner-logo">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 Bybit
-            </a>
-            <a href="https://www.okx.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
-                <svg viewBox="0 0 24 24" fill="var(--text-primary)">
-                    <circle cx="7" cy="7" r="3"/>
-                    <circle cx="17" cy="7" r="3"/>
-                    <circle cx="7" cy="17" r="3"/>
-                    <circle cx="17" cy="17" r="3"/>
-                </svg>
+            </div>
+            <div class="partner-logo">
+                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg>
                 OKX
-            </a>
+            </div>
+            <div class="partner-logo">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3zm16 16V5H5v14h14z"/></svg>
+                Upbit
+            </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="section" id="features">
+    <!-- Chart Preview -->
+    <section class="chart-preview">
+        <div class="chart-preview-bg"></div>
+        <div class="chart-container">
+            <div class="chart-header">
+                <span class="chart-title">실시간 차트 미리보기</span>
+                <div class="chart-pair">
+                    <span class="chart-pair-name">BTC/USDT</span>
+                    <span class="chart-pair-change positive">+2.34%</span>
+                </div>
+            </div>
+            <div class="chart-window">
+                <div class="chart-toolbar">
+                    <div class="chart-timeframes">
+                        <button class="chart-tf">1m</button>
+                        <button class="chart-tf">5m</button>
+                        <button class="chart-tf active">15m</button>
+                        <button class="chart-tf">1H</button>
+                        <button class="chart-tf">4H</button>
+                        <button class="chart-tf">1D</button>
+                    </div>
+                    <div class="chart-indicators">
+                        <span class="chart-indicator-tag"><span class="dot cyan"></span>VORTEX Signal</span>
+                        <span class="chart-indicator-tag"><span class="dot purple"></span>Momentum</span>
+                        <span class="chart-indicator-tag"><span class="dot green"></span>Support/Resistance</span>
+                    </div>
+                </div>
+                <div class="chart-canvas">
+                    <svg viewBox="0 0 1000 400" preserveAspectRatio="none">
+                        <!-- Grid -->
+                        <defs>
+                            <pattern id="grid" width="50" height="40" patternUnits="userSpaceOnUse">
+                                <path d="M 50 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                            </pattern>
+                            <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(0, 212, 255, 0.3)"/>
+                                <stop offset="100%" stop-color="rgba(0, 212, 255, 0)"/>
+                            </linearGradient>
+                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#00d4ff"/>
+                                <stop offset="50%" stop-color="#a855f7"/>
+                                <stop offset="100%" stop-color="#ec4899"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)"/>
+
+                        <!-- Support/Resistance zones -->
+                        <rect x="0" y="80" width="1000" height="40" fill="rgba(239, 68, 68, 0.05)"/>
+                        <rect x="0" y="280" width="1000" height="40" fill="rgba(34, 197, 94, 0.05)"/>
+                        <line x1="0" y1="100" x2="1000" y2="100" stroke="rgba(239, 68, 68, 0.3)" stroke-dasharray="5,5"/>
+                        <line x1="0" y1="300" x2="1000" y2="300" stroke="rgba(34, 197, 94, 0.3)" stroke-dasharray="5,5"/>
+
+                        <!-- Price area -->
+                        <path d="M0,250 Q50,240 100,230 T200,200 T300,220 T400,180 T500,200 T600,150 T700,170 T800,130 T900,140 T1000,120 L1000,400 L0,400 Z" fill="url(#areaGradient)"/>
+
+                        <!-- Price line -->
+                        <path d="M0,250 Q50,240 100,230 T200,200 T300,220 T400,180 T500,200 T600,150 T700,170 T800,130 T900,140 T1000,120" fill="none" stroke="url(#lineGradient)" stroke-width="3"/>
+
+                        <!-- Signal dots -->
+                        <circle cx="300" cy="220" r="8" fill="#22c55e" filter="url(#glow)"/>
+                        <circle cx="600" cy="150" r="8" fill="#ef4444" filter="url(#glow)"/>
+                        <circle cx="900" cy="140" r="8" fill="#22c55e" filter="url(#glow)"/>
+
+                        <!-- Signal labels -->
+                        <text x="300" y="250" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="600">BUY</text>
+                        <text x="600" y="130" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="600">SELL</text>
+                        <text x="900" y="170" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="600">BUY</text>
+                    </svg>
+                    <div class="chart-signals">
+                        <div class="chart-signal buy">
+                            <div class="chart-signal-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                    <path d="M12 19V5M5 12l7-7 7 7"/>
+                                </svg>
+                            </div>
+                            <span>Long @ 42,850</span>
+                        </div>
+                        <div class="chart-signal sell">
+                            <div class="chart-signal-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                    <path d="M12 5v14M5 12l7 7 7-7"/>
+                                </svg>
+                            </div>
+                            <span>TP @ 44,200</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
         <div class="section-header">
-            <p class="section-tag">Features</p>
-            <h2 class="section-title">왜 VORTEX인가</h2>
+            <span class="section-tag">FEATURES</span>
+            <h2 class="section-title">왜 VORTEX를 선택해야 할까요?</h2>
             <p class="section-desc">
-                수년간의 연구와 백테스팅을 거쳐 개발된 프리미엄 보조지표 시스템
+                수년간의 연구와 백테스팅을 거쳐 개발된 알고리즘으로
+                더 스마트한 트레이딩을 경험하세요.
             </p>
         </div>
         <div class="features-grid">
-            <div class="feature-card reveal">
+            <div class="feature-card">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                     </svg>
                 </div>
                 <h3>실시간 신호</h3>
-                <p>밀리초 단위의 지연시간으로 시장 움직임에 즉각 대응할 수 있는 실시간 매매 신호를 제공합니다.</p>
+                <p>밀리초 단위의 빠른 응답으로 시장 움직임에 즉각 대응할 수 있는 매매 신호를 제공합니다.</p>
             </div>
-            <div class="feature-card reveal">
+            <div class="feature-card">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/>
                         <circle cx="12" cy="12" r="6"/>
                         <circle cx="12" cy="12" r="2"/>
                     </svg>
                 </div>
                 <h3>정밀한 진입점</h3>
-                <p>머신러닝 기반 분석으로 최적의 진입 타이밍과 손절/익절 레벨을 자동으로 계산합니다.</p>
+                <p>AI 기반 분석으로 최적의 진입 타이밍과 손절/익절 레벨을 자동으로 계산합니다.</p>
             </div>
-            <div class="feature-card reveal">
+            <div class="feature-card">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18M9 21V9"/>
                     </svg>
                 </div>
                 <h3>다중 시간프레임</h3>
-                <p>1분봉부터 일봉까지 모든 시간프레임에서 동시 분석하여 최적의 트레이딩 기회를 포착합니다.</p>
+                <p>1분봉부터 일봉까지 모든 시간프레임에서 동시 분석하여 최적의 기회를 포착합니다.</p>
             </div>
-            <div class="feature-card reveal">
+            <div class="feature-card">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                     </svg>
                 </div>
                 <h3>스마트 알림</h3>
-                <p>텔레그램, 디스코드, 이메일을 통한 즉각적인 매매 신호 알림으로 기회를 놓치지 마세요.</p>
+                <p>텔레그램, 디스코드, 이메일을 통한 즉각적인 신호 알림으로 기회를 놓치지 마세요.</p>
             </div>
-            <div class="feature-card reveal">
+            <div class="feature-card">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                     </svg>
                 </div>
                 <h3>리스크 관리</h3>
                 <p>자동화된 포지션 사이징과 손실 제한 기능으로 자산을 안전하게 보호합니다.</p>
             </div>
-            <div class="feature-card reveal">
+            <div class="feature-card">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="20" x2="18" y2="10"/>
                         <line x1="12" y1="20" x2="12" y2="4"/>
                         <line x1="6" y1="20" x2="6" y2="14"/>
@@ -1505,323 +1599,313 @@
         </div>
     </section>
 
-    <!-- Indicators Section -->
-    <section class="section indicators-section" id="indicators">
-        <div class="section-header">
-            <p class="section-tag">Indicators</p>
-            <h2 class="section-title">프리미엄 보조지표</h2>
-            <p class="section-desc">
-                전문 트레이더들이 선택한 검증된 보조지표 컬렉션
-            </p>
-        </div>
-        <div class="indicators-grid">
-            <!-- Indicator 1 -->
-            <div class="indicator-card reveal">
-                <div class="indicator-preview">
-                    <svg viewBox="0 0 400 120">
-                        <path class="price-line" d="M0,80 Q50,60 100,70 T200,50 T300,60 T400,40" />
-                        <path class="indicator-line" d="M0,90 Q50,70 100,75 T200,55 T300,65 T400,45" />
-                        <circle class="signal-dot" cx="100" cy="75" r="5" />
-                        <circle class="signal-dot sell" cx="250" cy="58" r="5" />
-                        <circle class="signal-dot" cx="380" cy="47" r="5" />
-                    </svg>
-                </div>
-                <div class="indicator-content">
-                    <span class="indicator-tag">Best Seller</span>
-                    <h3>VORTEX Momentum Pro</h3>
-                    <p>다중 모멘텀 지표를 결합한 고급 트렌드 추종 시스템. 강력한 추세 포착과 정확한 진입/청산 신호를 제공합니다.</p>
-                    <div class="indicator-features">
-                        <span class="indicator-feature">트렌드 감지</span>
-                        <span class="indicator-feature">다이버전스 알림</span>
-                        <span class="indicator-feature">오토 S/L</span>
+    <!-- Comparison -->
+    <section class="comparison">
+        <div class="comparison-container">
+            <div class="section-header">
+                <span class="section-tag">COMPARISON</span>
+                <h2 class="section-title">Before vs After VORTEX</h2>
+                <p class="section-desc">
+                    VORTEX 보조지표가 적용된 차트와 그렇지 않은 차트의 차이를 확인하세요.
+                </p>
+            </div>
+            <div class="comparison-grid">
+                <div class="comparison-card before">
+                    <div class="comparison-label">WITHOUT VORTEX</div>
+                    <div class="comparison-chart">
+                        <svg viewBox="0 0 500 260" preserveAspectRatio="none">
+                            <defs>
+                                <pattern id="gridBefore" width="25" height="26" patternUnits="userSpaceOnUse">
+                                    <path d="M 25 0 L 0 0 0 26" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#gridBefore)"/>
+                            <path d="M0,180 Q30,170 60,160 T120,140 T180,150 T240,120 T300,140 T360,100 T420,120 T480,90 T500,100" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                        </svg>
                     </div>
                 </div>
-            </div>
-
-            <!-- Indicator 2 -->
-            <div class="indicator-card reveal">
-                <div class="indicator-preview">
-                    <svg viewBox="0 0 400 120">
-                        <path class="price-line" d="M0,60 L50,80 L100,40 L150,70 L200,30 L250,55 L300,45 L350,65 L400,50" />
-                        <path class="indicator-line" d="M0,100 Q100,90 200,85 T400,70" style="stroke: var(--accent-gold);" />
-                        <circle class="signal-dot" cx="100" cy="40" r="5" />
-                        <circle class="signal-dot" cx="200" cy="30" r="5" />
-                    </svg>
-                </div>
-                <div class="indicator-content">
-                    <span class="indicator-tag">Scalping</span>
-                    <h3>Smart Scalper X</h3>
-                    <p>초단타 트레이딩에 최적화된 스캘핑 전용 지표. 빠른 진입과 정확한 청산으로 소액 수익을 누적합니다.</p>
-                    <div class="indicator-features">
-                        <span class="indicator-feature">1분봉 최적화</span>
-                        <span class="indicator-feature">노이즈 필터</span>
-                        <span class="indicator-feature">볼륨 분석</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Indicator 3 -->
-            <div class="indicator-card reveal">
-                <div class="indicator-preview">
-                    <svg viewBox="0 0 400 120">
-                        <rect x="0" y="70" width="400" height="40" fill="rgba(0, 255, 136, 0.1)" />
-                        <rect x="0" y="20" width="400" height="30" fill="rgba(255, 51, 102, 0.1)" />
-                        <path class="price-line" d="M0,55 Q100,35 200,60 T400,45" />
-                        <line x1="150" y1="20" x2="150" y2="110" stroke="var(--accent-cyan)" stroke-width="1" stroke-dasharray="4" />
-                        <line x1="300" y1="20" x2="300" y2="110" stroke="var(--accent-cyan)" stroke-width="1" stroke-dasharray="4" />
-                    </svg>
-                </div>
-                <div class="indicator-content">
-                    <span class="indicator-tag">Support/Resistance</span>
-                    <h3>Zone Detector Pro</h3>
-                    <p>AI 기반 지지/저항 구간 자동 탐지. 핵심 가격대를 실시간으로 분석하여 최적의 매매 구간을 표시합니다.</p>
-                    <div class="indicator-features">
-                        <span class="indicator-feature">자동 구간 탐지</span>
-                        <span class="indicator-feature">강도 표시</span>
-                        <span class="indicator-feature">브레이크아웃 알림</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Indicator 4 -->
-            <div class="indicator-card reveal">
-                <div class="indicator-preview">
-                    <svg viewBox="0 0 400 120">
-                        <path class="price-line" d="M0,80 Q80,60 160,75 T320,55 T400,65" />
-                        <path class="indicator-line" d="M0,40 L100,60 L200,45 L300,55 L400,35" style="stroke: var(--accent-green);" />
-                        <path class="indicator-line" d="M0,95 L100,85 L200,90 L300,80 L400,85" style="stroke: var(--accent-red);" />
-                    </svg>
-                </div>
-                <div class="indicator-content">
-                    <span class="indicator-tag">Volume</span>
-                    <h3>Volume Flow Master</h3>
-                    <p>기관 수급을 추적하는 고급 볼륨 분석 도구. 스마트머니의 움직임을 포착하여 트렌드 전환점을 예측합니다.</p>
-                    <div class="indicator-features">
-                        <span class="indicator-feature">기관 추적</span>
-                        <span class="indicator-feature">수급 분석</span>
-                        <span class="indicator-feature">축적/분산</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Indicator 5 -->
-            <div class="indicator-card reveal">
-                <div class="indicator-preview">
-                    <svg viewBox="0 0 400 120">
-                        <path class="price-line" d="M0,60 C50,40 100,80 150,55 C200,30 250,70 300,50 C350,30 400,60 400,60" />
-                        <ellipse cx="150" cy="55" rx="30" ry="20" fill="none" stroke="var(--accent-cyan)" stroke-width="1.5" opacity="0.6" />
-                        <ellipse cx="300" cy="50" rx="25" ry="18" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" opacity="0.6" />
-                    </svg>
-                </div>
-                <div class="indicator-content">
-                    <span class="indicator-tag">Pattern</span>
-                    <h3>Pattern Scanner AI</h3>
-                    <p>머신러닝 기반 차트 패턴 자동 인식. 헤드앤숄더, 이중바닥 등 50가지 이상의 패턴을 실시간 탐지합니다.</p>
-                    <div class="indicator-features">
-                        <span class="indicator-feature">50+ 패턴</span>
-                        <span class="indicator-feature">목표가 계산</span>
-                        <span class="indicator-feature">신뢰도 점수</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Indicator 6 -->
-            <div class="indicator-card reveal">
-                <div class="indicator-preview">
-                    <svg viewBox="0 0 400 120">
-                        <defs>
-                            <linearGradient id="bandGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="var(--accent-cyan)" stop-opacity="0.3" />
-                                <stop offset="100%" stop-color="var(--accent-cyan)" stop-opacity="0" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M0,30 Q100,20 200,35 T400,25 L400,90 Q300,100 200,85 T0,95 Z" fill="url(#bandGradient)" />
-                        <path class="price-line" d="M0,60 Q100,50 200,65 T400,55" />
-                    </svg>
-                </div>
-                <div class="indicator-content">
-                    <span class="indicator-tag">Volatility</span>
-                    <h3>Volatility Band Plus</h3>
-                    <p>동적 변동성 밴드 시스템. 시장 변동성에 따라 자동 조절되는 밴드로 과매수/과매도 구간을 정확히 포착합니다.</p>
-                    <div class="indicator-features">
-                        <span class="indicator-feature">동적 밴드</span>
-                        <span class="indicator-feature">스퀴즈 감지</span>
-                        <span class="indicator-feature">확장 알림</span>
+                <div class="comparison-card after">
+                    <div class="comparison-label">WITH VORTEX</div>
+                    <div class="comparison-chart">
+                        <svg viewBox="0 0 500 260" preserveAspectRatio="none">
+                            <defs>
+                                <pattern id="gridAfter" width="25" height="26" patternUnits="userSpaceOnUse">
+                                    <path d="M 25 0 L 0 0 0 26" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                                </pattern>
+                                <linearGradient id="afterGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#00d4ff"/>
+                                    <stop offset="100%" stop-color="#a855f7"/>
+                                </linearGradient>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#gridAfter)"/>
+                            <!-- Support zone -->
+                            <rect x="0" y="200" width="500" height="30" fill="rgba(34, 197, 94, 0.08)"/>
+                            <line x1="0" y1="215" x2="500" y2="215" stroke="rgba(34, 197, 94, 0.4)" stroke-dasharray="4,4"/>
+                            <!-- Resistance zone -->
+                            <rect x="0" y="60" width="500" height="25" fill="rgba(239, 68, 68, 0.08)"/>
+                            <line x1="0" y1="72" x2="500" y2="72" stroke="rgba(239, 68, 68, 0.4)" stroke-dasharray="4,4"/>
+                            <!-- Price line -->
+                            <path d="M0,180 Q30,170 60,160 T120,140 T180,150 T240,120 T300,140 T360,100 T420,120 T480,90 T500,100" fill="none" stroke="url(#afterGradient)" stroke-width="2.5"/>
+                            <!-- Signals -->
+                            <circle cx="180" cy="150" r="6" fill="#22c55e"/>
+                            <circle cx="360" cy="100" r="6" fill="#ef4444"/>
+                            <circle cx="480" cy="90" r="6" fill="#22c55e"/>
+                            <text x="180" y="175" text-anchor="middle" fill="#22c55e" font-size="9" font-weight="600">BUY</text>
+                            <text x="360" y="85" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="600">SELL</text>
+                            <text x="480" y="115" text-anchor="middle" fill="#22c55e" font-size="9" font-weight="600">BUY</text>
+                        </svg>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section class="section pricing-section" id="pricing">
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
         <div class="section-header">
-            <p class="section-tag">Pricing</p>
-            <h2 class="section-title">구독 요금제</h2>
+            <span class="section-tag">PRICING</span>
+            <h2 class="section-title">심플한 요금제</h2>
             <p class="section-desc">
-                필요한 만큼만 선택하세요. 플랜에 따라 사용 가능한 보조지표 개수가 달라집니다.
+                7일 무료 체험 후, 나에게 맞는 플랜을 선택하세요.
             </p>
+        </div>
+        <div class="pricing-toggle">
+            <span class="pricing-toggle-label active" data-period="monthly">월간</span>
+            <div class="pricing-toggle-switch" id="pricingToggle"></div>
+            <span class="pricing-toggle-label" data-period="yearly">연간</span>
+            <span class="pricing-save">20% 할인</span>
         </div>
         <div class="pricing-grid">
-            <div class="pricing-card reveal">
-                <div class="pricing-name">Basic</div>
-                <div class="pricing-price">W49,000</div>
-                <div class="pricing-period">월간 구독</div>
-                <div class="pricing-indicator-count">보조지표 3개 선택</div>
+            <div class="pricing-card">
+                <div class="pricing-name">Starter</div>
+                <div class="pricing-price">
+                    <span class="pricing-currency">W</span>
+                    <span class="pricing-amount" data-monthly="49000" data-yearly="39000">49,000</span>
+                </div>
+                <div class="pricing-period">/월</div>
                 <ul class="pricing-features">
-                    <li><span class="check">+</span> 원하는 보조지표 3종 선택</li>
-                    <li><span class="check">+</span> 실시간 알림 (이메일)</li>
-                    <li><span class="check">+</span> 기본 고객 지원</li>
-                    <li><span class="check">+</span> 사용 가이드 제공</li>
-                    <li class="disabled"><span class="check">-</span> 텔레그램/디스코드 알림</li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        핵심 보조지표 3종
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        실시간 알림 (이메일)
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        기본 고객 지원
+                    </li>
+                    <li class="disabled">
+                        <svg class="x" viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        텔레그램/디스코드 알림
+                    </li>
+                    <li class="disabled">
+                        <svg class="x" viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        프리미엄 전략 가이드
+                    </li>
                 </ul>
-                <button class="btn-pricing">구독 시작</button>
+                <button class="pricing-btn">시작하기</button>
             </div>
-            <div class="pricing-card featured reveal">
-                <div class="pricing-name">Standard</div>
-                <div class="pricing-price">W89,000</div>
-                <div class="pricing-period">월간 구독</div>
-                <div class="pricing-indicator-count">보조지표 4개 선택</div>
+            <div class="pricing-card featured">
+                <div class="pricing-name">Professional</div>
+                <div class="pricing-price">
+                    <span class="pricing-currency">W</span>
+                    <span class="pricing-amount" data-monthly="99000" data-yearly="79000">99,000</span>
+                </div>
+                <div class="pricing-period">/월</div>
                 <ul class="pricing-features">
-                    <li><span class="check">+</span> 원하는 보조지표 4종 선택</li>
-                    <li><span class="check">+</span> 실시간 알림 (텔레그램/디스코드)</li>
-                    <li><span class="check">+</span> 우선 고객 지원</li>
-                    <li><span class="check">+</span> 프리미엄 전략 가이드</li>
-                    <li><span class="check">+</span> 월간 시장 분석 리포트</li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        모든 보조지표 (6종+)
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        텔레그램/디스코드 알림
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        우선 고객 지원
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        프리미엄 전략 가이드
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        월간 시장 분석 리포트
+                    </li>
                 </ul>
-                <button class="btn-pricing">구독 시작</button>
+                <button class="pricing-btn">시작하기</button>
             </div>
-            <div class="pricing-card reveal">
-                <div class="pricing-name">Premium</div>
-                <div class="pricing-price">W149,000</div>
-                <div class="pricing-period">월간 구독</div>
-                <div class="pricing-indicator-count">보조지표 6개 선택</div>
+            <div class="pricing-card">
+                <div class="pricing-name">Enterprise</div>
+                <div class="pricing-price">
+                    <span class="pricing-currency">W</span>
+                    <span class="pricing-amount" data-monthly="249000" data-yearly="199000">249,000</span>
+                </div>
+                <div class="pricing-period">/월</div>
                 <ul class="pricing-features">
-                    <li><span class="check">+</span> 원하는 보조지표 6종 선택</li>
-                    <li><span class="check">+</span> 모든 알림 채널 지원</li>
-                    <li><span class="check">+</span> 전담 매니저 배정</li>
-                    <li><span class="check">+</span> 커스텀 알림 설정</li>
-                    <li><span class="check">+</span> 신규 지표 우선 액세스</li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        모든 기능 + 베타 액세스
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        커스텀 알림 설정
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        전담 매니저 배정
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        API 액세스
+                    </li>
+                    <li>
+                        <svg class="check" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        주간 1:1 코칭
+                    </li>
                 </ul>
-                <button class="btn-pricing">구독 시작</button>
+                <button class="pricing-btn">문의하기</button>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="section testimonials-section">
+    <!-- Testimonials -->
+    <section class="testimonials" id="testimonials">
         <div class="section-header">
-            <p class="section-tag">Testimonials</p>
-            <h2 class="section-title">사용자 후기</h2>
+            <span class="section-tag">TESTIMONIALS</span>
+            <h2 class="section-title">트레이더들의 후기</h2>
             <p class="section-desc">
-                VORTEX와 함께 성과를 만들어가는 트레이더들
+                VORTEX와 함께 성과를 만들어가는 분들의 이야기
             </p>
         </div>
         <div class="testimonials-grid">
-            <div class="testimonial-card reveal">
-                <div class="testimonial-rating">* * * * *</div>
-                <p class="testimonial-text">
-                    "Momentum Pro 지표 하나로 승률이 30% 이상 개선됐습니다. 진입 타이밍이 정말 정확해요. 이제 감으로 하던 트레이딩은 상상도 못합니다."
-                </p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">K</div>
-                    <div class="author-info">
-                        <h4>김준혁</h4>
-                        <p>개인 투자자 / 3년차</p>
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">K</div>
+                        <div>
+                            <div class="testimonial-name">김준혁</div>
+                            <div class="testimonial-role">개인 투자자 / 3년차</div>
+                        </div>
+                    </div>
+                    <div class="testimonial-stars">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                     </div>
                 </div>
-            </div>
-            <div class="testimonial-card reveal">
-                <div class="testimonial-rating">* * * * *</div>
                 <p class="testimonial-text">
-                    "Zone Detector의 지지/저항 구간이 놀라울 정도로 정확합니다. 덕분에 손절 라인 설정이 훨씬 수월해졌어요."
+                    "승률이 30% 이상 개선됐습니다. 진입 타이밍이 정말 정확해요. 이제 감으로 하던 트레이딩은 상상도 못합니다."
                 </p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">P</div>
-                    <div class="author-info">
-                        <h4>박서연</h4>
-                        <p>전업 트레이더 / 5년차</p>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">P</div>
+                        <div>
+                            <div class="testimonial-name">박서연</div>
+                            <div class="testimonial-role">전업 트레이더 / 5년차</div>
+                        </div>
+                    </div>
+                    <div class="testimonial-stars">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                     </div>
                 </div>
+                <p class="testimonial-text">
+                    "지지/저항 구간이 놀라울 정도로 정확합니다. 손절 라인 설정이 훨씬 수월해졌어요. 강력 추천합니다."
+                </p>
             </div>
-            <div class="testimonial-card reveal">
-                <div class="testimonial-rating">* * * * *</div>
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">L</div>
+                        <div>
+                            <div class="testimonial-name">이민수</div>
+                            <div class="testimonial-role">퀀트 트레이더 / 7년차</div>
+                        </div>
+                    </div>
+                    <div class="testimonial-stars">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    </div>
+                </div>
                 <p class="testimonial-text">
                     "여러 지표 서비스를 써봤지만 VORTEX만큼 체계적이고 신뢰할 수 있는 곳은 없었습니다. 고객 지원도 최고예요."
                 </p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">L</div>
-                    <div class="author-info">
-                        <h4>이민수</h4>
-                        <p>퀀트 트레이더 / 7년차</p>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section class="section faq-section" id="faq">
+    <!-- FAQ -->
+    <section class="faq" id="faq">
         <div class="section-header">
-            <p class="section-tag">FAQ</p>
+            <span class="section-tag">FAQ</span>
             <h2 class="section-title">자주 묻는 질문</h2>
         </div>
         <div class="faq-container">
             <div class="faq-item">
                 <button class="faq-question">
                     어떤 거래소/플랫폼에서 사용할 수 있나요?
-                    <span class="faq-icon">+</span>
+                    <span class="faq-icon"></span>
                 </button>
                 <div class="faq-answer">
-                    <p>VORTEX 보조지표는 TradingView 플랫폼에서 작동합니다. 바이낸스, 업비트, 빗썸 등 TradingView에 연동된 모든 거래소에서 사용 가능합니다. 주식, 코인, 선물 등 모든 자산군을 지원합니다.</p>
+                    <p>VORTEX 보조지표는 TradingView 플랫폼에서 작동합니다. 바이낸스, 업비트, 빗썸, Bybit, OKX 등 TradingView에 연동된 모든 거래소에서 사용 가능합니다.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    구독 중 보조지표를 변경할 수 있나요?
-                    <span class="faq-icon">+</span>
+                    7일 무료 체험은 어떻게 진행되나요?
+                    <span class="faq-icon"></span>
                 </button>
                 <div class="faq-answer">
-                    <p>네, 매월 구독 갱신 시점에 선택한 보조지표를 변경할 수 있습니다. 다양한 지표를 시험해보고 본인의 트레이딩 스타일에 맞는 조합을 찾아보세요.</p>
+                    <p>가입 후 7일간 Professional 플랜의 모든 기능을 무료로 이용하실 수 있습니다. 체험 기간 종료 전 언제든 취소 가능하며, 취소 시 비용이 청구되지 않습니다.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
                     초보자도 사용할 수 있나요?
-                    <span class="faq-icon">+</span>
+                    <span class="faq-icon"></span>
                 </button>
                 <div class="faq-answer">
-                    <p>물론입니다. 모든 보조지표에는 상세한 사용 가이드와 영상 튜토리얼이 포함되어 있습니다. Standard 이상 플랜에서는 기초부터 고급까지 전략 가이드를 제공합니다.</p>
+                    <p>물론입니다. 모든 보조지표에는 상세한 사용 가이드와 영상 튜토리얼이 포함되어 있습니다. Professional 이상 플랜에서는 기초부터 고급까지 전략 가이드를 제공합니다.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
                     환불 정책은 어떻게 되나요?
-                    <span class="faq-icon">+</span>
+                    <span class="faq-icon"></span>
                 </button>
                 <div class="faq-answer">
-                    <p>첫 구독 후 7일 이내에 환불을 요청하시면 전액 환불해 드립니다. 이후에는 남은 구독 기간에 대한 환불은 불가하며, 다음 결제일부터 구독이 취소됩니다.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question">
-                    여러 기기에서 사용할 수 있나요?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer">
-                    <p>기본 구독은 1개의 TradingView 계정에서 사용 가능합니다. 추가 계정이 필요하시면 Premium 플랜을 이용하시거나 고객 지원팀에 문의해 주세요.</p>
+                    <p>첫 구독 후 14일 이내에 환불을 요청하시면 전액 환불해 드립니다. 이후에는 남은 구독 기간에 대한 환불은 불가하며, 다음 결제일부터 구독이 취소됩니다.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <h2 class="reveal">트레이딩의 새로운 기준</h2>
-        <p class="reveal">지금 시작하세요. 첫 7일은 무료입니다.</p>
-        <div class="hero-buttons reveal">
-            <button class="btn-primary">무료 체험 시작</button>
-            <button class="btn-secondary">상담 신청</button>
+    <!-- CTA -->
+    <section class="cta">
+        <div class="cta-bg"></div>
+        <div class="cta-content">
+            <h2>트레이딩의 새로운 기준</h2>
+            <p>지금 시작하세요. 첫 7일은 무료입니다.</p>
+            <button class="btn btn-primary">
+                무료 체험 시작
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
         </div>
     </section>
 
@@ -1833,15 +1917,15 @@
                 <p>기관급 알고리즘 기반 프리미엄 트레이딩 보조지표. 더 스마트한 트레이딩을 위한 첫 걸음.</p>
             </div>
             <div class="footer-links">
-                <h4>제품</h4>
+                <h4>Product</h4>
                 <ul>
-                    <li><a href="#indicators">보조지표</a></li>
+                    <li><a href="#features">기능</a></li>
                     <li><a href="#pricing">요금제</a></li>
                     <li><a href="#">업데이트</a></li>
                 </ul>
             </div>
             <div class="footer-links">
-                <h4>지원</h4>
+                <h4>Support</h4>
                 <ul>
                     <li><a href="#">사용 가이드</a></li>
                     <li><a href="#faq">FAQ</a></li>
@@ -1849,7 +1933,7 @@
                 </ul>
             </div>
             <div class="footer-links">
-                <h4>회사</h4>
+                <h4>Company</h4>
                 <ul>
                     <li><a href="#">소개</a></li>
                     <li><a href="#">이용약관</a></li>
@@ -1858,8 +1942,8 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>2025 VORTEX. All rights reserved.</p>
-            <div class="social-links">
+            <p class="footer-copy">2025 VORTEX. All rights reserved.</p>
+            <div class="footer-socials">
                 <a href="#" aria-label="Twitter">
                     <svg viewBox="0 0 24 24" fill="currentColor">
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -1883,110 +1967,83 @@
         // Preloader
         window.addEventListener('load', () => {
             setTimeout(() => {
-                const preloader = document.querySelector('.preloader');
-                preloader.classList.add('loaded');
+                document.querySelector('.preloader').classList.add('loaded');
                 document.body.classList.remove('loading');
-
-                // Remove preloader from DOM after animation
-                setTimeout(() => {
-                    preloader.style.display = 'none';
-                }, 1000);
-            }, 2000); // Show preloader for 2 seconds
+            }, 2300);
         });
 
-        // Number counting animation
-        const animateNumbers = () => {
-            const statNumbers = document.querySelectorAll('.stat-number[data-target]');
-
-            statNumbers.forEach(stat => {
+        // Stats counter
+        const animateStats = () => {
+            document.querySelectorAll('.hero-stat-value[data-target]').forEach(stat => {
                 const target = parseFloat(stat.dataset.target);
                 const suffix = stat.dataset.suffix || '';
                 const format = stat.dataset.format;
                 const duration = 2000;
-                const startTime = performance.now();
+                const start = performance.now();
 
-                const updateNumber = (currentTime) => {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
+                const update = (now) => {
+                    const progress = Math.min((now - start) / duration, 1);
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    const current = target * ease;
 
-                    // Easing function (ease-out)
-                    const easeOut = 1 - Math.pow(1 - progress, 3);
-                    const current = target * easeOut;
-
-                    let displayValue;
+                    let display;
                     if (format === 'comma') {
-                        displayValue = Math.floor(current).toLocaleString();
+                        display = Math.floor(current).toLocaleString();
                     } else if (target % 1 !== 0) {
-                        displayValue = current.toFixed(1);
+                        display = current.toFixed(1);
                     } else {
-                        displayValue = Math.floor(current);
+                        display = Math.floor(current);
                     }
 
-                    stat.textContent = displayValue + suffix;
+                    stat.textContent = display + suffix;
 
-                    if (progress < 1) {
-                        requestAnimationFrame(updateNumber);
-                    }
+                    if (progress < 1) requestAnimationFrame(update);
                 };
 
-                requestAnimationFrame(updateNumber);
+                requestAnimationFrame(update);
             });
         };
 
-        // Intersection Observer for stats animation
-        const statsBar = document.querySelector('.stats-bar');
+        // Observe hero for stats animation
         let statsAnimated = false;
-
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !statsAnimated) {
-                    statsAnimated = true;
-                    animateNumbers();
-                }
-            });
-        }, { threshold: 0.5 });
-
-        if (statsBar) {
-            statsObserver.observe(statsBar);
-        }
-
-        // Scroll reveal animation
-        const reveals = document.querySelectorAll('.reveal');
-
-        const revealOnScroll = () => {
-            reveals.forEach(el => {
-                const windowHeight = window.innerHeight;
-                const revealTop = el.getBoundingClientRect().top;
-                const revealPoint = 150;
-
-                if (revealTop < windowHeight - revealPoint) {
-                    el.classList.add('active');
-                }
-            });
-        };
-
-        window.addEventListener('scroll', revealOnScroll);
-        revealOnScroll();
-
-        // Nav scroll effect
-        const nav = document.querySelector('nav');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
+        const heroObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !statsAnimated) {
+                statsAnimated = true;
+                animateStats();
             }
+        }, { threshold: 0.3 });
+
+        heroObserver.observe(document.querySelector('.hero'));
+
+        // Pricing toggle
+        const pricingToggle = document.getElementById('pricingToggle');
+        const toggleLabels = document.querySelectorAll('.pricing-toggle-label');
+        const priceAmounts = document.querySelectorAll('.pricing-amount');
+        let isYearly = false;
+
+        pricingToggle.addEventListener('click', () => {
+            isYearly = !isYearly;
+            pricingToggle.classList.toggle('yearly', isYearly);
+
+            toggleLabels.forEach(label => {
+                label.classList.toggle('active',
+                    (label.dataset.period === 'yearly') === isYearly
+                );
+            });
+
+            priceAmounts.forEach(amount => {
+                const price = isYearly ? amount.dataset.yearly : amount.dataset.monthly;
+                amount.textContent = parseInt(price).toLocaleString();
+            });
         });
 
         // FAQ accordion
-        const faqItems = document.querySelectorAll('.faq-item');
-
-        faqItems.forEach(item => {
-            const question = item.querySelector('.faq-question');
-            question.addEventListener('click', () => {
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
                 const isActive = item.classList.contains('active');
 
-                faqItems.forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
 
                 if (!isActive) {
                     item.classList.add('active');
@@ -1994,35 +2051,24 @@
             });
         });
 
-        // Smooth scroll for nav links
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+            anchor.addEventListener('click', e => {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+                const target = document.querySelector(anchor.getAttribute('href'));
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                    target.scrollIntoView({ behavior: 'smooth' });
                 }
             });
         });
 
-        // Animated chart line
-        const chartPath = document.querySelector('.chart-line');
-        if (chartPath) {
-            const animateChart = () => {
-                const points = [];
-                for (let i = 0; i <= 12; i++) {
-                    const x = i * 100;
-                    const y = 150 + Math.sin(Date.now() / 1000 + i) * 50 + Math.random() * 20;
-                    points.push(`${i === 0 ? 'M' : 'L'}${x},${y}`);
-                }
-                chartPath.setAttribute('d', points.join(' '));
-                requestAnimationFrame(animateChart);
-            };
-            animateChart();
-        }
+        // Chart timeframe buttons
+        document.querySelectorAll('.chart-tf').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.chart-tf').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
     </script>
 </body>
 </html>
