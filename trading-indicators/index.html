@@ -1146,9 +1146,189 @@
                 font-size: 0.9rem;
             }
         }
+
+        /* Preloader */
+        .preloader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .preloader::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% 30%, rgba(0, 212, 255, 0.1), transparent),
+                radial-gradient(ellipse 60% 40% at 70% 70%, rgba(255, 215, 0, 0.05), transparent);
+        }
+
+        .preloader-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .preloader-logo {
+            font-family: 'Monument Extended', sans-serif;
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preloader-logo span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100%) rotateX(-90deg);
+            animation: letterReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .preloader-logo span:nth-child(1) { animation-delay: 0.1s; }
+        .preloader-logo span:nth-child(2) { animation-delay: 0.15s; }
+        .preloader-logo span:nth-child(3) { animation-delay: 0.2s; }
+        .preloader-logo span:nth-child(4) { animation-delay: 0.25s; }
+        .preloader-logo span:nth-child(5) { animation-delay: 0.3s; }
+        .preloader-logo span:nth-child(6) { animation-delay: 0.35s; }
+
+        @keyframes letterReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        .preloader-line {
+            width: 200px;
+            height: 2px;
+            background: var(--border-subtle);
+            margin: 40px auto 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preloader-line::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
+            animation: lineProgress 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+
+        @keyframes lineProgress {
+            to { width: 100%; }
+        }
+
+        .preloader-text {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            color: var(--text-muted);
+            opacity: 0;
+            animation: fadeIn 0.5s ease 0.6s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .preloader.loaded {
+            animation: preloaderExit 1s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        }
+
+        .preloader.loaded .preloader-content {
+            animation: contentExit 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        }
+
+        @keyframes contentExit {
+            to {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
+
+        @keyframes preloaderExit {
+            0% {
+                clip-path: inset(0 0 0 0);
+            }
+            100% {
+                clip-path: inset(0 0 100% 0);
+            }
+        }
+
+        /* Glitch effect on preloader */
+        .preloader-logo::before,
+        .preloader-logo::after {
+            content: 'VORTEX';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .preloader-logo::before {
+            animation: glitch1 2s infinite linear 1s;
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+        }
+
+        .preloader-logo::after {
+            animation: glitch2 2s infinite linear 1s;
+            clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+        }
+
+        @keyframes glitch1 {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-3px, 1px); }
+            94% { transform: translate(3px, -1px); }
+            96% { transform: translate(-2px, 0); }
+            98% { transform: translate(2px, 1px); }
+        }
+
+        @keyframes glitch2 {
+            0%, 90%, 100% { transform: translate(0); }
+            91% { transform: translate(3px, 0); }
+            93% { transform: translate(-3px, 1px); }
+            95% { transform: translate(2px, -1px); }
+            97% { transform: translate(-2px, 0); }
+        }
+
+        /* Hide body overflow during preloader */
+        body.loading {
+            overflow: hidden;
+        }
     </style>
 </head>
-<body>
+<body class="loading">
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-content">
+            <div class="preloader-logo">
+                <span>V</span><span>O</span><span>R</span><span>T</span><span>E</span><span>X</span>
+            </div>
+            <div class="preloader-line"></div>
+            <p class="preloader-text">LOADING</p>
+        </div>
+    </div>
+
     <!-- Animated Background -->
     <div class="bg-animation">
         <div class="grid-lines"></div>
@@ -1700,6 +1880,20 @@
     </footer>
 
     <script>
+        // Preloader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const preloader = document.querySelector('.preloader');
+                preloader.classList.add('loaded');
+                document.body.classList.remove('loading');
+
+                // Remove preloader from DOM after animation
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 1000);
+            }, 2000); // Show preloader for 2 seconds
+        });
+
         // Number counting animation
         const animateNumbers = () => {
             const statNumbers = document.querySelectorAll('.stat-number[data-target]');
