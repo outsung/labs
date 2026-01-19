@@ -402,6 +402,61 @@
             margin-top: 8px;
         }
 
+        /* Exchange Links Section */
+        .exchanges-section {
+            padding: 60px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .exchanges-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .exchanges-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+        }
+
+        .exchanges-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .exchange-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+
+        .exchange-link:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .exchange-link svg {
+            width: 24px;
+            height: 24px;
+        }
+
         /* Features Section */
         .section {
             padding: 120px 60px;
@@ -485,7 +540,14 @@
             background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), transparent);
             border: 1px solid rgba(0, 212, 255, 0.2);
             margin-bottom: 30px;
-            font-size: 1.5rem;
+        }
+
+        .feature-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--accent-cyan);
+            fill: none;
+            stroke-width: 1.5;
         }
 
         .feature-card h3 {
@@ -612,7 +674,6 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 25px;
         }
 
         .indicator-feature {
@@ -621,44 +682,6 @@
             border: 1px solid var(--border-subtle);
             font-size: 0.75rem;
             color: var(--text-secondary);
-        }
-
-        .indicator-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-subtle);
-        }
-
-        .indicator-price {
-            font-family: 'Monument Extended', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 800;
-        }
-
-        .indicator-price span {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-family: 'Noto Sans KR', sans-serif;
-            font-weight: 400;
-        }
-
-        .btn-indicator {
-            padding: 14px 30px;
-            background: transparent;
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            font-family: 'Noto Sans KR', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-indicator:hover {
-            background: var(--accent-cyan);
-            color: var(--bg-primary);
         }
 
         /* Pricing Section */
@@ -689,7 +712,7 @@
         }
 
         .pricing-card.featured::before {
-            content: '인기';
+            content: 'BEST';
             position: absolute;
             top: -12px;
             left: 50%;
@@ -731,7 +754,18 @@
         .pricing-period {
             color: var(--text-muted);
             font-size: 0.9rem;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+        }
+
+        .pricing-indicator-count {
+            display: inline-block;
+            padding: 10px 25px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            color: var(--accent-cyan);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 30px;
         }
 
         .pricing-features {
@@ -750,8 +784,7 @@
             gap: 12px;
         }
 
-        .pricing-features li::before {
-            content: '✓';
+        .pricing-features li .check {
             color: var(--accent-cyan);
             font-weight: bold;
         }
@@ -761,8 +794,7 @@
             text-decoration: line-through;
         }
 
-        .pricing-features li.disabled::before {
-            content: '✕';
+        .pricing-features li.disabled .check {
             color: var(--text-muted);
         }
 
@@ -1029,12 +1061,19 @@
 
         .social-links a {
             color: var(--text-muted);
-            font-size: 1.2rem;
             transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .social-links a:hover {
             color: var(--accent-cyan);
+        }
+
+        .social-links svg {
+            width: 20px;
+            height: 20px;
         }
 
         /* Scroll Animations */
@@ -1097,6 +1136,15 @@
                 gap: 20px;
                 text-align: center;
             }
+
+            .exchanges-grid {
+                gap: 20px;
+            }
+
+            .exchange-link {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -1146,22 +1194,64 @@
     <!-- Stats Bar -->
     <div class="stats-bar">
         <div class="stat-item">
-            <div class="stat-number">87.3%</div>
+            <div class="stat-number" data-target="87.3" data-suffix="%">0%</div>
             <div class="stat-label">평균 승률</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number">12,847</div>
+            <div class="stat-number" data-target="12847" data-format="comma">0</div>
             <div class="stat-label">활성 사용자</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number">24/7</div>
+            <div class="stat-number" data-target="24" data-suffix="/7">0/7</div>
             <div class="stat-label">실시간 알림</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number">15+</div>
+            <div class="stat-number" data-target="15" data-suffix="+">0+</div>
             <div class="stat-label">보조지표</div>
         </div>
     </div>
+
+    <!-- Exchange Links Section -->
+    <section class="exchanges-section">
+        <div class="exchanges-header">
+            <p>지원 거래소에서 바로 트레이딩하세요</p>
+        </div>
+        <div class="exchanges-grid">
+            <a href="https://www.binance.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
+                <svg viewBox="0 0 24 24" fill="var(--accent-gold)">
+                    <path d="M12 2L6.5 7.5L8.62 9.62L12 6.24L15.38 9.62L17.5 7.5L12 2ZM2 12L4.12 9.88L6.24 12L4.12 14.12L2 12ZM12 22L6.5 16.5L8.62 14.38L12 17.76L15.38 14.38L17.5 16.5L12 22ZM22 12L19.88 14.12L17.76 12L19.88 9.88L22 12ZM12 9.76L9.76 12L12 14.24L14.24 12L12 9.76Z"/>
+                </svg>
+                Binance
+            </a>
+            <a href="https://upbit.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
+                <svg viewBox="0 0 24 24" fill="var(--accent-cyan)">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                Upbit
+            </a>
+            <a href="https://www.bithumb.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
+                <svg viewBox="0 0 24 24" fill="var(--accent-red)">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                Bithumb
+            </a>
+            <a href="https://www.bybit.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
+                <svg viewBox="0 0 24 24" fill="var(--accent-gold)">
+                    <path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z"/>
+                </svg>
+                Bybit
+            </a>
+            <a href="https://www.okx.com" target="_blank" rel="noopener noreferrer" class="exchange-link">
+                <svg viewBox="0 0 24 24" fill="var(--text-primary)">
+                    <circle cx="7" cy="7" r="3"/>
+                    <circle cx="17" cy="7" r="3"/>
+                    <circle cx="7" cy="17" r="3"/>
+                    <circle cx="17" cy="17" r="3"/>
+                </svg>
+                OKX
+            </a>
+        </div>
+    </section>
 
     <!-- Features Section -->
     <section class="section" id="features">
@@ -1174,32 +1264,61 @@
         </div>
         <div class="features-grid">
             <div class="feature-card reveal">
-                <div class="feature-icon">⚡</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                </div>
                 <h3>실시간 신호</h3>
                 <p>밀리초 단위의 지연시간으로 시장 움직임에 즉각 대응할 수 있는 실시간 매매 신호를 제공합니다.</p>
             </div>
             <div class="feature-card reveal">
-                <div class="feature-icon">🎯</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="6"/>
+                        <circle cx="12" cy="12" r="2"/>
+                    </svg>
+                </div>
                 <h3>정밀한 진입점</h3>
                 <p>머신러닝 기반 분석으로 최적의 진입 타이밍과 손절/익절 레벨을 자동으로 계산합니다.</p>
             </div>
             <div class="feature-card reveal">
-                <div class="feature-icon">📊</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                </div>
                 <h3>다중 시간프레임</h3>
                 <p>1분봉부터 일봉까지 모든 시간프레임에서 동시 분석하여 최적의 트레이딩 기회를 포착합니다.</p>
             </div>
             <div class="feature-card reveal">
-                <div class="feature-icon">🔔</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                </div>
                 <h3>스마트 알림</h3>
                 <p>텔레그램, 디스코드, 이메일을 통한 즉각적인 매매 신호 알림으로 기회를 놓치지 마세요.</p>
             </div>
             <div class="feature-card reveal">
-                <div class="feature-icon">🛡️</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
                 <h3>리스크 관리</h3>
                 <p>자동화된 포지션 사이징과 손실 제한 기능으로 자산을 안전하게 보호합니다.</p>
             </div>
             <div class="feature-card reveal">
-                <div class="feature-icon">📈</div>
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                </div>
                 <h3>성과 분석</h3>
                 <p>상세한 트레이딩 통계와 분석 리포트로 전략을 지속적으로 개선할 수 있습니다.</p>
             </div>
@@ -1236,10 +1355,6 @@
                         <span class="indicator-feature">다이버전스 알림</span>
                         <span class="indicator-feature">오토 S/L</span>
                     </div>
-                    <div class="indicator-footer">
-                        <div class="indicator-price">₩299,000 <span>/평생</span></div>
-                        <button class="btn-indicator">상세보기</button>
-                    </div>
                 </div>
             </div>
 
@@ -1261,10 +1376,6 @@
                         <span class="indicator-feature">1분봉 최적화</span>
                         <span class="indicator-feature">노이즈 필터</span>
                         <span class="indicator-feature">볼륨 분석</span>
-                    </div>
-                    <div class="indicator-footer">
-                        <div class="indicator-price">₩199,000 <span>/평생</span></div>
-                        <button class="btn-indicator">상세보기</button>
                     </div>
                 </div>
             </div>
@@ -1289,10 +1400,6 @@
                         <span class="indicator-feature">강도 표시</span>
                         <span class="indicator-feature">브레이크아웃 알림</span>
                     </div>
-                    <div class="indicator-footer">
-                        <div class="indicator-price">₩249,000 <span>/평생</span></div>
-                        <button class="btn-indicator">상세보기</button>
-                    </div>
                 </div>
             </div>
 
@@ -1314,10 +1421,6 @@
                         <span class="indicator-feature">수급 분석</span>
                         <span class="indicator-feature">축적/분산</span>
                     </div>
-                    <div class="indicator-footer">
-                        <div class="indicator-price">₩349,000 <span>/평생</span></div>
-                        <button class="btn-indicator">상세보기</button>
-                    </div>
                 </div>
             </div>
 
@@ -1338,10 +1441,6 @@
                         <span class="indicator-feature">50+ 패턴</span>
                         <span class="indicator-feature">목표가 계산</span>
                         <span class="indicator-feature">신뢰도 점수</span>
-                    </div>
-                    <div class="indicator-footer">
-                        <div class="indicator-price">₩399,000 <span>/평생</span></div>
-                        <button class="btn-indicator">상세보기</button>
                     </div>
                 </div>
             </div>
@@ -1369,10 +1468,6 @@
                         <span class="indicator-feature">스퀴즈 감지</span>
                         <span class="indicator-feature">확장 알림</span>
                     </div>
-                    <div class="indicator-footer">
-                        <div class="indicator-price">₩279,000 <span>/평생</span></div>
-                        <button class="btn-indicator">상세보기</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1382,50 +1477,53 @@
     <section class="section pricing-section" id="pricing">
         <div class="section-header">
             <p class="section-tag">Pricing</p>
-            <h2 class="section-title">멤버십 요금제</h2>
+            <h2 class="section-title">구독 요금제</h2>
             <p class="section-desc">
-                모든 보조지표를 한 번에 이용할 수 있는 올인원 멤버십
+                필요한 만큼만 선택하세요. 플랜에 따라 사용 가능한 보조지표 개수가 달라집니다.
             </p>
         </div>
         <div class="pricing-grid">
             <div class="pricing-card reveal">
-                <div class="pricing-name">Starter</div>
-                <div class="pricing-price">₩49,000</div>
+                <div class="pricing-name">Basic</div>
+                <div class="pricing-price">W49,000</div>
                 <div class="pricing-period">월간 구독</div>
+                <div class="pricing-indicator-count">보조지표 3개 선택</div>
                 <ul class="pricing-features">
-                    <li>기본 보조지표 3종</li>
-                    <li>실시간 알림 (이메일)</li>
-                    <li>기본 고객 지원</li>
-                    <li class="disabled">프리미엄 보조지표</li>
-                    <li class="disabled">1:1 트레이딩 코칭</li>
+                    <li><span class="check">+</span> 원하는 보조지표 3종 선택</li>
+                    <li><span class="check">+</span> 실시간 알림 (이메일)</li>
+                    <li><span class="check">+</span> 기본 고객 지원</li>
+                    <li><span class="check">+</span> 사용 가이드 제공</li>
+                    <li class="disabled"><span class="check">-</span> 텔레그램/디스코드 알림</li>
                 </ul>
-                <button class="btn-pricing">시작하기</button>
+                <button class="btn-pricing">구독 시작</button>
             </div>
             <div class="pricing-card featured reveal">
-                <div class="pricing-name">Professional</div>
-                <div class="pricing-price">₩149,000</div>
+                <div class="pricing-name">Standard</div>
+                <div class="pricing-price">W89,000</div>
                 <div class="pricing-period">월간 구독</div>
+                <div class="pricing-indicator-count">보조지표 4개 선택</div>
                 <ul class="pricing-features">
-                    <li>모든 보조지표 15종</li>
-                    <li>실시간 알림 (텔레그램/디스코드)</li>
-                    <li>우선 고객 지원</li>
-                    <li>프리미엄 전략 가이드</li>
-                    <li class="disabled">1:1 트레이딩 코칭</li>
+                    <li><span class="check">+</span> 원하는 보조지표 4종 선택</li>
+                    <li><span class="check">+</span> 실시간 알림 (텔레그램/디스코드)</li>
+                    <li><span class="check">+</span> 우선 고객 지원</li>
+                    <li><span class="check">+</span> 프리미엄 전략 가이드</li>
+                    <li><span class="check">+</span> 월간 시장 분석 리포트</li>
                 </ul>
-                <button class="btn-pricing">시작하기</button>
+                <button class="btn-pricing">구독 시작</button>
             </div>
             <div class="pricing-card reveal">
-                <div class="pricing-name">Enterprise</div>
-                <div class="pricing-price">₩499,000</div>
+                <div class="pricing-name">Premium</div>
+                <div class="pricing-price">W149,000</div>
                 <div class="pricing-period">월간 구독</div>
+                <div class="pricing-indicator-count">보조지표 6개 선택</div>
                 <ul class="pricing-features">
-                    <li>모든 보조지표 + 베타 액세스</li>
-                    <li>커스텀 알림 설정</li>
-                    <li>전담 매니저 배정</li>
-                    <li>전략 커스터마이징</li>
-                    <li>주간 1:1 트레이딩 코칭</li>
+                    <li><span class="check">+</span> 원하는 보조지표 6종 선택</li>
+                    <li><span class="check">+</span> 모든 알림 채널 지원</li>
+                    <li><span class="check">+</span> 전담 매니저 배정</li>
+                    <li><span class="check">+</span> 커스텀 알림 설정</li>
+                    <li><span class="check">+</span> 신규 지표 우선 액세스</li>
                 </ul>
-                <button class="btn-pricing">문의하기</button>
+                <button class="btn-pricing">구독 시작</button>
             </div>
         </div>
     </section>
@@ -1441,7 +1539,7 @@
         </div>
         <div class="testimonials-grid">
             <div class="testimonial-card reveal">
-                <div class="testimonial-rating">★★★★★</div>
+                <div class="testimonial-rating">* * * * *</div>
                 <p class="testimonial-text">
                     "Momentum Pro 지표 하나로 승률이 30% 이상 개선됐습니다. 진입 타이밍이 정말 정확해요. 이제 감으로 하던 트레이딩은 상상도 못합니다."
                 </p>
@@ -1449,12 +1547,12 @@
                     <div class="author-avatar">K</div>
                     <div class="author-info">
                         <h4>김준혁</h4>
-                        <p>개인 투자자 · 3년차</p>
+                        <p>개인 투자자 / 3년차</p>
                     </div>
                 </div>
             </div>
             <div class="testimonial-card reveal">
-                <div class="testimonial-rating">★★★★★</div>
+                <div class="testimonial-rating">* * * * *</div>
                 <p class="testimonial-text">
                     "Zone Detector의 지지/저항 구간이 놀라울 정도로 정확합니다. 덕분에 손절 라인 설정이 훨씬 수월해졌어요."
                 </p>
@@ -1462,12 +1560,12 @@
                     <div class="author-avatar">P</div>
                     <div class="author-info">
                         <h4>박서연</h4>
-                        <p>전업 트레이더 · 5년차</p>
+                        <p>전업 트레이더 / 5년차</p>
                     </div>
                 </div>
             </div>
             <div class="testimonial-card reveal">
-                <div class="testimonial-rating">★★★★★</div>
+                <div class="testimonial-rating">* * * * *</div>
                 <p class="testimonial-text">
                     "여러 지표 서비스를 써봤지만 VORTEX만큼 체계적이고 신뢰할 수 있는 곳은 없었습니다. 고객 지원도 최고예요."
                 </p>
@@ -1475,7 +1573,7 @@
                     <div class="author-avatar">L</div>
                     <div class="author-info">
                         <h4>이민수</h4>
-                        <p>퀀트 트레이더 · 7년차</p>
+                        <p>퀀트 트레이더 / 7년차</p>
                     </div>
                 </div>
             </div>
@@ -1500,11 +1598,11 @@
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    환불 정책은 어떻게 되나요?
+                    구독 중 보조지표를 변경할 수 있나요?
                     <span class="faq-icon">+</span>
                 </button>
                 <div class="faq-answer">
-                    <p>구매 후 7일 이내에 환불을 요청하시면 전액 환불해 드립니다. 단, 평생 라이선스 제품의 경우 첫 사용 전에만 환불이 가능합니다.</p>
+                    <p>네, 매월 구독 갱신 시점에 선택한 보조지표를 변경할 수 있습니다. 다양한 지표를 시험해보고 본인의 트레이딩 스타일에 맞는 조합을 찾아보세요.</p>
                 </div>
             </div>
             <div class="faq-item">
@@ -1513,16 +1611,16 @@
                     <span class="faq-icon">+</span>
                 </button>
                 <div class="faq-answer">
-                    <p>물론입니다. 모든 보조지표에는 상세한 사용 가이드와 영상 튜토리얼이 포함되어 있습니다. Professional 이상 멤버십에서는 기초부터 고급까지 전략 가이드를 제공합니다.</p>
+                    <p>물론입니다. 모든 보조지표에는 상세한 사용 가이드와 영상 튜토리얼이 포함되어 있습니다. Standard 이상 플랜에서는 기초부터 고급까지 전략 가이드를 제공합니다.</p>
                 </div>
             </div>
             <div class="faq-item">
                 <button class="faq-question">
-                    업데이트는 무료인가요?
+                    환불 정책은 어떻게 되나요?
                     <span class="faq-icon">+</span>
                 </button>
                 <div class="faq-answer">
-                    <p>네, 한 번 구매하시면 해당 지표의 모든 업데이트를 평생 무료로 받으실 수 있습니다. 새로운 기능 추가, 성능 개선, 버그 수정 등 모든 업데이트가 포함됩니다.</p>
+                    <p>첫 구독 후 7일 이내에 환불을 요청하시면 전액 환불해 드립니다. 이후에는 남은 구독 기간에 대한 환불은 불가하며, 다음 결제일부터 구독이 취소됩니다.</p>
                 </div>
             </div>
             <div class="faq-item">
@@ -1531,7 +1629,7 @@
                     <span class="faq-icon">+</span>
                 </button>
                 <div class="faq-answer">
-                    <p>기본 라이선스는 1개의 TradingView 계정에서 사용 가능합니다. 추가 기기나 계정이 필요하시면 멀티 라이선스를 할인된 가격으로 구매하실 수 있습니다.</p>
+                    <p>기본 구독은 1개의 TradingView 계정에서 사용 가능합니다. 추가 계정이 필요하시면 Premium 플랜을 이용하시거나 고객 지원팀에 문의해 주세요.</p>
                 </div>
             </div>
         </div>
@@ -1557,8 +1655,8 @@
             <div class="footer-links">
                 <h4>제품</h4>
                 <ul>
-                    <li><a href="#">보조지표</a></li>
-                    <li><a href="#">요금제</a></li>
+                    <li><a href="#indicators">보조지표</a></li>
+                    <li><a href="#pricing">요금제</a></li>
                     <li><a href="#">업데이트</a></li>
                 </ul>
             </div>
@@ -1566,7 +1664,7 @@
                 <h4>지원</h4>
                 <ul>
                     <li><a href="#">사용 가이드</a></li>
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#faq">FAQ</a></li>
                     <li><a href="#">문의하기</a></li>
                 </ul>
             </div>
@@ -1580,16 +1678,84 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2025 VORTEX. All rights reserved.</p>
+            <p>2025 VORTEX. All rights reserved.</p>
             <div class="social-links">
-                <a href="#">𝕏</a>
-                <a href="#">📱</a>
-                <a href="#">💬</a>
+                <a href="#" aria-label="Twitter">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                <a href="#" aria-label="Telegram">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                    </svg>
+                </a>
+                <a href="#" aria-label="Discord">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
+                    </svg>
+                </a>
             </div>
         </div>
     </footer>
 
     <script>
+        // Number counting animation
+        const animateNumbers = () => {
+            const statNumbers = document.querySelectorAll('.stat-number[data-target]');
+
+            statNumbers.forEach(stat => {
+                const target = parseFloat(stat.dataset.target);
+                const suffix = stat.dataset.suffix || '';
+                const format = stat.dataset.format;
+                const duration = 2000;
+                const startTime = performance.now();
+
+                const updateNumber = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    // Easing function (ease-out)
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    const current = target * easeOut;
+
+                    let displayValue;
+                    if (format === 'comma') {
+                        displayValue = Math.floor(current).toLocaleString();
+                    } else if (target % 1 !== 0) {
+                        displayValue = current.toFixed(1);
+                    } else {
+                        displayValue = Math.floor(current);
+                    }
+
+                    stat.textContent = displayValue + suffix;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(updateNumber);
+                    }
+                };
+
+                requestAnimationFrame(updateNumber);
+            });
+        };
+
+        // Intersection Observer for stats animation
+        const statsBar = document.querySelector('.stats-bar');
+        let statsAnimated = false;
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !statsAnimated) {
+                    statsAnimated = true;
+                    animateNumbers();
+                }
+            });
+        }, { threshold: 0.5 });
+
+        if (statsBar) {
+            statsObserver.observe(statsBar);
+        }
+
         // Scroll reveal animation
         const reveals = document.querySelectorAll('.reveal');
 
