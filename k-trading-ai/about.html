@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - DBS LABS</title>
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background-color: #0A0A0A; }
+    .scroll-fade-up { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .scroll-fade-up.visible { opacity: 1; transform: translateY(0); }
+    .scroll-fade-right { opacity: 0; transform: translateX(-40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .scroll-fade-right.visible { opacity: 1; transform: translateX(0); }
+    .scroll-zoom-in { opacity: 0; transform: scale(0.9); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .scroll-zoom-in.visible { opacity: 1; transform: scale(1); }
+  </style>
+</head>
+<body class="text-white bg-black">
+
+  <!-- Header -->
+  <header class="w-full fixed top-0 left-0 z-50 bg-white backdrop-blur-lg border-b border-gray-200/50">
+    <div class="container mx-auto max-w-7xl px-4 h-20 flex justify-between items-center">
+      <a href="index.html" class="flex items-center space-x-2">
+        <img src="logo.jpg" alt="DBS LABS Logo" class="h-12 w-auto rounded">
+        <span class="text-2xl font-extrabold text-gray-800">DBS LABS</span>
+      </a>
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="about.html" class="text-red-600 font-bold text-xl">About</a>
+        <a href="services.html" class="text-gray-800 font-bold text-xl hover:text-red-600 transition-colors">Services</a>
+        <a href="faq.html" class="text-gray-800 font-bold text-xl hover:text-red-600 transition-colors">FAQ</a>
+        <a href="contact.html" class="text-white bg-red-600 hover:bg-red-700 font-bold text-lg px-5 py-2.5 rounded-full transition-colors">Contact</a>
+      </nav>
+      <button id="mobile-menu-btn" class="md:hidden text-gray-800 p-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="fixed inset-0 z-40 transform translate-x-full transition-transform duration-300 md:hidden bg-gray-900/95 backdrop-blur-sm">
+    <div class="flex justify-end items-center px-6 h-20">
+      <button id="mobile-close-btn" class="text-white p-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <nav class="flex flex-col items-center space-y-8 pt-20">
+      <a href="index.html" class="text-red-400 font-bold text-3xl">Home</a>
+      <a href="about.html" class="text-white font-bold text-3xl">About</a>
+      <a href="services.html" class="text-red-400 font-bold text-3xl">Services</a>
+      <a href="faq.html" class="text-red-400 font-bold text-3xl">FAQ</a>
+      <a href="contact.html" class="text-red-400 font-bold text-3xl">Contact</a>
+    </nav>
+  </div>
+
+  <main>
+    <!-- Hero -->
+    <section class="relative pt-32 pb-24 overflow-hidden">
+      <div class="absolute inset-0" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);"></div>
+      <div class="relative container mx-auto max-w-6xl px-4 grid md:grid-cols-2 gap-16 items-center">
+        <div class="scroll-fade-right">
+          <p class="text-lg text-red-400 font-semibold mb-4">A Letter from the CEO</p>
+          <h1 class="text-4xl md:text-5xl font-black leading-tight mb-6">
+            <span class="block bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-orange-400">Lessons from failure</span>
+            <span class="block">created today's</span>
+            <span class="block bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-orange-400">DBS LABS.</span>
+          </h1>
+          <p class="mt-8 text-xl text-gray-300">Hello. This is DBS LABS.</p>
+        </div>
+        <div class="flex justify-center scroll-zoom-in">
+          <img src="logo.jpg" alt="DBS LABS Logo" class="w-64 h-64 rounded-2xl shadow-2xl">
+        </div>
+      </div>
+    </section>
+
+    <!-- Story Section 1 -->
+    <div class="relative" style="background: linear-gradient(180deg, #111827 0%, #0a0a0a 100%);">
+      <div class="absolute inset-0 bg-black/70"></div>
+      <section class="relative py-24">
+        <div class="container mx-auto max-w-3xl px-4 space-y-12 text-lg text-gray-300 leading-loose">
+          <div class="text-center scroll-fade-up">
+            <p>Until now, I have created dozens of automated trading programs.</p>
+            <p class="mt-4">Using all kinds of indicators like RSI, MACD, and moving averages.</p>
+            <p class="mt-4">Despite incorporating all publicly available information, I experienced multiple liquidations.</p>
+          </div>
+          <div class="bg-white/5 backdrop-blur-md p-10 rounded-2xl border border-white/10 scroll-zoom-in">
+            <blockquote class="text-2xl md:text-4xl font-bold italic text-center text-white">
+              "Why does this keep happening?"
+            </blockquote>
+          </div>
+          <div class="text-center scroll-fade-up">
+            <p>Each time, I asked myself that question, and through analyzing my failures, I realized one important fact.</p>
+            <p class="mt-4">I shouldn't be obsessed with individual indicators or a single strategy.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Story Section 2 -->
+    <div class="relative" style="background: linear-gradient(180deg, #0a0a0a 0%, #111827 100%);">
+      <div class="absolute inset-0 bg-black/70"></div>
+      <section class="relative py-24">
+        <div class="container mx-auto max-w-3xl px-4 space-y-12 text-lg text-gray-300 leading-loose">
+          <div class="bg-yellow-900/10 backdrop-blur-md p-12 rounded-2xl border border-yellow-400/20 shadow-2xl scroll-zoom-in">
+            <p class="text-xl md:text-2xl font-bold text-center text-yellow-300">
+              "Liquidation is not just a single loss, but the biggest risk that destroys the balance of the entire investment strategy."
+            </p>
+          </div>
+          <div class="text-center scroll-fade-up">
+            <p>Based on this lesson, I learned that properly handling data and understanding the big picture of the market is more important than anything else.</p>
+            <p class="mt-4">These experiences eventually became the foundation for creating today's DBS LABS program.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Closing -->
+    <div class="relative" style="background: linear-gradient(180deg, #111827 0%, #0a0a0a 100%);">
+      <div class="absolute inset-0 bg-black/70"></div>
+      <section class="relative py-24">
+        <div class="container mx-auto max-w-3xl px-4 text-center space-y-6 text-lg text-gray-300 leading-loose scroll-fade-up">
+          <p>Of course, you don't have to use our program.</p>
+          <p>However, if DBS LABS can serve as a benchmark to help you find the optimal method for your investment, we believe that alone is meaningful.</p>
+          <p class="mt-6">Our DBS LABS team members are constantly striving to provide better data-driven automated trading systems than anyone else.</p>
+          <p class="pt-16 text-2xl font-light text-gray-400 tracking-wider">Thank you.<br>DBS LABS Team</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- CTA -->
+    <section class="py-24 bg-black">
+      <div class="container mx-auto max-w-4xl px-4 text-center scroll-fade-up">
+        <h2 class="text-4xl md:text-5xl font-extrabold mb-6">Ready to start?</h2>
+        <p class="text-lg text-gray-400 mb-10">Contact our experts for a consultation.</p>
+        <a href="contact.html" class="inline-block bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-12 py-5 rounded-full text-2xl font-extrabold transition-all duration-300 transform hover:scale-105 shadow-2xl">
+          Contact Us
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-16 border-t border-gray-800 bg-black">
+    <div class="container mx-auto max-w-7xl px-4 text-center text-gray-500">
+      <div class="flex items-center justify-center space-x-3 mb-6">
+        <img src="logo.jpg" alt="DBS LABS Logo" class="h-12 w-auto rounded">
+        <span class="font-semibold text-white text-2xl">DBS LABS</span>
+      </div>
+      <p class="text-xs text-gray-600">© 2025 DBS LABS. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile Menu
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('translate-x-full'));
+    document.getElementById('mobile-close-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.add('translate-x-full'));
+
+    // Scroll Animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.scroll-fade-up, .scroll-fade-right, .scroll-zoom-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

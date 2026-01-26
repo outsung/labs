@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ - DBS LABS</title>
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background-color: #0A0A0A; }
+    .scroll-fade-up { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .scroll-fade-up.visible { opacity: 1; transform: translateY(0); }
+    details[open] summary ~ * { animation: faqOpen 0.3s ease-in-out; }
+    @keyframes faqOpen { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="text-white bg-black">
+
+  <!-- Header -->
+  <header class="w-full fixed top-0 left-0 z-50 bg-white backdrop-blur-lg border-b border-gray-200/50">
+    <div class="container mx-auto max-w-7xl px-4 h-20 flex justify-between items-center">
+      <a href="index.html" class="flex items-center space-x-2">
+        <img src="logo.jpg" alt="DBS LABS Logo" class="h-12 w-auto rounded">
+        <span class="text-2xl font-extrabold text-gray-800">DBS LABS</span>
+      </a>
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="about.html" class="text-gray-800 font-bold text-xl hover:text-red-600 transition-colors">About</a>
+        <a href="services.html" class="text-gray-800 font-bold text-xl hover:text-red-600 transition-colors">Services</a>
+        <a href="faq.html" class="text-red-600 font-bold text-xl">FAQ</a>
+        <a href="contact.html" class="text-white bg-red-600 hover:bg-red-700 font-bold text-lg px-5 py-2.5 rounded-full transition-colors">Contact</a>
+      </nav>
+      <button id="mobile-menu-btn" class="md:hidden text-gray-800 p-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="fixed inset-0 z-40 transform translate-x-full transition-transform duration-300 md:hidden bg-gray-900/95 backdrop-blur-sm">
+    <div class="flex justify-end items-center px-6 h-20">
+      <button id="mobile-close-btn" class="text-white p-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <nav class="flex flex-col items-center space-y-8 pt-20">
+      <a href="index.html" class="text-red-400 font-bold text-3xl">Home</a>
+      <a href="about.html" class="text-red-400 font-bold text-3xl">About</a>
+      <a href="services.html" class="text-red-400 font-bold text-3xl">Services</a>
+      <a href="faq.html" class="text-white font-bold text-3xl">FAQ</a>
+      <a href="contact.html" class="text-red-400 font-bold text-3xl">Contact</a>
+    </nav>
+  </div>
+
+  <main>
+    <!-- Hero -->
+    <section class="relative pt-32 pb-16" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);">
+      <div class="container mx-auto max-w-4xl px-4 text-center">
+        <h1 class="text-4xl md:text-6xl font-black mb-6 scroll-fade-up">
+          Frequently Asked <span class="bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-orange-400">Questions</span>
+        </h1>
+        <p class="text-xl text-gray-300 scroll-fade-up">Find answers to common questions about DBS LABS.</p>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-24" style="background: linear-gradient(180deg, #111827 0%, #0a0a0a 100%);">
+      <div class="container mx-auto max-w-3xl px-4">
+        <div class="space-y-4">
+          <details class="bg-gray-800 border-2 border-gray-700 rounded-lg transition duration-300 hover:border-red-500/50 scroll-fade-up">
+            <summary class="cursor-pointer p-6 list-none flex justify-between items-center text-xl font-bold text-red-400">
+              Can I try the program first?
+              <span class="text-red-400 details-arrow text-3xl font-light">+</span>
+            </summary>
+            <div class="px-6 pb-6 text-gray-300 leading-relaxed">
+              Yes, we operate an experience-first policy where you can actually use the program before deciding to purchase. Please contact us for a consultation to learn about the trial process.
+            </div>
+          </details>
+
+          <details class="bg-gray-800 border-2 border-gray-700 rounded-lg transition duration-300 hover:border-red-500/50 scroll-fade-up">
+            <summary class="cursor-pointer p-6 list-none flex justify-between items-center text-xl font-bold text-red-400">
+              How does the automated trading program work?
+              <span class="text-red-400 details-arrow text-3xl font-light">+</span>
+            </summary>
+            <div class="px-6 pb-6 text-gray-300 leading-relaxed">
+              DBS LABS analyzes real-time market data 24/7 and captures optimal trading moments according to our proprietary AI algorithms. Sophisticated risk management features are included for added stability.
+            </div>
+          </details>
+
+          <details class="bg-gray-800 border-2 border-gray-700 rounded-lg transition duration-300 hover:border-red-500/50 scroll-fade-up">
+            <summary class="cursor-pointer p-6 list-none flex justify-between items-center text-xl font-bold text-red-400">
+              Is my investment capital safe?
+              <span class="text-red-400 details-arrow text-3xl font-light">+</span>
+            </summary>
+            <div class="px-6 pb-6 text-gray-300 leading-relaxed">
+              Yes, your funds never leave your exchange wallet. We only connect via API with trading permissions. All connections are encrypted with bank-grade security protocols.
+            </div>
+          </details>
+
+          <details class="bg-gray-800 border-2 border-gray-700 rounded-lg transition duration-300 hover:border-red-500/50 scroll-fade-up">
+            <summary class="cursor-pointer p-6 list-none flex justify-between items-center text-xl font-bold text-red-400">
+              What exchanges are supported?
+              <span class="text-red-400 details-arrow text-3xl font-light">+</span>
+            </summary>
+            <div class="px-6 pb-6 text-gray-300 leading-relaxed">
+              We support major exchanges including Binance, Bybit, OKX, and more. Contact us for the full list of supported platforms.
+            </div>
+          </details>
+
+          <details class="bg-gray-800 border-2 border-gray-700 rounded-lg transition duration-300 hover:border-red-500/50 scroll-fade-up">
+            <summary class="cursor-pointer p-6 list-none flex justify-between items-center text-xl font-bold text-red-400">
+              Can I customize the trading strategies?
+              <span class="text-red-400 details-arrow text-3xl font-light">+</span>
+            </summary>
+            <div class="px-6 pb-6 text-gray-300 leading-relaxed">
+              Absolutely. While we offer pre-configured AI strategies optimized by our team, you can also customize parameters such as risk level, position size, and trading pairs to match your investment goals.
+            </div>
+          </details>
+
+          <details class="bg-gray-800 border-2 border-gray-700 rounded-lg transition duration-300 hover:border-red-500/50 scroll-fade-up">
+            <summary class="cursor-pointer p-6 list-none flex justify-between items-center text-xl font-bold text-red-400">
+              What are the fees?
+              <span class="text-red-400 details-arrow text-3xl font-light">+</span>
+            </summary>
+            <div class="px-6 pb-6 text-gray-300 leading-relaxed">
+              Our pricing is transparent and competitive. We offer different plans based on your trading volume and needs. Contact us for detailed pricing information.
+            </div>
+          </details>
+
+          <details class="bg-gray-800 border-2 border-gray-700 rounded-lg transition duration-300 hover:border-red-500/50 scroll-fade-up">
+            <summary class="cursor-pointer p-6 list-none flex justify-between items-center text-xl font-bold text-red-400">
+              How do I get started?
+              <span class="text-red-400 details-arrow text-3xl font-light">+</span>
+            </summary>
+            <div class="px-6 pb-6 text-gray-300 leading-relaxed">
+              Getting started is simple. Contact us through the Contact page, and our team will guide you through the setup process. The entire onboarding takes less than 30 minutes.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-24 bg-black">
+      <div class="container mx-auto max-w-4xl px-4 text-center scroll-fade-up">
+        <h2 class="text-4xl md:text-5xl font-extrabold mb-6">Still have questions?</h2>
+        <p class="text-lg text-gray-400 mb-10">Our team is ready to help you get started.</p>
+        <a href="contact.html" class="inline-block bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-12 py-5 rounded-full text-2xl font-extrabold transition-all duration-300 transform hover:scale-105 shadow-2xl">
+          Contact Us
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-16 border-t border-gray-800 bg-black">
+    <div class="container mx-auto max-w-7xl px-4 text-center text-gray-500">
+      <div class="flex items-center justify-center space-x-3 mb-6">
+        <img src="logo.jpg" alt="DBS LABS Logo" class="h-12 w-auto rounded">
+        <span class="font-semibold text-white text-2xl">DBS LABS</span>
+      </div>
+      <p class="text-xs text-gray-600">© 2025 DBS LABS. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('translate-x-full'));
+    document.getElementById('mobile-close-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.add('translate-x-full'));
+
+    // FAQ Accordion
+    document.querySelectorAll('details').forEach(detail => {
+      detail.addEventListener('toggle', () => {
+        const arrow = detail.querySelector('.details-arrow');
+        arrow.textContent = detail.open ? '−' : '+';
+      });
+    });
+
+    // Scroll Animation
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.scroll-fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
