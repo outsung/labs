@@ -36,11 +36,15 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        transition: opacity 0.5s ease, visibility 0.5s ease;
+        opacity: 1;
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .preloader.fade-out {
+        opacity: 0;
+        pointer-events: none;
       }
       .preloader.hidden {
-        opacity: 0;
-        visibility: hidden;
+        display: none;
       }
       .preloader-logo {
         width: 80px;
@@ -393,10 +397,15 @@
   </footer>
 
   <script>
-    // Preloader
+    // Preloader with fade-out
     window.addEventListener('load', () => {
+      const preloader = document.getElementById('preloader');
       setTimeout(() => {
-        document.getElementById('preloader').classList.add('hidden');
+        preloader.classList.add('fade-out');
+        // After fade-out transition completes, hide completely
+        setTimeout(() => {
+          preloader.classList.add('hidden');
+        }, 800);
       }, 1800);
     });
 
