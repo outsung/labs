@@ -1,20 +1,18 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(open:*)",
       "Bash(gh auth status:*)",
-      "Bash(brew install:*)",
       "Bash(gh api:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push)",
-      "Skill(frontend-design)",
-      "WebFetch(domain:outsung.github.io)",
-      "Bash(curl:*)",
-      "Bash(git mv:*)",
       "Bash(gh run list:*)",
       "Bash(git restore:*)",
-      "WebFetch(domain:github.com)"
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Skill(frontend-design)",
+      "WebFetch(domain:news.hada.io)"
     ]
   }
 }

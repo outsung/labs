@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(open:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(git status)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git mv:*)",
+      "Bash(python3 -m http.server:*)",
+      "WebFetch(domain:outsung.github.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:fonts.google.com)"
+    ]
+  }
+}
