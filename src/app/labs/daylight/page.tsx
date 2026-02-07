@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const EASE_OUT_QUINT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -41,92 +41,277 @@ function CharacterReveal({ text, className }: { text: string; className?: string
 
 /**
  * WindowShadowOverlay — the signature Daylight effect.
- * Creates diagonal light/shadow stripes across the entire page,
- * simulating sunlight filtering through window blinds.
- * Shadow angle shifts subtly based on the user's local time.
+ *
+ * Implements the actual technique from the Basement Studio blog:
+ * https://basement.studio/post/creating-daylight-or-the-shadows
+ *
+ * 1. Creates a depth map texture with blind slat objects
+ *    (Red channel = depth, Green channel = 1.0 means object exists)
+ * 2. Applies a GLSL fragment shader with Vogel Disk Sampling (100 samples/pixel)
+ *    to compute physically-realistic soft shadows
+ * 3. Shadow softness depends on object depth — closer = sharper, farther = softer
+ * 4. Renders at 1/3 resolution for performance, composited via mix-blend-mode: multiply
  */
 function WindowShadowOverlay() {
-  const [angle, setAngle] = useState(-35);
-  const [offsetY, setOffsetY] = useState(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    function updateShadow() {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const gl = canvas.getContext("webgl", {
+      premultipliedAlpha: false,
+      alpha: false,
+    });
+    if (!gl) return;
+
+    const RENDER_SCALE = 0.33;
+
+    // ─── GLSL Shaders (from Basement Studio blog) ───
+
+    const vertexSource = `
+      attribute vec2 aPosition;
+      varying vec2 vTexCoord;
+      void main() {
+        vTexCoord = aPosition * 0.5 + 0.5;
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+      }
+    `;
+
+    // Vogel Disk Sampling shadow shader — adapted from the blog post
+    const fragmentSource = `
+      precision highp float;
+      uniform sampler2D uDepthMap;
+      uniform float uWidth;
+      uniform float uHeight;
+      varying vec2 vTexCoord;
+
+      const float pi = 3.14159265358979;
+      const float goldenAngle = pi * (3.0 - sqrt(5.0));
+      const float diskSize = 80.0;
+      const int diskSamples = 100;
+      const float minSize = 20.0;
+      const float maxSize = 300.0;
+
+      vec3 rand(vec2 uv) {
+        return vec3(
+          fract(sin(dot(uv, vec2(12.75613, 38.12123))) * 13234.76575),
+          fract(sin(dot(uv, vec2(19.45531, 58.46547))) * 43678.23431),
+          fract(sin(dot(uv, vec2(23.67817, 78.23121))) * 93567.23423)
+        );
+      }
+
+      void main() {
+        vec2 uv = vTexCoord;
+        uv.y = 1.0 - uv.y;
+
+        float shadowInfluence = 0.0;
+        float noiseSample = rand(uv).x;
+        float angle = noiseSample * pi;
+        float cosA = cos(angle);
+        float sinA = sin(angle);
+
+        for (int i = 1; i <= diskSamples; i++) {
+          float r = diskSize * sqrt(float(i) / float(diskSamples));
+          float theta = float(i) * goldenAngle;
+
+          vec2 offset = vec2(r * cos(theta), r * sin(theta));
+          vec2 rotated = vec2(
+            cosA * offset.x - sinA * offset.y,
+            sinA * offset.x + cosA * offset.y
+          );
+
+          vec4 samp = texture2D(uDepthMap, uv + rotated / vec2(uWidth, uHeight));
+
+          if (samp.r > 0.0 && samp.g > 0.9) {
+            float dist = length(offset);
+            float size = (samp.r * (maxSize - minSize)) + minSize;
+
+            if (size / 2.0 >= dist) {
+              shadowInfluence += mix(8.0, 0.5, size / maxSize);
+            }
+          }
+        }
+
+        float shadowFactor = shadowInfluence / float(diskSamples);
+        shadowFactor = clamp(shadowFactor, 0.0, 0.8);
+
+        // Warm-tinted shadow (not cold gray)
+        vec3 color = mix(vec3(1.0), vec3(0.92, 0.90, 0.88), shadowFactor);
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `;
+
+    // ─── Compile & link shaders ───
+
+    function compile(type: number, src: string) {
+      const s = gl!.createShader(type)!;
+      gl!.shaderSource(s, src);
+      gl!.compileShader(s);
+      if (!gl!.getShaderParameter(s, gl!.COMPILE_STATUS)) {
+        console.error("Shader compile error:", gl!.getShaderInfoLog(s));
+        return null;
+      }
+      return s;
+    }
+
+    const vs = compile(gl.VERTEX_SHADER, vertexSource);
+    const fs = compile(gl.FRAGMENT_SHADER, fragmentSource);
+    if (!vs || !fs) return;
+
+    const program = gl.createProgram()!;
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error("Program link error:", gl.getProgramInfoLog(program));
+      return;
+    }
+
+    // ─── Full-screen quad geometry ───
+
+    const quadBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+      gl.STATIC_DRAW
+    );
+
+    const aPos = gl.getAttribLocation(program, "aPosition");
+    const uDepthMap = gl.getUniformLocation(program, "uDepthMap");
+    const uWidth = gl.getUniformLocation(program, "uWidth");
+    const uHeight = gl.getUniformLocation(program, "uHeight");
+
+    // ─── Depth map generation ───
+    // Draws blind slat objects into a 2D canvas.
+    // Red channel = depth (0-1), Green = 255 means "object here".
+
+    function generateDepthMap(w: number, h: number): HTMLCanvasElement {
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext("2d")!;
+
+      // Black background = empty space (no objects)
+      ctx.fillStyle = "rgb(0, 0, 0)";
+      ctx.fillRect(0, 0, w, h);
+
+      // Time-based shadow angle
       const now = new Date();
       const hours = now.getHours() + now.getMinutes() / 60;
-      // Sun arc: shadow angle goes from -50deg (morning) to -20deg (noon) to -50deg (evening)
-      // Maps 6-18 hours to a parabolic curve
-      const normalized = Math.max(0, Math.min(1, (hours - 6) / 12)); // 0 at 6am, 1 at 6pm
-      const arc = -4 * (normalized - 0.5) * (normalized - 0.5) + 1; // peaks at 1 at noon
-      const newAngle = -50 + arc * 30; // ranges from -50 to -20
-      // Vertical offset shifts shadows down as day progresses
-      const newOffsetY = (normalized - 0.5) * 60;
-      setAngle(newAngle);
-      setOffsetY(newOffsetY);
+      const t = Math.max(0, Math.min(1, (hours - 6) / 12));
+      const arc = -4 * (t - 0.5) ** 2 + 1;
+      const angleDeg = -45 + arc * 25;
+      const angleRad = (angleDeg * Math.PI) / 180;
+
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(angleRad);
+
+      // ─ Blind slats ─
+      // Each slat gets a slightly different depth for natural variation
+      const slatSpacing = 50;
+      const slatWidth = 5;
+      const count = Math.ceil((Math.max(w, h) * 2) / slatSpacing);
+
+      for (let i = -count; i <= count; i++) {
+        // Deterministic depth variation per slat (0.25 – 0.45 range)
+        const depth = 0.3 + Math.sin(i * 1.37) * 0.08 + Math.cos(i * 0.73) * 0.05;
+        const r = Math.round(Math.max(1, Math.min(255, depth * 255)));
+        ctx.fillStyle = `rgb(${r}, 255, 0)`;
+        ctx.fillRect(-w * 2, i * slatSpacing, w * 4, slatWidth);
+      }
+
+      // ─ Window frame crossbars ─
+      // At greater depth → softer, wider shadows
+      const frameDepth = Math.round(0.65 * 255);
+      ctx.fillStyle = `rgb(${frameDepth}, 255, 0)`;
+      ctx.fillRect(-w * 2, -h * 0.15, w * 4, 10); // horizontal bar
+      ctx.fillRect(-w * 2, h * 0.35, w * 4, 10); // second horizontal bar
+
+      ctx.restore();
+
+      // Vertical frame bar (perpendicular to slats)
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(angleRad + Math.PI / 2);
+      ctx.fillStyle = `rgb(${frameDepth}, 255, 0)`;
+      ctx.fillRect(-w * 2, 0, w * 4, 10);
+      ctx.restore();
+
+      return c;
     }
-    updateShadow();
-    const interval = setInterval(updateShadow, 60000); // update every minute
-    return () => clearInterval(interval);
+
+    // ─── WebGL texture upload ───
+
+    let depthTex: WebGLTexture | null = null;
+
+    function uploadTex(source: HTMLCanvasElement) {
+      if (depthTex) gl!.deleteTexture(depthTex);
+      depthTex = gl!.createTexture();
+      gl!.bindTexture(gl!.TEXTURE_2D, depthTex);
+      gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA, gl!.RGBA, gl!.UNSIGNED_BYTE, source);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.LINEAR);
+    }
+
+    // ─── Render ───
+
+    function render() {
+      if (!canvas || !gl) return;
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.round(window.innerWidth * RENDER_SCALE * dpr);
+      const h = Math.round(window.innerHeight * RENDER_SCALE * dpr);
+
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+
+      // Generate and upload depth map
+      const depthCanvas = generateDepthMap(w, h);
+      uploadTex(depthCanvas);
+
+      // Run shadow shader
+      gl!.useProgram(program);
+      gl!.activeTexture(gl!.TEXTURE0);
+      gl!.bindTexture(gl!.TEXTURE_2D, depthTex);
+      gl!.uniform1i(uDepthMap, 0);
+      gl!.uniform1f(uWidth, w);
+      gl!.uniform1f(uHeight, h);
+
+      gl!.bindBuffer(gl!.ARRAY_BUFFER, quadBuf);
+      gl!.enableVertexAttribArray(aPos);
+      gl!.vertexAttribPointer(aPos, 2, gl!.FLOAT, false, 0, 0);
+      gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
+    }
+
+    render();
+
+    const onResize = () => render();
+    window.addEventListener("resize", onResize);
+    // Re-render every minute for time-based shadow shift
+    const interval = setInterval(render, 60000);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      clearInterval(interval);
+      if (depthTex) gl!.deleteTexture(depthTex);
+      gl!.deleteProgram(program);
+      gl!.deleteShader(vs);
+      gl!.deleteShader(fs);
+      gl!.deleteBuffer(quadBuf);
+    };
   }, []);
 
-  const shadows = useMemo(() => {
-    // Primary blind stripes — sharp but soft-edged
-    const primary = `repeating-linear-gradient(
-      ${angle}deg,
-      transparent 0px,
-      transparent 45px,
-      rgba(26,24,21,0.025) 48px,
-      rgba(26,24,21,0.055) 56px,
-      rgba(26,24,21,0.055) 64px,
-      rgba(26,24,21,0.025) 72px,
-      transparent 75px,
-      transparent 120px
-    )`;
-
-    // Secondary wider stripes for depth — slightly different angle
-    const secondary = `repeating-linear-gradient(
-      ${angle - 5}deg,
-      transparent 0px,
-      transparent 100px,
-      rgba(26,24,21,0.015) 105px,
-      rgba(26,24,21,0.035) 130px,
-      rgba(26,24,21,0.015) 155px,
-      transparent 160px,
-      transparent 260px
-    )`;
-
-    // Warm light glow from the light source direction
-    const lightAngleRad = ((angle + 90) * Math.PI) / 180;
-    const lx = 50 + Math.cos(lightAngleRad) * 40;
-    const ly = Math.max(0, 10 + offsetY * 0.3);
-    const warmLight = `radial-gradient(
-      ellipse at ${lx}% ${ly}%,
-      rgba(255,248,235,0.18) 0%,
-      rgba(255,245,225,0.06) 30%,
-      transparent 60%
-    )`;
-
-    return { primary, secondary, warmLight };
-  }, [angle, offsetY]);
-
   return (
-    <div
-      className="pointer-events-none fixed inset-0 z-40"
-      style={{ transform: `translateY(${offsetY * 0.15}px)` }}
-    >
-      {/* Primary blind stripes */}
-      <div className="absolute inset-[-20%] w-[140%] h-[140%]" style={{ background: shadows.primary }} />
-      {/* Secondary depth stripes */}
-      <div className="absolute inset-[-20%] w-[140%] h-[140%]" style={{ background: shadows.secondary }} />
-      {/* Warm light glow */}
-      <div className="absolute inset-0" style={{ background: shadows.warmLight }} />
-      {/* Soft vignette at edges for realism */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(26,24,21,0.03) 100%)`,
-        }}
-      />
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none fixed inset-0 z-40 h-full w-full"
+      style={{ mixBlendMode: "multiply" }}
+    />
   );
 }
 
