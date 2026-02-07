@@ -2,6 +2,15 @@ import { Lab } from "@/types/lab";
 
 export const labs: Lab[] = [
   {
+    id: "daylight",
+    title: "Daylight",
+    description: "Warm-tone hardware product page with physical shadow system",
+    tags: ["product", "light-theme", "editorial", "scroll-animation"],
+    date: "2026-02",
+    reference: "https://daylightcomputer.com",
+    status: "active",
+  },
+  {
     id: "typography-001",
     title: "Typography 001",
     description: "Font weight, tracking, and hierarchy exploration",
