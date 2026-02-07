@@ -912,7 +912,7 @@ export default function DaylightPage() {
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-[6vw]">
           <span className="font-[Georgia,_'Times_New_Roman',serif] text-lg text-[#1a1815]">
-            daylight
+            penumbra
           </span>
           <div className="flex items-center gap-3">
             <button
@@ -1029,7 +1029,7 @@ export default function DaylightPage() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mx-auto mb-8 h-px w-16 bg-[#c4a46a]/40" />
           <blockquote className="font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,2rem)] leading-relaxed text-[#1a1815]">
-            &ldquo;The most beautiful thing about daylight is how it turns
+            &ldquo;The most beautiful thing about light is how it turns
             ordinary spaces into something quietly extraordinary.&rdquo;
           </blockquote>
           <div className="mx-auto mt-8 h-px w-16 bg-[#c4a46a]/40" />
@@ -1375,7 +1375,7 @@ export default function DaylightPage() {
               WebGL + Vogel Disk Sampling
             </p>
             <Link
-              href="/labs/daylight/playground"
+              href="/labs/penumbra/playground"
               className="rounded-full border border-[#c4a46a]/30 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-[#c4a46a] transition-colors hover:bg-[#c4a46a]/10"
             >
               playground

@@ -109,6 +109,7 @@ TeamCreate → TaskCreate (조사/설계/구현/검수) → Task (에이전트 �
 
 | 프로젝트 | 설명 | 상태 |
 |---------|------|------|
+| penumbra | 창문 그림자 체험 — WebGL Vogel Disk Sampling | active |
 | typography-001 | 타이포그래피 실험 | active |
 | jerry-plants | 제리의 프리미엄 식물샵 | archived |
 | commune | 프라이빗 공간대여 & 모임 서비스 | archived |

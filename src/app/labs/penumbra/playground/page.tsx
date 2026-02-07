@@ -723,10 +723,10 @@ export default function PlaygroundPage() {
       <nav className="fixed left-0 top-0 z-50 w-full bg-[#faf5f2]/80 px-6 py-4 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <Link
-            href="/labs/daylight"
+            href="/labs/penumbra"
             className="text-xs text-[#8a8078] transition-colors hover:text-[#1a1815]"
           >
-            &larr; back to daylight
+            &larr; back to penumbra
           </Link>
           <span className="text-xs text-[#1a1815]/20">|</span>
           <span className="text-xs text-[#8a8078]">
