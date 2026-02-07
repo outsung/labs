@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 const EASE_OUT_QUINT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -36,6 +36,97 @@ function CharacterReveal({ text, className }: { text: string; className?: string
         </motion.span>
       ))}
     </span>
+  );
+}
+
+/**
+ * WindowShadowOverlay — the signature Daylight effect.
+ * Creates diagonal light/shadow stripes across the entire page,
+ * simulating sunlight filtering through window blinds.
+ * Shadow angle shifts subtly based on the user's local time.
+ */
+function WindowShadowOverlay() {
+  const [angle, setAngle] = useState(-35);
+  const [offsetY, setOffsetY] = useState(0);
+
+  useEffect(() => {
+    function updateShadow() {
+      const now = new Date();
+      const hours = now.getHours() + now.getMinutes() / 60;
+      // Sun arc: shadow angle goes from -50deg (morning) to -20deg (noon) to -50deg (evening)
+      // Maps 6-18 hours to a parabolic curve
+      const normalized = Math.max(0, Math.min(1, (hours - 6) / 12)); // 0 at 6am, 1 at 6pm
+      const arc = -4 * (normalized - 0.5) * (normalized - 0.5) + 1; // peaks at 1 at noon
+      const newAngle = -50 + arc * 30; // ranges from -50 to -20
+      // Vertical offset shifts shadows down as day progresses
+      const newOffsetY = (normalized - 0.5) * 60;
+      setAngle(newAngle);
+      setOffsetY(newOffsetY);
+    }
+    updateShadow();
+    const interval = setInterval(updateShadow, 60000); // update every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const shadows = useMemo(() => {
+    // Primary blind stripes — sharp but soft-edged
+    const primary = `repeating-linear-gradient(
+      ${angle}deg,
+      transparent 0px,
+      transparent 45px,
+      rgba(26,24,21,0.025) 48px,
+      rgba(26,24,21,0.055) 56px,
+      rgba(26,24,21,0.055) 64px,
+      rgba(26,24,21,0.025) 72px,
+      transparent 75px,
+      transparent 120px
+    )`;
+
+    // Secondary wider stripes for depth — slightly different angle
+    const secondary = `repeating-linear-gradient(
+      ${angle - 5}deg,
+      transparent 0px,
+      transparent 100px,
+      rgba(26,24,21,0.015) 105px,
+      rgba(26,24,21,0.035) 130px,
+      rgba(26,24,21,0.015) 155px,
+      transparent 160px,
+      transparent 260px
+    )`;
+
+    // Warm light glow from the light source direction
+    const lightAngleRad = ((angle + 90) * Math.PI) / 180;
+    const lx = 50 + Math.cos(lightAngleRad) * 40;
+    const ly = Math.max(0, 10 + offsetY * 0.3);
+    const warmLight = `radial-gradient(
+      ellipse at ${lx}% ${ly}%,
+      rgba(255,248,235,0.18) 0%,
+      rgba(255,245,225,0.06) 30%,
+      transparent 60%
+    )`;
+
+    return { primary, secondary, warmLight };
+  }, [angle, offsetY]);
+
+  return (
+    <div
+      className="pointer-events-none fixed inset-0 z-40"
+      style={{ transform: `translateY(${offsetY * 0.15}px)` }}
+    >
+      {/* Primary blind stripes */}
+      <div className="absolute inset-[-20%] w-[140%] h-[140%]" style={{ background: shadows.primary }} />
+      {/* Secondary depth stripes */}
+      <div className="absolute inset-[-20%] w-[140%] h-[140%]" style={{ background: shadows.secondary }} />
+      {/* Warm light glow */}
+      <div className="absolute inset-0" style={{ background: shadows.warmLight }} />
+      {/* Soft vignette at edges for realism */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(26,24,21,0.03) 100%)`,
+        }}
+      />
+    </div>
   );
 }
 
@@ -754,9 +845,17 @@ function DaylightFooter() {
         </div>
       </div>
       <div className="mx-auto mt-12 flex max-w-7xl items-center justify-between border-t border-[#1a1815]/5 pt-8">
-        <p className="text-xs text-[#8a8078]">
-          &copy; 2026 Daylight Computer Co. &mdash; Public Benefit Corporation
-        </p>
+        <div className="flex items-center gap-4">
+          <p className="text-xs text-[#8a8078]">
+            &copy; 2026 Daylight Computer Co. &mdash; Public Benefit Corporation
+          </p>
+          <Link
+            href="/labs/daylight/playground"
+            className="rounded-full border border-[#c4a46a]/30 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-[#c4a46a] transition-colors hover:bg-[#c4a46a]/10"
+          >
+            playground
+          </Link>
+        </div>
         <Link
           href="/"
           className="text-xs text-[#8a8078] transition-colors hover:text-[#1a1815]"
@@ -773,6 +872,7 @@ export default function DaylightPage() {
     <div className="min-h-screen scroll-smooth bg-[#faf5f2] font-sans text-[#1a1815] [&_::selection]:bg-[#c4a46a]/20">
       {/* Override dark body background to prevent bleed-through on overscroll */}
       <style>{`html, body { background-color: #faf5f2 !important; }`}</style>
+      <WindowShadowOverlay />
       <DaylightNav />
       <HeroSection />
       <MissionSection />
