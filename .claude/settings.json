@@ -10,7 +10,8 @@
       "Bash(git log:*)",
       "Bash(git diff:*)",
       "Bash(git mv:*)",
-      "Bash(python3 -m http.server:*)",
+      "Bash(pnpm:*)",
+      "Bash(npx:*)",
       "WebFetch(domain:outsung.github.io)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:fonts.google.com)"

@@ -21,10 +21,17 @@ disallowed-tools:
 ## 역할
 
 - 최신 웹 디자인 트렌드 조사
-- 경쟁 서비스 / 레퍼런스 사이트 분석
+- 경쟁 서비스 / 레퍼런스 사이트 분석 (레이아웃, 컬러, 타이포, 애니메이션)
 - 컬러 팔레트, 타이포그래피, 레이아웃 패턴 제안
-- Google Fonts, CDN 라이브러리 탐색
+- Google Fonts, npm 패키지 탐색
 - 기존 프로젝트 코드 분석 및 패턴 파악
+
+## 기술 컨텍스트
+
+- **Framework**: Next.js (App Router, TypeScript)
+- **Styling**: Tailwind CSS
+- **Animation**: Framer Motion
+- 각 랩은 `src/app/labs/<name>/page.tsx`에 독립 구현
 
 ## 제약
 

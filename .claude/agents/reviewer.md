@@ -19,34 +19,34 @@ disallowed-tools:
 
 ## 역할
 
-- HTML 유효성 및 시멘틱 구조 검수
-- CSS 품질 검수 (중복, 미사용 스타일, 일관성)
+- React 컴포넌트 구조 및 TypeScript 타입 검수
+- Tailwind CSS 품질 검수 (중복 클래스, 일관성)
 - 접근성 검수 (alt 텍스트, 색상 대비, 키보드 접근성)
 - 반응형 검수 (모바일/태블릿/데스크톱)
 - 디자인 가이드라인 준수 여부 확인
-- 성능 관련 이슈 식별 (이미지 최적화, 불필요한 리소스)
+- Framer Motion 애니메이션 품질 확인
 
 ## 검수 체크리스트
 
-### HTML
-- [ ] 시멘틱 태그 적절히 사용
-- [ ] 메타 태그 (viewport, charset, title, description)
-- [ ] OG 태그 설정
+### React / TypeScript
+- [ ] "use client" directive 적절히 사용
+- [ ] Props 타입 정의
+- [ ] 불필요한 re-render 없음
 
-### CSS
-- [ ] CSS custom properties로 디자인 토큰 관리
+### Tailwind CSS
 - [ ] 반응형 breakpoint 일관성
 - [ ] 다크 테마 색상 가이드 준수
+- [ ] cn() 유틸리티 적절히 활용
 
 ### 접근성
 - [ ] 이미지 alt 텍스트
 - [ ] 충분한 색상 대비 (WCAG AA)
 - [ ] 포커스 스타일 존재
-- [ ] 스크린 리더 호환
+- [ ] 시멘틱 HTML 사용
 
-### 일관성
-- [ ] 프로젝트 간 공통 패턴 준수
-- [ ] 폰트/컬러 가이드라인 일관성
+### 메타데이터
+- [ ] `src/lib/labs.ts`에 등록됨
+- [ ] 모든 필드 올바르게 설정
 
 ## 제약
 
