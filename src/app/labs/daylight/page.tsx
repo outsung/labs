@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 const EASE_OUT_QUINT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -15,7 +15,15 @@ const sectionAnim = {
   },
 };
 
-function CharacterReveal({ text, className }: { text: string; className?: string }) {
+function CharacterReveal({
+  text,
+  className,
+  delay = 0.6,
+}: {
+  text: string;
+  className?: string;
+  delay?: number;
+}) {
   const chars = text.split("");
   return (
     <span className={className}>
@@ -25,7 +33,7 @@ function CharacterReveal({ text, className }: { text: string; className?: string
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: "0%", opacity: 1 }}
           transition={{
-            delay: 0.6 + i * 0.03,
+            delay: delay + i * 0.03,
             duration: 0.6,
             ease: EASE_OUT_QUINT,
           }}
@@ -39,22 +47,261 @@ function CharacterReveal({ text, className }: { text: string; className?: string
   );
 }
 
-/**
- * WindowShadowOverlay — the signature Daylight effect.
- *
- * Implements the actual technique from the Basement Studio blog:
- * https://basement.studio/post/creating-daylight-or-the-shadows
- *
- * 1. Creates a depth map texture with blind slat objects
- *    (Red channel = depth, Green channel = 1.0 means object exists)
- * 2. Applies a GLSL fragment shader with Vogel Disk Sampling (100 samples/pixel)
- *    to compute physically-realistic soft shadows
- * 3. Shadow softness depends on object depth — closer = sharper, farther = softer
- * 4. Renders at 1/3 resolution for performance, composited via mix-blend-mode: multiply
- */
-function WindowShadowOverlay() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+/* ─── Preset definitions ─── */
+type ShadowMode = "programmatic" | "image";
 
+interface PresetSettings {
+  threshold: number;
+  contrast: number;
+  depth: number;
+  invert: boolean;
+}
+
+interface Preset {
+  id: string;
+  name: string;
+  mode: ShadowMode;
+  src: string; // empty for programmatic
+  settings: PresetSettings;
+}
+
+const DEFAULT_SETTINGS: PresetSettings = {
+  threshold: 128,
+  contrast: 1.8,
+  depth: 0.4,
+  invert: false,
+};
+
+const PRESETS: Preset[] = [
+  {
+    id: "classic-blinds",
+    name: "Classic",
+    mode: "programmatic",
+    src: "",
+    settings: { threshold: 0, contrast: 0, depth: 0, invert: false },
+  },
+  {
+    id: "venetian-blinds",
+    name: "Blinds",
+    mode: "image",
+    src: "/presets/venetian-blinds.jpeg",
+    settings: { threshold: 140, contrast: 2.0, depth: 0.35, invert: false },
+  },
+  {
+    id: "arched-panes",
+    name: "Arched",
+    mode: "image",
+    src: "/presets/arched-panes.jpeg",
+    settings: { threshold: 120, contrast: 2.2, depth: 0.4, invert: false },
+  },
+  {
+    id: "french-window",
+    name: "French",
+    mode: "image",
+    src: "/presets/french-window.jpeg",
+    settings: { threshold: 135, contrast: 1.8, depth: 0.45, invert: false },
+  },
+  {
+    id: "foliage",
+    name: "Foliage",
+    mode: "image",
+    src: "/presets/foliage-window.jpeg",
+    settings: { threshold: 110, contrast: 2.5, depth: 0.3, invert: false },
+  },
+  {
+    id: "ivy",
+    name: "Ivy",
+    mode: "image",
+    src: "/presets/ivy-window.jpeg",
+    settings: { threshold: 105, contrast: 2.4, depth: 0.35, invert: false },
+  },
+  {
+    id: "provincial",
+    name: "Provincial",
+    mode: "image",
+    src: "/presets/provincial.jpeg",
+    settings: { threshold: 130, contrast: 1.6, depth: 0.5, invert: false },
+  },
+  {
+    id: "orange-arch",
+    name: "Arch",
+    mode: "image",
+    src: "/presets/orange-arch.jpeg",
+    settings: { threshold: 145, contrast: 1.9, depth: 0.4, invert: true },
+  },
+  {
+    id: "curtained",
+    name: "Curtain",
+    mode: "image",
+    src: "/presets/curtained.jpeg",
+    settings: { threshold: 125, contrast: 2.0, depth: 0.45, invert: false },
+  },
+];
+
+/* ─── Programmatic depth map (original blind slats) ─── */
+function generateProgrammaticDepthMap(w: number, h: number): HTMLCanvasElement {
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d")!;
+
+  ctx.fillStyle = "rgb(0, 0, 0)";
+  ctx.fillRect(0, 0, w, h);
+
+  const now = new Date();
+  const hours = now.getHours() + now.getMinutes() / 60;
+  const t = Math.max(0, Math.min(1, (hours - 6) / 12));
+  const arc = -4 * (t - 0.5) ** 2 + 1;
+  const angleDeg = -45 + arc * 25;
+  const angleRad = (angleDeg * Math.PI) / 180;
+
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+  ctx.rotate(angleRad);
+
+  const slatSpacing = 50;
+  const slatWidth = 5;
+  const count = Math.ceil((Math.max(w, h) * 2) / slatSpacing);
+
+  for (let i = -count; i <= count; i++) {
+    const depth =
+      0.3 + Math.sin(i * 1.37) * 0.08 + Math.cos(i * 0.73) * 0.05;
+    const r = Math.round(Math.max(1, Math.min(255, depth * 255)));
+    ctx.fillStyle = `rgb(${r}, 255, 0)`;
+    ctx.fillRect(-w * 2, i * slatSpacing, w * 4, slatWidth);
+  }
+
+  const frameDepth = Math.round(0.65 * 255);
+  ctx.fillStyle = `rgb(${frameDepth}, 255, 0)`;
+  ctx.fillRect(-w * 2, -h * 0.15, w * 4, 10);
+  ctx.fillRect(-w * 2, h * 0.35, w * 4, 10);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+  ctx.rotate(angleRad + Math.PI / 2);
+  ctx.fillStyle = `rgb(${frameDepth}, 255, 0)`;
+  ctx.fillRect(-w * 2, 0, w * 4, 10);
+  ctx.restore();
+
+  return c;
+}
+
+/* ─── Image → Depth Map conversion ─── */
+function processImageToDepthMap(
+  sourceCanvas: HTMLCanvasElement,
+  w: number,
+  h: number,
+  opts: PresetSettings
+): HTMLCanvasElement {
+  const sourceCtx = sourceCanvas.getContext("2d")!;
+  const imageData = sourceCtx.getImageData(0, 0, w, h);
+  const { threshold, contrast, depth, invert } = opts;
+  const { data } = imageData;
+  const output = new ImageData(w, h);
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i],
+      g = data[i + 1],
+      b = data[i + 2];
+
+    let lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    lum = ((lum / 255 - 0.5) * contrast + 0.5) * 255;
+    lum = Math.max(0, Math.min(255, lum));
+
+    if (invert) lum = 255 - lum;
+
+    if (lum > threshold) {
+      output.data[i] = 0;
+      output.data[i + 1] = 0;
+      output.data[i + 2] = 0;
+      output.data[i + 3] = 255;
+    } else {
+      const depthVal = Math.round(
+        depth * 255 * (1 - lum / Math.max(threshold, 1))
+      );
+      output.data[i] = Math.max(1, Math.min(255, depthVal));
+      output.data[i + 1] = 255;
+      output.data[i + 2] = 0;
+      output.data[i + 3] = 255;
+    }
+  }
+
+  const outCanvas = document.createElement("canvas");
+  outCanvas.width = w;
+  outCanvas.height = h;
+  outCanvas.getContext("2d")!.putImageData(output, 0, 0);
+  return outCanvas;
+}
+
+/* ─── Draw image with cover fit ─── */
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  w: number,
+  h: number
+) {
+  const imgAspect = img.width / img.height;
+  const canvasAspect = w / h;
+  let drawW: number, drawH: number, drawX: number, drawY: number;
+
+  if (imgAspect > canvasAspect) {
+    drawH = h;
+    drawW = h * imgAspect;
+  } else {
+    drawW = w;
+    drawH = w / imgAspect;
+  }
+  drawX = (w - drawW) / 2;
+  drawY = (h - drawH) / 2;
+
+  ctx.drawImage(img, drawX, drawY, drawW, drawH);
+}
+
+/* ─── WebGL Shadow Overlay ─── */
+function ShadowOverlay({
+  selectedPreset,
+  settings,
+  imageReady,
+  allPresets,
+}: {
+  selectedPreset: string;
+  settings: PresetSettings;
+  imageReady: number;
+  allPresets: Preset[];
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const glRef = useRef<WebGLRenderingContext | null>(null);
+  const programRef = useRef<WebGLProgram | null>(null);
+  const quadBufRef = useRef<WebGLBuffer | null>(null);
+  const depthTexRef = useRef<WebGLTexture | null>(null);
+  const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
+  const [internalReady, setInternalReady] = useState(0);
+
+  // Load preset image (skip for programmatic)
+  useEffect(() => {
+    const preset = allPresets.find((p) => p.id === selectedPreset);
+    if (!preset || preset.mode === "programmatic") {
+      setInternalReady((v) => v + 1);
+      return;
+    }
+
+    if (imageCacheRef.current.has(preset.src)) {
+      setInternalReady((v) => v + 1);
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      imageCacheRef.current.set(preset.src, img);
+      setInternalReady((v) => v + 1);
+    };
+    img.onerror = () => console.error("Failed to load preset:", preset.src);
+    img.src = preset.src;
+  }, [selectedPreset, allPresets]);
+
+  // Init WebGL once
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -64,10 +311,31 @@ function WindowShadowOverlay() {
       alpha: false,
     });
     if (!gl) return;
+    glRef.current = gl;
+
+    const quadBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+      gl.STATIC_DRAW
+    );
+    quadBufRef.current = quadBuf;
+
+    return () => {
+      if (depthTexRef.current) gl.deleteTexture(depthTexRef.current);
+      if (programRef.current) gl.deleteProgram(programRef.current);
+      if (quadBufRef.current) gl.deleteBuffer(quadBufRef.current);
+    };
+  }, []);
+
+  // Render
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const gl = glRef.current;
+    if (!canvas || !gl) return;
 
     const RENDER_SCALE = 0.33;
-
-    // ─── GLSL Shaders (from Basement Studio blog) ───
 
     const vertexSource = `
       attribute vec2 aPosition;
@@ -78,7 +346,6 @@ function WindowShadowOverlay() {
       }
     `;
 
-    // Vogel Disk Sampling shadow shader — adapted from the blog post
     const fragmentSource = `
       precision highp float;
       uniform sampler2D uDepthMap;
@@ -111,7 +378,7 @@ function WindowShadowOverlay() {
         float cosA = cos(angle);
         float sinA = sin(angle);
 
-        for (int i = 1; i <= diskSamples; i++) {
+        for (int i = 1; i <= 100; i++) {
           float r = diskSize * sqrt(float(i) / float(diskSamples));
           float theta = float(i) * goldenAngle;
 
@@ -136,20 +403,17 @@ function WindowShadowOverlay() {
         float shadowFactor = shadowInfluence / float(diskSamples);
         shadowFactor = clamp(shadowFactor, 0.0, 0.8);
 
-        // Warm-tinted shadow (not cold gray)
         vec3 color = mix(vec3(1.0), vec3(0.92, 0.90, 0.88), shadowFactor);
         gl_FragColor = vec4(color, 1.0);
       }
     `;
-
-    // ─── Compile & link shaders ───
 
     function compile(type: number, src: string) {
       const s = gl!.createShader(type)!;
       gl!.shaderSource(s, src);
       gl!.compileShader(s);
       if (!gl!.getShaderParameter(s, gl!.COMPILE_STATUS)) {
-        console.error("Shader compile error:", gl!.getShaderInfoLog(s));
+        console.error("Shader error:", gl!.getShaderInfoLog(s));
         return null;
       }
       return s;
@@ -159,151 +423,84 @@ function WindowShadowOverlay() {
     const fs = compile(gl.FRAGMENT_SHADER, fragmentSource);
     if (!vs || !fs) return;
 
+    if (programRef.current) gl.deleteProgram(programRef.current);
     const program = gl.createProgram()!;
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.error("Program link error:", gl.getProgramInfoLog(program));
+      console.error("Link error:", gl.getProgramInfoLog(program));
       return;
     }
+    programRef.current = program;
+    gl.deleteShader(vs);
+    gl.deleteShader(fs);
 
-    // ─── Full-screen quad geometry ───
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.round(window.innerWidth * RENDER_SCALE * dpr);
+    const h = Math.round(window.innerHeight * RENDER_SCALE * dpr);
+    canvas.width = w;
+    canvas.height = h;
+    gl.viewport(0, 0, w, h);
 
-    const quadBuf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
-      gl.STATIC_DRAW
+    // Generate depth map
+    const preset = allPresets.find((p) => p.id === selectedPreset);
+    let depthCanvas: HTMLCanvasElement;
+
+    if (!preset || preset.mode === "programmatic") {
+      depthCanvas = generateProgrammaticDepthMap(w, h);
+    } else {
+      const img = imageCacheRef.current.get(preset.src);
+      if (!img) return;
+
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = w;
+      tempCanvas.height = h;
+      const tempCtx = tempCanvas.getContext("2d")!;
+      tempCtx.fillStyle = "rgb(0, 0, 0)";
+      tempCtx.fillRect(0, 0, w, h);
+      drawImageCover(tempCtx, img, w, h);
+      depthCanvas = processImageToDepthMap(tempCanvas, w, h, settings);
+    }
+
+    // Upload depth texture
+    if (depthTexRef.current) gl.deleteTexture(depthTexRef.current);
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      depthCanvas
     );
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    depthTexRef.current = tex;
+
+    // Render
+    gl.useProgram(program);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.uniform1i(gl.getUniformLocation(program, "uDepthMap"), 0);
+    gl.uniform1f(gl.getUniformLocation(program, "uWidth"), w);
+    gl.uniform1f(gl.getUniformLocation(program, "uHeight"), h);
 
     const aPos = gl.getAttribLocation(program, "aPosition");
-    const uDepthMap = gl.getUniformLocation(program, "uDepthMap");
-    const uWidth = gl.getUniformLocation(program, "uWidth");
-    const uHeight = gl.getUniformLocation(program, "uHeight");
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBufRef.current);
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }, [selectedPreset, settings, imageReady, internalReady, allPresets]);
 
-    // ─── Depth map generation ───
-    // Draws blind slat objects into a 2D canvas.
-    // Red channel = depth (0-1), Green = 255 means "object here".
-
-    function generateDepthMap(w: number, h: number): HTMLCanvasElement {
-      const c = document.createElement("canvas");
-      c.width = w;
-      c.height = h;
-      const ctx = c.getContext("2d")!;
-
-      // Black background = empty space (no objects)
-      ctx.fillStyle = "rgb(0, 0, 0)";
-      ctx.fillRect(0, 0, w, h);
-
-      // Time-based shadow angle
-      const now = new Date();
-      const hours = now.getHours() + now.getMinutes() / 60;
-      const t = Math.max(0, Math.min(1, (hours - 6) / 12));
-      const arc = -4 * (t - 0.5) ** 2 + 1;
-      const angleDeg = -45 + arc * 25;
-      const angleRad = (angleDeg * Math.PI) / 180;
-
-      ctx.save();
-      ctx.translate(w / 2, h / 2);
-      ctx.rotate(angleRad);
-
-      // ─ Blind slats ─
-      // Each slat gets a slightly different depth for natural variation
-      const slatSpacing = 50;
-      const slatWidth = 5;
-      const count = Math.ceil((Math.max(w, h) * 2) / slatSpacing);
-
-      for (let i = -count; i <= count; i++) {
-        // Deterministic depth variation per slat (0.25 – 0.45 range)
-        const depth = 0.3 + Math.sin(i * 1.37) * 0.08 + Math.cos(i * 0.73) * 0.05;
-        const r = Math.round(Math.max(1, Math.min(255, depth * 255)));
-        ctx.fillStyle = `rgb(${r}, 255, 0)`;
-        ctx.fillRect(-w * 2, i * slatSpacing, w * 4, slatWidth);
-      }
-
-      // ─ Window frame crossbars ─
-      // At greater depth → softer, wider shadows
-      const frameDepth = Math.round(0.65 * 255);
-      ctx.fillStyle = `rgb(${frameDepth}, 255, 0)`;
-      ctx.fillRect(-w * 2, -h * 0.15, w * 4, 10); // horizontal bar
-      ctx.fillRect(-w * 2, h * 0.35, w * 4, 10); // second horizontal bar
-
-      ctx.restore();
-
-      // Vertical frame bar (perpendicular to slats)
-      ctx.save();
-      ctx.translate(w / 2, h / 2);
-      ctx.rotate(angleRad + Math.PI / 2);
-      ctx.fillStyle = `rgb(${frameDepth}, 255, 0)`;
-      ctx.fillRect(-w * 2, 0, w * 4, 10);
-      ctx.restore();
-
-      return c;
-    }
-
-    // ─── WebGL texture upload ───
-
-    let depthTex: WebGLTexture | null = null;
-
-    function uploadTex(source: HTMLCanvasElement) {
-      if (depthTex) gl!.deleteTexture(depthTex);
-      depthTex = gl!.createTexture();
-      gl!.bindTexture(gl!.TEXTURE_2D, depthTex);
-      gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA, gl!.RGBA, gl!.UNSIGNED_BYTE, source);
-      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
-      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
-      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR);
-      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.LINEAR);
-    }
-
-    // ─── Render ───
-
-    function render() {
-      if (!canvas || !gl) return;
-      const dpr = window.devicePixelRatio || 1;
-      const w = Math.round(window.innerWidth * RENDER_SCALE * dpr);
-      const h = Math.round(window.innerHeight * RENDER_SCALE * dpr);
-
-      canvas.width = w;
-      canvas.height = h;
-      gl.viewport(0, 0, w, h);
-
-      // Generate and upload depth map
-      const depthCanvas = generateDepthMap(w, h);
-      uploadTex(depthCanvas);
-
-      // Run shadow shader
-      gl!.useProgram(program);
-      gl!.activeTexture(gl!.TEXTURE0);
-      gl!.bindTexture(gl!.TEXTURE_2D, depthTex);
-      gl!.uniform1i(uDepthMap, 0);
-      gl!.uniform1f(uWidth, w);
-      gl!.uniform1f(uHeight, h);
-
-      gl!.bindBuffer(gl!.ARRAY_BUFFER, quadBuf);
-      gl!.enableVertexAttribArray(aPos);
-      gl!.vertexAttribPointer(aPos, 2, gl!.FLOAT, false, 0, 0);
-      gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
-    }
-
-    render();
-
-    const onResize = () => render();
+  // Handle resize
+  useEffect(() => {
+    const onResize = () => setInternalReady((v) => v + 1);
     window.addEventListener("resize", onResize);
-    // Re-render every minute for time-based shadow shift
-    const interval = setInterval(render, 60000);
-
-    return () => {
-      window.removeEventListener("resize", onResize);
-      clearInterval(interval);
-      if (depthTex) gl!.deleteTexture(depthTex);
-      gl!.deleteProgram(program);
-      gl!.deleteShader(vs);
-      gl!.deleteShader(fs);
-      gl!.deleteBuffer(quadBuf);
-    };
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   return (
@@ -315,140 +512,778 @@ function WindowShadowOverlay() {
   );
 }
 
-function DaylightNav() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const navLinks = [
-    { href: "#story", label: "Story" },
-    { href: "#specs", label: "Specs" },
-    { href: "#reviews", label: "Reviews" },
-  ];
-
+/* ─── Settings Panel ─── */
+function SettingsPanel({
+  open,
+  onClose,
+  settings,
+  onSettingsChange,
+  isProgrammatic,
+}: {
+  open: boolean;
+  onClose: () => void;
+  settings: PresetSettings;
+  onSettingsChange: (s: PresetSettings) => void;
+  isProgrammatic: boolean;
+}) {
   return (
-    <motion.nav
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: EASE_OUT_QUINT }}
-      className="fixed top-0 z-50 w-full bg-[#faf5f2]/80 backdrop-blur-md"
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-[6vw]">
-        <span className="font-[Georgia,_'Times_New_Roman',serif] text-lg text-[#1a1815]">
-          daylight
-        </span>
-        <div className="hidden items-center gap-8 lg:flex">
-          {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className="text-sm text-[#8a8078] transition-colors hover:text-[#1a1815]">
-              {link.label}
-            </a>
-          ))}
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#1a1815]/15 lg:hidden"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          >
-            <div className="flex w-4 flex-col gap-1">
-              <span className={`block h-px bg-[#1a1815] transition-transform ${mobileOpen ? "translate-y-[3px] rotate-45" : ""}`} />
-              <span className={`block h-px bg-[#1a1815] transition-opacity ${mobileOpen ? "opacity-0" : ""}`} />
-              <span className={`block h-px bg-[#1a1815] transition-transform ${mobileOpen ? "-translate-y-[3px] -rotate-45" : ""}`} />
-            </div>
-          </button>
-          <button className="rounded-full border border-[#1a1815] px-5 py-2 text-xs font-medium tracking-wide text-[#1a1815] transition-colors hover:bg-[#1a1815] hover:text-[#faf5f2]">
-            Order Now
-          </button>
-        </div>
-      </div>
-      <AnimatePresence>
-        {mobileOpen && (
+    <AnimatePresence>
+      {open && (
+        <>
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: EASE_OUT_QUINT }}
-            className="overflow-hidden border-t border-[#1a1815]/5 lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-black/10"
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.35, ease: EASE_OUT_QUINT }}
+            className="fixed bottom-0 right-0 top-0 z-50 w-80 overflow-y-auto border-l border-[#1a1815]/10 bg-[#faf5f2] p-6 shadow-[-4px_0_24px_rgba(26,24,21,0.08)]"
           >
-            <div className="flex flex-col gap-4 px-6 py-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-sm text-[#8a8078] transition-colors hover:text-[#1a1815]"
-                >
-                  {link.label}
-                </a>
-              ))}
+            <div className="mb-8 flex items-center justify-between">
+              <h2 className="font-[Georgia,_'Times_New_Roman',serif] text-lg text-[#1a1815]">
+                Settings
+              </h2>
+              <button
+                onClick={onClose}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-[#8a8078] transition-colors hover:bg-[#1a1815]/5 hover:text-[#1a1815]"
+                aria-label="Close settings"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path
+                    d="M4 4l8 8M12 4l-8 8"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
             </div>
+
+            {isProgrammatic ? (
+              <div className="rounded-xl border border-[#c4a46a]/20 bg-[#c4a46a]/5 p-5">
+                <p className="text-sm text-[#1a1815]">Classic Mode</p>
+                <p className="mt-2 text-[12px] leading-relaxed text-[#8a8078]">
+                  Programmatic blind slat shadows with time-based sun angle.
+                  This mode uses code-generated depth maps — no image processing
+                  settings needed.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className="text-sm text-[#1a1815]">Threshold</label>
+                    <span className="tabular-nums text-xs text-[#8a8078]">
+                      {settings.threshold}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={255}
+                    step={1}
+                    value={settings.threshold}
+                    onChange={(e) =>
+                      onSettingsChange({
+                        ...settings,
+                        threshold: Number(e.target.value),
+                      })
+                    }
+                    className="w-full accent-[#1a1815]"
+                  />
+                  <p className="mt-1 text-[11px] text-[#8a8078]">
+                    Brightness cutoff for shadow detection
+                  </p>
+                </div>
+
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className="text-sm text-[#1a1815]">Contrast</label>
+                    <span className="tabular-nums text-xs text-[#8a8078]">
+                      {settings.contrast.toFixed(1)}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0.5}
+                    max={5.0}
+                    step={0.1}
+                    value={settings.contrast}
+                    onChange={(e) =>
+                      onSettingsChange({
+                        ...settings,
+                        contrast: Number(e.target.value),
+                      })
+                    }
+                    className="w-full accent-[#1a1815]"
+                  />
+                  <p className="mt-1 text-[11px] text-[#8a8078]">
+                    Enhance light/dark separation
+                  </p>
+                </div>
+
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className="text-sm text-[#1a1815]">Depth</label>
+                    <span className="tabular-nums text-xs text-[#8a8078]">
+                      {settings.depth.toFixed(2)}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0.05}
+                    max={1.0}
+                    step={0.05}
+                    value={settings.depth}
+                    onChange={(e) =>
+                      onSettingsChange({
+                        ...settings,
+                        depth: Number(e.target.value),
+                      })
+                    }
+                    className="w-full accent-[#1a1815]"
+                  />
+                  <p className="mt-1 text-[11px] text-[#8a8078]">
+                    Shadow softness — closer objects cast sharper shadows
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border border-[#1a1815]/10 px-4 py-3">
+                  <div>
+                    <label className="text-sm text-[#1a1815]">Invert</label>
+                    <p className="text-[11px] text-[#8a8078]">
+                      For exterior or inverted photos
+                    </p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      onSettingsChange({
+                        ...settings,
+                        invert: !settings.invert,
+                      })
+                    }
+                    className={`relative h-6 w-10 rounded-full transition-colors ${
+                      settings.invert ? "bg-[#1a1815]" : "bg-[#1a1815]/15"
+                    }`}
+                    role="switch"
+                    aria-checked={settings.invert}
+                  >
+                    <span
+                      className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                        settings.invert ? "translate-x-4" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.nav>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
 
-function HeroSection() {
+/* ─── Preset Gallery ─── */
+function PresetGallery({
+  presets,
+  selected,
+  onSelect,
+}: {
+  presets: Preset[];
+  selected: string;
+  onSelect: (id: string) => void;
+}) {
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center px-6 pt-20 lg:px-[6vw]">
-      <div className="mx-auto max-w-7xl text-center">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
+    <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:grid-cols-9">
+      {presets.map((preset, i) => (
+        <motion.button
+          key={preset.id}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6, ease: EASE_OUT_QUINT }}
-          className="mb-6 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs"
+          transition={{
+            delay: 0.8 + i * 0.05,
+            duration: 0.5,
+            ease: EASE_OUT_QUINT,
+          }}
+          onClick={() => onSelect(preset.id)}
+          className={`group relative aspect-square overflow-hidden rounded-xl transition-all ${
+            selected === preset.id
+              ? "ring-2 ring-[#1a1815] ring-offset-2 ring-offset-[#faf5f2]"
+              : "opacity-60 hover:opacity-100"
+          }`}
         >
-          Introducing Daylight DC-1
-        </motion.p>
+          {preset.mode === "programmatic" ? (
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#f0e8e0] to-[#e8ddd4]">
+              {/* Blind slat icon */}
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 28 28"
+                fill="none"
+                className="text-[#8a8078]"
+              >
+                <rect
+                  x="4"
+                  y="5"
+                  width="20"
+                  height="18"
+                  rx="2"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                />
+                <line
+                  x1="4"
+                  y1="9"
+                  x2="24"
+                  y2="9"
+                  stroke="currentColor"
+                  strokeWidth="0.8"
+                  opacity="0.6"
+                />
+                <line
+                  x1="4"
+                  y1="13"
+                  x2="24"
+                  y2="13"
+                  stroke="currentColor"
+                  strokeWidth="0.8"
+                  opacity="0.6"
+                />
+                <line
+                  x1="4"
+                  y1="17"
+                  x2="24"
+                  y2="17"
+                  stroke="currentColor"
+                  strokeWidth="0.8"
+                  opacity="0.6"
+                />
+                <line
+                  x1="4"
+                  y1="21"
+                  x2="24"
+                  y2="21"
+                  stroke="currentColor"
+                  strokeWidth="0.8"
+                  opacity="0.6"
+                />
+              </svg>
+            </div>
+          ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={preset.src}
+              alt={preset.name}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          )}
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/50 to-transparent px-2 pb-1.5 pt-5">
+            <span className="text-[10px] font-medium text-white">
+              {preset.name}
+            </span>
+          </div>
+        </motion.button>
+      ))}
+    </div>
+  );
+}
 
-        <h1 className="overflow-hidden font-[Georgia,_'Times_New_Roman',serif] text-[clamp(3rem,8vw,7.5rem)] font-normal leading-[1.05] text-[#1a1815]">
-          <CharacterReveal text="The computer," />
-          <br />
-          <CharacterReveal text="re-imagined" />
-        </h1>
+/* ─── Upload Zone ─── */
+function UploadZone({ onUpload }: { onUpload: (file: File) => void }) {
+  const [dragging, setDragging] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4, duration: 0.6, ease: EASE_OUT_QUINT }}
-          className="mx-auto mt-8 max-w-lg text-base text-[#2a2520] lg:text-lg"
-        >
-          A tablet designed for reading, writing, and focused work. Built for
-          the way your eyes and mind actually work.
-        </motion.p>
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragging(false);
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith("image/")) onUpload(file);
+    },
+    [onUpload]
+  );
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.6, duration: 0.6, ease: EASE_OUT_QUINT }}
-          className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
-        >
-          <button className="rounded-full bg-[#1a1815] px-8 py-3.5 text-sm font-medium text-[#faf5f2] transition-opacity hover:opacity-90">
-            Pre-order DC-1
-          </button>
-          <button className="rounded-full border border-[#1a1815]/20 px-8 py-3.5 text-sm font-medium text-[#1a1815] transition-colors hover:border-[#1a1815]/40">
-            Learn more
-          </button>
-        </motion.div>
+  return (
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragging(true);
+      }}
+      onDragLeave={() => setDragging(false)}
+      onDrop={handleDrop}
+      onClick={() => fileRef.current?.click()}
+      className={`cursor-pointer rounded-xl border-2 border-dashed px-6 py-6 text-center transition-colors ${
+        dragging
+          ? "border-[#1a1815]/40 bg-[#1a1815]/5"
+          : "border-[#1a1815]/10 hover:border-[#1a1815]/25"
+      }`}
+    >
+      <p className="text-sm text-[#8a8078]">
+        이미지를 드래그하거나 클릭하여 업로드
+      </p>
+      <p className="mt-1 text-[11px] text-[#8a8078]/50">JPG, PNG, WebP</p>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) onUpload(file);
+        }}
+      />
+    </div>
+  );
+}
 
-        {/* Product Visual */}
-        <motion.div
-          initial={{ opacity: 0, y: 60, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 1.8, duration: 1, ease: EASE_OUT_QUINT }}
-          className="mx-auto mt-16 max-w-2xl lg:mt-24"
-        >
-          <div className="relative rounded-[20px] bg-[#f0e8e0] p-4 shadow-[0_2px_4px_rgba(26,24,21,0.10),0_8px_24px_rgba(26,24,21,0.08),0_24px_60px_rgba(26,24,21,0.06)] lg:rounded-[32px] lg:p-6">
-            {/* Light overlay */}
-            <div className="pointer-events-none absolute inset-0 rounded-[20px] bg-[radial-gradient(ellipse_at_30%_20%,rgba(255,248,240,0.4)_0%,transparent_60%)] lg:rounded-[32px]" />
-            {/* Screen */}
-            <div className="relative overflow-hidden rounded-xl bg-white p-6 lg:rounded-2xl lg:p-10">
-              {/* Sidebar dots */}
-              <div className="absolute left-4 top-6 flex flex-col gap-2 lg:left-6">
-                <div className="h-2.5 w-2.5 rounded-full bg-[#c4a46a]/60" />
-                <div className="h-2.5 w-2.5 rounded-full bg-[#585b3d]/40" />
-                <div className="h-2.5 w-2.5 rounded-full bg-[#8a8078]/30" />
-              </div>
-              {/* Simulated text lines */}
-              <div className="ml-8 space-y-4 py-4 lg:ml-10 lg:py-8">
+/* ─── Main Page ─── */
+export default function DaylightPage() {
+  const [selectedPreset, setSelectedPreset] = useState(PRESETS[0].id);
+  const [settings, setSettings] = useState<PresetSettings>(PRESETS[0].settings);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [imageReady, setImageReady] = useState(0);
+  const [customPresets, setCustomPresets] = useState<Preset[]>([]);
+
+  const allPresets = useMemo(
+    () => [...PRESETS, ...customPresets],
+    [customPresets]
+  );
+
+  const currentPreset = useMemo(
+    () => allPresets.find((p) => p.id === selectedPreset),
+    [allPresets, selectedPreset]
+  );
+
+  const handleSelectPreset = useCallback(
+    (id: string) => {
+      setSelectedPreset(id);
+      const preset = [...PRESETS, ...customPresets].find((p) => p.id === id);
+      if (preset) setSettings(preset.settings);
+    },
+    [customPresets]
+  );
+
+  const handleUpload = useCallback((file: File) => {
+    const url = URL.createObjectURL(file);
+    const id = `custom-${Date.now()}`;
+    const name = file.name.replace(/\.[^.]+$/, "").slice(0, 12);
+
+    const img = new Image();
+    img.onload = () => {
+      const newPreset: Preset = {
+        id,
+        name,
+        mode: "image",
+        src: url,
+        settings: { ...DEFAULT_SETTINGS },
+      };
+      setCustomPresets((prev) => [...prev, newPreset]);
+      setSelectedPreset(id);
+      setSettings({ ...DEFAULT_SETTINGS });
+      setImageReady((v) => v + 1);
+    };
+    img.src = url;
+  }, []);
+
+  return (
+    <div className="min-h-screen scroll-smooth bg-[#faf5f2] font-sans text-[#1a1815] [&_::selection]:bg-[#c4a46a]/20">
+      <style>{`html, body { background-color: #faf5f2 !important; }`}</style>
+
+      <ShadowOverlay
+        selectedPreset={selectedPreset}
+        settings={settings}
+        imageReady={imageReady}
+        allPresets={allPresets}
+      />
+
+      {/* ─── Nav ─── */}
+      <motion.nav
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: EASE_OUT_QUINT }}
+        className="fixed top-0 z-50 w-full bg-[#faf5f2]/80 backdrop-blur-md"
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-[6vw]">
+          <span className="font-[Georgia,_'Times_New_Roman',serif] text-lg text-[#1a1815]">
+            daylight
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#1a1815]/15 text-[#8a8078] transition-colors hover:border-[#1a1815]/30 hover:text-[#1a1815]"
+              aria-label="Open settings"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="2.5"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                />
+                <path
+                  d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.17 3.17l1.41 1.41M11.42 11.42l1.41 1.41M3.17 12.83l1.41-1.41M11.42 4.58l1.41-1.41"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </motion.nav>
+
+      {/* ─── Settings Panel ─── */}
+      <SettingsPanel
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        settings={settings}
+        onSettingsChange={setSettings}
+        isProgrammatic={currentPreset?.mode === "programmatic"}
+      />
+
+      {/* ─── Hero ─── */}
+      <section className="relative flex min-h-[85vh] flex-col items-center justify-center px-6 pt-20 lg:px-[6vw]">
+        <div className="mx-auto max-w-7xl text-center">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6, ease: EASE_OUT_QUINT }}
+            className="mb-6 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs"
+          >
+            Window Shadow Experience
+          </motion.p>
+
+          <h1 className="overflow-hidden font-[Georgia,_'Times_New_Roman',serif] text-[clamp(3rem,8vw,7.5rem)] font-normal leading-[1.05] text-[#1a1815]">
+            <CharacterReveal text="Turn any window" />
+            <br />
+            <CharacterReveal text="into light." delay={0.9} />
+          </h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4, duration: 0.6, ease: EASE_OUT_QUINT }}
+            className="mx-auto mt-8 max-w-lg text-base text-[#2a2520] lg:text-lg"
+          >
+            창문 사진을 선택하거나 업로드하면 실시간으로 그림자가 화면에
+            드리워집니다.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* ─── Preset Gallery Section ─── */}
+      <section className="px-6 py-[4vh] lg:px-[6vw]">
+        <div className="mx-auto max-w-7xl">
+          <motion.p
+            variants={sectionAnim}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mb-4 text-center font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs"
+          >
+            Choose a window
+          </motion.p>
+          <motion.h2
+            variants={sectionAnim}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mb-10 text-center font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#1a1815]"
+          >
+            Select a shadow
+          </motion.h2>
+
+          <PresetGallery
+            presets={allPresets}
+            selected={selectedPreset}
+            onSelect={handleSelectPreset}
+          />
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+            className="mt-6"
+          >
+            <UploadZone onUpload={handleUpload} />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── Mission Quote ─── */}
+      <motion.section
+        variants={sectionAnim}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]"
+      >
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto mb-8 h-px w-16 bg-[#c4a46a]/40" />
+          <blockquote className="font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,2rem)] leading-relaxed text-[#1a1815]">
+            &ldquo;The most beautiful thing about daylight is how it turns
+            ordinary spaces into something quietly extraordinary.&rdquo;
+          </blockquote>
+          <div className="mx-auto mt-8 h-px w-16 bg-[#c4a46a]/40" />
+        </div>
+      </motion.section>
+
+      {/* ─── Benefits / How it works ─── */}
+      <section className="bg-[#f5ede8] px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
+        <div className="mx-auto max-w-7xl">
+          <motion.p
+            variants={sectionAnim}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mb-4 text-center font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs"
+          >
+            How it works
+          </motion.p>
+          <motion.h2
+            variants={sectionAnim}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mb-16 text-center font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#1a1815]"
+          >
+            Light, computed
+          </motion.h2>
+          <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
+            {[
+              {
+                icon: (
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 32 32"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <rect
+                      x="4"
+                      y="8"
+                      width="24"
+                      height="16"
+                      rx="2"
+                      stroke="#c4a46a"
+                      strokeWidth="1.5"
+                    />
+                    <line
+                      x1="4"
+                      y1="14"
+                      x2="28"
+                      y2="14"
+                      stroke="#c4a46a"
+                      strokeWidth="1"
+                      opacity="0.5"
+                    />
+                    <line
+                      x1="4"
+                      y1="18"
+                      x2="28"
+                      y2="18"
+                      stroke="#c4a46a"
+                      strokeWidth="1"
+                      opacity="0.3"
+                    />
+                  </svg>
+                ),
+                title: "Depth mapping",
+                description:
+                  "Window photos are converted into depth maps. Light areas pass through; dark regions become shadow-casting objects with varying depth.",
+              },
+              {
+                icon: (
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 32 32"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="10"
+                      stroke="#c4a46a"
+                      strokeWidth="1.5"
+                    />
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="4"
+                      fill="#c4a46a"
+                      opacity="0.3"
+                    />
+                  </svg>
+                ),
+                title: "Vogel disk sampling",
+                description:
+                  "100 samples per pixel distributed in a golden-angle spiral. Each sample checks the depth map for shadow influence, creating smooth, natural falloff.",
+              },
+              {
+                icon: (
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 32 32"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      cx="16"
+                      cy="14"
+                      r="5"
+                      stroke="#c4a46a"
+                      strokeWidth="1.5"
+                    />
+                    <line
+                      x1="16"
+                      y1="4"
+                      x2="16"
+                      y2="7"
+                      stroke="#c4a46a"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <line
+                      x1="16"
+                      y1="21"
+                      x2="16"
+                      y2="24"
+                      stroke="#c4a46a"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <line
+                      x1="6"
+                      y1="14"
+                      x2="9"
+                      y2="14"
+                      stroke="#c4a46a"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <line
+                      x1="23"
+                      y1="14"
+                      x2="26"
+                      y2="14"
+                      stroke="#c4a46a"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                ),
+                title: "Warm-tinted shadows",
+                description:
+                  "Shadows are tinted with a warm off-white tone rather than cold gray, composited via multiply blend for a natural, sunlit atmosphere.",
+              },
+            ].map((b, i) => (
+              <motion.div
+                key={i}
+                variants={sectionAnim}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="rounded-2xl bg-white p-8 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)] lg:p-10"
+              >
+                <div className="mb-6">{b.icon}</div>
+                <h3 className="mb-3 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,1.5rem)] text-[#1a1815]">
+                  {b.title}
+                </h3>
+                <p className="leading-relaxed text-[#2a2520]/70">
+                  {b.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Specs ─── */}
+      <section className="bg-[#1a1815] px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
+        <div className="mx-auto max-w-7xl">
+          <motion.p
+            variants={sectionAnim}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mb-4 text-center font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs"
+          >
+            Under the hood
+          </motion.p>
+          <motion.h2
+            variants={sectionAnim}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mb-16 text-center font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#faf5f2]"
+          >
+            The shader
+          </motion.h2>
+          <div className="grid grid-cols-2 gap-6 lg:grid-cols-5 lg:gap-4">
+            {[
+              { value: "100", label: "Samples / px" },
+              { value: "WebGL", label: "Rendering" },
+              { value: "0.33x", label: "Render Scale" },
+              { value: "60fps", label: "Target" },
+              { value: "Vogel", label: "Disk Sampling" },
+            ].map((s, i) => (
+              <motion.div
+                key={i}
+                variants={sectionAnim}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="flex flex-col items-center rounded-2xl border border-[#d4b87a22] p-6 text-center lg:p-8"
+              >
+                <p className="font-[Georgia,_'Times_New_Roman',serif] text-2xl text-[#faf5f2] lg:text-3xl">
+                  {s.value}
+                </p>
+                <p className="mt-2 text-sm text-[#8a8078]">{s.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Demo Content ─── */}
+      <section className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
+        <div className="mx-auto max-w-7xl space-y-24 lg:space-y-32">
+          <motion.div
+            variants={sectionAnim}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16"
+          >
+            <div>
+              <p className="mb-3 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs">
+                Programmatic
+              </p>
+              <h3 className="mb-4 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,2rem)] text-[#1a1815]">
+                Classic blind slats
+              </h3>
+              <p className="max-w-md leading-relaxed text-[#2a2520]/70">
+                The original shadow mode generates venetian blind slats with
+                window frame crossbars directly in code. The sun angle shifts
+                with time of day for a living, dynamic effect.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white p-6 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)] lg:p-8">
+              <div className="space-y-4">
                 <div className="h-3 w-3/4 rounded bg-[#1a1815]/10" />
                 <div className="h-3 w-full rounded bg-[#1a1815]/8" />
                 <div className="h-3 w-5/6 rounded bg-[#1a1815]/8" />
@@ -456,619 +1291,104 @@ function HeroSection() {
                 <div className="h-2.5 w-full rounded bg-[#1a1815]/6" />
                 <div className="h-2.5 w-4/5 rounded bg-[#1a1815]/6" />
                 <div className="h-2.5 w-3/4 rounded bg-[#1a1815]/6" />
-                <div className="mt-6 h-2.5 w-1/2 rounded bg-[#1a1815]/6" />
-                <div className="h-2.5 w-full rounded bg-[#1a1815]/6" />
-                <div className="h-2.5 w-5/6 rounded bg-[#1a1815]/6" />
               </div>
             </div>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
+          </motion.div>
 
-function MissionSection() {
-  return (
-    <motion.section
-      variants={sectionAnim}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      id="story"
-      className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]"
-    >
-      <div className="mx-auto max-w-3xl text-center">
-        <div className="mx-auto mb-8 h-px w-16 bg-[#c4a46a]/40" />
-        <blockquote className="font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,2rem)] leading-relaxed text-[#1a1815]">
-          &ldquo;We believe your most important technology should not leave you
-          feeling exhausted, distracted, or in pain.&rdquo;
-        </blockquote>
-        <div className="mx-auto mt-8 h-px w-16 bg-[#c4a46a]/40" />
-      </div>
-    </motion.section>
-  );
-}
-
-function BenefitsGrid() {
-  const benefits = [
-    {
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-          <rect x="4" y="8" width="24" height="16" rx="2" stroke="#c4a46a" strokeWidth="1.5" />
-          <line x1="4" y1="14" x2="28" y2="14" stroke="#c4a46a" strokeWidth="1" opacity="0.5" />
-          <line x1="4" y1="18" x2="28" y2="18" stroke="#c4a46a" strokeWidth="1" opacity="0.3" />
-        </svg>
-      ),
-      title: "Smooth like paper",
-      description:
-        "A reflective display that mimics the texture and feel of real paper. No more glossy glare or eye strain from backlit screens.",
-    },
-    {
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-          <circle cx="16" cy="16" r="10" stroke="#c4a46a" strokeWidth="1.5" />
-          <circle cx="16" cy="16" r="4" fill="#c4a46a" opacity="0.3" />
-        </svg>
-      ),
-      title: "Calm by design",
-      description:
-        "No notifications pulling you away. No infinite feeds. Just you and your content, in a distraction-free environment.",
-    },
-    {
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-          <path d="M16 6 L16 16 L22 22" stroke="#c4a46a" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="16" cy="16" r="11" stroke="#c4a46a" strokeWidth="1.5" />
-        </svg>
-      ),
-      title: "Built for health",
-      description:
-        "Warm-toned ambient light follows your circadian rhythm. Blue-light-free technology that lets you read comfortably day and night.",
-    },
-  ];
-
-  return (
-    <section className="bg-[#f5ede8] px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
-      <div className="mx-auto max-w-7xl">
-        <motion.p
-          variants={sectionAnim}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mb-4 text-center font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs"
-        >
-          Why Daylight
-        </motion.p>
-        <motion.h2
-          variants={sectionAnim}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mb-16 text-center font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#1a1815]"
-        >
-          A different kind of screen
-        </motion.h2>
-        <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
-          {benefits.map((b, i) => (
-            <motion.div
-              key={i}
-              variants={sectionAnim}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="rounded-2xl bg-white p-8 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)] lg:p-10"
-            >
-              <div className="mb-6">{b.icon}</div>
-              <h3 className="mb-3 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,1.5rem)] text-[#1a1815]">
-                {b.title}
-              </h3>
-              <p className="leading-relaxed text-[#2a2520]/70">{b.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FeatureShowcase() {
-  const features = [
-    {
-      label: "Reading",
-      title: "Read without limits",
-      description:
-        "Our LivePaper display renders text with the clarity of printed paper. Read for hours without fatigue, in any lighting condition — even direct sunlight.",
-      visual: (
-        <div className="rounded-2xl bg-white p-6 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)] lg:p-8">
-          {/* Simulated article */}
-          <div className="mb-4 h-3 w-1/3 rounded bg-[#c4a46a]/30" />
-          <div className="mb-6 h-5 w-3/4 rounded bg-[#1a1815]/12" />
-          <div className="space-y-3">
-            <div className="h-2.5 w-full rounded bg-[#1a1815]/8" />
-            <div className="h-2.5 w-5/6 rounded bg-[#1a1815]/8" />
-            <div className="h-2.5 w-full rounded bg-[#1a1815]/8" />
-            <div className="h-2.5 w-4/5 rounded bg-[#1a1815]/8" />
-            <div className="mt-4 h-2.5 w-full rounded bg-[#1a1815]/6" />
-            <div className="h-2.5 w-3/4 rounded bg-[#1a1815]/6" />
-            <div className="h-2.5 w-5/6 rounded bg-[#1a1815]/6" />
-          </div>
-        </div>
-      ),
-    },
-    {
-      label: "Writing",
-      title: "Write with focus",
-      description:
-        "A minimal writing surface that feels like a notebook. Low-latency stylus input and a calm interface let your thoughts flow without friction.",
-      visual: (
-        <div className="rounded-2xl bg-white p-6 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)] lg:p-8">
-          {/* Simulated writing canvas */}
-          <div className="border-b border-[#1a1815]/5 pb-3">
-            <div className="h-4 w-2/5 rounded bg-[#1a1815]/10" />
-          </div>
-          <div className="mt-6 space-y-6">
-            <div className="flex items-end">
-              <div className="h-2.5 w-3/4 rounded bg-[#1a1815]/8" />
-              <motion.div
-                animate={{ opacity: [1, 0] }}
-                transition={{ repeat: Infinity, duration: 0.8, repeatType: "reverse" }}
-                className="ml-0.5 h-4 w-0.5 bg-[#c4a46a]"
-              />
-            </div>
-            <div className="h-px w-full bg-[#1a1815]/5" />
-            <div className="h-px w-full bg-[#1a1815]/5" />
-            <div className="h-px w-full bg-[#1a1815]/5" />
-            <div className="h-px w-full bg-[#1a1815]/5" />
-          </div>
-        </div>
-      ),
-    },
-    {
-      label: "Organization",
-      title: "Organize naturally",
-      description:
-        "Arrange your notes, documents, and reading list like cards on a desk. Spatial organization that mirrors how you actually think.",
-      visual: (
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { w: "w-3/4", h: "h-20", color: "bg-[#585b3d]/10" },
-            { w: "w-full", h: "h-24", color: "bg-[#c4a46a]/10" },
-            { w: "w-full", h: "h-28", color: "bg-[#272819]/8" },
-            { w: "w-2/3", h: "h-20", color: "bg-[#434626]/10" },
-          ].map((card, i) => (
-            <div
-              key={i}
-              className={`${card.h} rounded-xl ${card.color} p-4 shadow-[0_1px_3px_rgba(26,24,21,0.04),0_4px_8px_rgba(26,24,21,0.03)]`}
-            >
-              <div className={`${card.w} mb-2 h-2 rounded bg-[#1a1815]/10`} />
-              <div className="h-1.5 w-full rounded bg-[#1a1815]/5" />
-              <div className="mt-1 h-1.5 w-4/5 rounded bg-[#1a1815]/5" />
-            </div>
-          ))}
-        </div>
-      ),
-    },
-  ];
-
-  return (
-    <section className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
-      <div className="mx-auto max-w-7xl space-y-24 lg:space-y-32">
-        {features.map((f, i) => (
           <motion.div
-            key={i}
             variants={sectionAnim}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className={`grid items-center gap-12 lg:grid-cols-2 lg:gap-16 ${
-              i % 2 === 1 ? "lg:[direction:rtl]" : ""
-            }`}
+            className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 lg:[direction:rtl]"
           >
-            <div className={i % 2 === 1 ? "lg:[direction:ltr]" : ""}>
+            <div className="lg:[direction:ltr]">
               <p className="mb-3 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs">
-                {f.label}
+                Image-based
               </p>
               <h3 className="mb-4 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,2rem)] text-[#1a1815]">
-                {f.title}
+                Any window, any shape
               </h3>
-              <p className="max-w-md leading-relaxed text-[#2a2520]/70">{f.description}</p>
-            </div>
-            <div className={i % 2 === 1 ? "lg:[direction:ltr]" : ""}>{f.visual}</div>
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function SpecsSection() {
-  const specs = [
-    {
-      value: '10.5"',
-      label: "Display",
-      icon: (
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <rect x="4" y="6" width="20" height="16" rx="2" stroke="#c4a46a" strokeWidth="1.5" />
-        </svg>
-      ),
-    },
-    {
-      value: "60Hz",
-      label: "Refresh Rate",
-      icon: (
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <polyline points="4,20 10,12 16,16 24,8" stroke="#c4a46a" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      ),
-    },
-    {
-      value: "12hr",
-      label: "Battery Life",
-      icon: (
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <rect x="3" y="10" width="20" height="10" rx="2" stroke="#c4a46a" strokeWidth="1.5" />
-          <rect x="25" y="13" width="2" height="4" rx="0.5" fill="#c4a46a" opacity="0.6" />
-          <rect x="6" y="13" width="8" height="4" rx="1" fill="#c4a46a" opacity="0.3" />
-        </svg>
-      ),
-    },
-    {
-      value: "450g",
-      label: "Weight",
-      icon: (
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <circle cx="14" cy="18" r="6" stroke="#c4a46a" strokeWidth="1.5" />
-          <path d="M11 12 L14 8 L17 12" stroke="#c4a46a" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      ),
-    },
-    {
-      value: "LivePaper",
-      label: "Technology",
-      icon: (
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <circle cx="14" cy="14" r="5" stroke="#c4a46a" strokeWidth="1.5" />
-          <line x1="14" y1="4" x2="14" y2="7" stroke="#c4a46a" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="14" y1="21" x2="14" y2="24" stroke="#c4a46a" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="4" y1="14" x2="7" y2="14" stroke="#c4a46a" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="21" y1="14" x2="24" y2="14" stroke="#c4a46a" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-      ),
-    },
-  ];
-
-  return (
-    <section id="specs" className="bg-[#1a1815] px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
-      <div className="mx-auto max-w-7xl">
-        <motion.p
-          variants={sectionAnim}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mb-4 text-center font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs"
-        >
-          Specifications
-        </motion.p>
-        <motion.h2
-          variants={sectionAnim}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mb-16 text-center font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#faf5f2]"
-        >
-          What&apos;s inside
-        </motion.h2>
-        <div className="grid grid-cols-2 gap-6 lg:grid-cols-5 lg:gap-4">
-          {specs.map((s, i) => (
-            <motion.div
-              key={i}
-              variants={sectionAnim}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="flex flex-col items-center rounded-2xl border border-[#d4b87a22] p-6 text-center lg:p-8"
-            >
-              <div className="mb-4">{s.icon}</div>
-              <p className="font-[Georgia,_'Times_New_Roman',serif] text-2xl text-[#faf5f2] lg:text-3xl">
-                {s.value}
+              <p className="max-w-md leading-relaxed text-[#2a2520]/70">
+                Upload a window photo or pick from presets — arched panes,
+                foliage-covered frames, French windows. Each image is processed
+                into a depth map that the shader renders as realistic shadows.
               </p>
-              <p className="mt-2 text-sm text-[#8a8078]">{s.label}</p>
-            </motion.div>
-          ))}
+            </div>
+            <div className="grid grid-cols-2 gap-3 lg:[direction:ltr]">
+              {[
+                { color: "bg-[#585b3d]/10", h: "h-20" },
+                { color: "bg-[#c4a46a]/10", h: "h-24" },
+                { color: "bg-[#272819]/8", h: "h-28" },
+                { color: "bg-[#434626]/10", h: "h-20" },
+              ].map((card, i) => (
+                <div
+                  key={i}
+                  className={`${card.h} rounded-xl ${card.color} p-4 shadow-[0_1px_3px_rgba(26,24,21,0.04),0_4px_8px_rgba(26,24,21,0.03)]`}
+                >
+                  <div className="mb-2 h-2 w-3/4 rounded bg-[#1a1815]/10" />
+                  <div className="h-1.5 w-full rounded bg-[#1a1815]/5" />
+                  <div className="mt-1 h-1.5 w-4/5 rounded bg-[#1a1815]/5" />
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-function OutdoorSection() {
-  return (
-    <section className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
-      <motion.div
+      {/* ─── CTA ─── */}
+      <motion.section
         variants={sectionAnim}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-16"
+        className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]"
       >
-        <div>
-          <p className="mb-3 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs">
-            Sunlight readable
-          </p>
-          <h2 className="mb-6 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#1a1815]">
-            Take it outside
-          </h2>
-          <p className="max-w-md leading-relaxed text-[#2a2520]/70">
-            Unlike traditional screens that wash out in bright light, the DC-1
-            uses ambient light to illuminate the display — just like real paper.
-            The brighter the sun, the better it looks.
-          </p>
-        </div>
-        {/* Sun scene illustration */}
-        <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-[#f5ede8] to-[#faf5f2] lg:h-96">
-          {/* Sun */}
-          <div className="absolute right-12 top-12 lg:right-16 lg:top-16">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto mb-10 flex h-24 w-24 items-center justify-center">
             <div className="relative">
-              <div className="h-16 w-16 rounded-full bg-[#c4a46a]/20" />
-              <div className="absolute inset-2 rounded-full bg-[#c4a46a]/30" />
-              <div className="absolute inset-4 rounded-full bg-[#c4a46a]/50" />
-              {/* Rays */}
-              <div className="absolute -top-4 left-1/2 h-4 w-px -translate-x-1/2 bg-[#c4a46a]/30" />
-              <div className="absolute -bottom-4 left-1/2 h-4 w-px -translate-x-1/2 bg-[#c4a46a]/30" />
-              <div className="absolute -left-4 top-1/2 h-px w-4 -translate-y-1/2 bg-[#c4a46a]/30" />
-              <div className="absolute -right-4 top-1/2 h-px w-4 -translate-y-1/2 bg-[#c4a46a]/30" />
+              <div className="h-16 w-16 rounded-full border border-[#c4a46a]/20" />
+              <div className="absolute inset-2 rounded-full border border-[#c4a46a]/30" />
+              <div className="absolute inset-4 rounded-full bg-[#c4a46a]/15" />
+              <div className="absolute -top-3 left-1/2 h-3 w-px -translate-x-1/2 bg-[#c4a46a]/40" />
+              <div className="absolute -bottom-3 left-1/2 h-3 w-px -translate-x-1/2 bg-[#c4a46a]/40" />
+              <div className="absolute -left-3 top-1/2 h-px w-3 -translate-y-1/2 bg-[#c4a46a]/40" />
+              <div className="absolute -right-3 top-1/2 h-px w-3 -translate-y-1/2 bg-[#c4a46a]/40" />
             </div>
           </div>
-          {/* Small device */}
-          <div className="relative mt-8">
-            <div className="h-32 w-24 rounded-lg bg-[#f0e8e0] p-2 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)] lg:h-40 lg:w-28">
-              <div className="h-full rounded bg-white p-2">
-                <div className="space-y-1.5">
-                  <div className="h-1.5 w-3/4 rounded bg-[#1a1815]/10" />
-                  <div className="h-1.5 w-full rounded bg-[#1a1815]/6" />
-                  <div className="h-1.5 w-5/6 rounded bg-[#1a1815]/6" />
-                  <div className="h-1.5 w-2/3 rounded bg-[#1a1815]/6" />
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Light rays from sun */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(196,164,106,0.12)_0%,transparent_50%)]" />
-        </div>
-      </motion.div>
-    </section>
-  );
-}
-
-function TestimonialsSection() {
-  const testimonials = [
-    {
-      quote:
-        "I have not used my iPad since getting the DC-1. Reading on this device is genuinely transformative.",
-      name: "Sarah Chen",
-      role: "Writer & Editor",
-    },
-    {
-      quote:
-        "As someone who stares at screens 12 hours a day, the Daylight has been a revelation. My eye strain headaches are gone.",
-      name: "Marcus Rivera",
-      role: "Software Engineer",
-    },
-    {
-      quote: "The paper-like display is not a gimmick. It actually feels different. My focus has noticeably improved.",
-      name: "Emily Watanabe",
-      role: "PhD Researcher",
-    },
-    {
-      quote:
-        "I bought it for reading but now I do all my writing on it. The stylus latency is incredible.",
-      name: "David Park",
-      role: "Journalist",
-    },
-    {
-      quote:
-        "Finally, a device that does not fight for my attention. No notifications, no distractions. Just work.",
-      name: "Leila Osman",
-      role: "Product Designer",
-    },
-  ];
-
-  return (
-    <section id="reviews" className="bg-[#f5ede8] px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
-      <div className="mx-auto max-w-7xl">
-        <motion.p
-          variants={sectionAnim}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mb-4 text-center font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs"
-        >
-          Reviews
-        </motion.p>
-        <motion.h2
-          variants={sectionAnim}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mb-16 text-center font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#1a1815]"
-        >
-          Loved by readers
-        </motion.h2>
-        <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={i}
-              variants={sectionAnim}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="mb-6 break-inside-avoid rounded-2xl bg-white p-6 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)] lg:p-8"
-            >
-              <span className="font-[Georgia,_'Times_New_Roman',serif] text-3xl leading-none text-[#c4a46a]">
-                &ldquo;
-              </span>
-              <p className="mt-2 leading-relaxed text-[#2a2520]/80">{t.quote}</p>
-              <div className="mt-6 border-t border-[#1a1815]/5 pt-4">
-                <p className="text-sm font-medium text-[#1a1815]">{t.name}</p>
-                <p className="text-xs text-[#8a8078]">{t.role}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PressSection() {
-  const press = ["The Verge", "Wired", "Fast Company", "TechCrunch", "Ars Technica"];
-
-  return (
-    <motion.section
-      variants={sectionAnim}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]"
-    >
-      <div className="mx-auto max-w-7xl">
-        <p className="mb-10 text-center font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs">
-          Featured in
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-16">
-          {press.map((name, i) => (
-            <span
-              key={i}
-              className="font-[Georgia,_'Times_New_Roman',serif] text-xl text-[#1a1815]/20 lg:text-2xl"
-            >
-              {name}
-            </span>
-          ))}
-        </div>
-      </div>
-    </motion.section>
-  );
-}
-
-function PublicBenefitSection() {
-  return (
-    <motion.section
-      variants={sectionAnim}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]"
-    >
-      <div className="mx-auto max-w-3xl text-center">
-        {/* Sun illustration */}
-        <div className="mx-auto mb-10 flex h-24 w-24 items-center justify-center">
-          <div className="relative">
-            <div className="h-16 w-16 rounded-full border border-[#c4a46a]/20" />
-            <div className="absolute inset-2 rounded-full border border-[#c4a46a]/30" />
-            <div className="absolute inset-4 rounded-full bg-[#c4a46a]/15" />
-            {/* 4 rays */}
-            <div className="absolute -top-3 left-1/2 h-3 w-px -translate-x-1/2 bg-[#c4a46a]/40" />
-            <div className="absolute -bottom-3 left-1/2 h-3 w-px -translate-x-1/2 bg-[#c4a46a]/40" />
-            <div className="absolute -left-3 top-1/2 h-px w-3 -translate-y-1/2 bg-[#c4a46a]/40" />
-            <div className="absolute -right-3 top-1/2 h-px w-3 -translate-y-1/2 bg-[#c4a46a]/40" />
-          </div>
-        </div>
-        <h2 className="mb-6 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#1a1815]">
-          Technology should serve humanity
-        </h2>
-        <p className="mx-auto max-w-xl leading-relaxed text-[#2a2520]/70">
-          Daylight is a Public Benefit Corporation. We are committed to building
-          technology that improves human health and well-being, not technology
-          that exploits attention for profit.
-        </p>
-        <div className="mt-8 text-sm text-[#8a8078]">
-          <span className="italic">Anjan Katta</span> &mdash; Founder & CEO
-        </div>
-      </div>
-    </motion.section>
-  );
-}
-
-function DaylightFooter() {
-  return (
-    <footer className="border-t border-[#1a1815]/10 px-6 py-12 lg:px-[6vw]">
-      <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-3">
-        <div>
-          <p className="mb-4 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078]">
-            Product
+          <h2 className="mb-6 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#1a1815]">
+            Light shapes everything
+          </h2>
+          <p className="mx-auto max-w-xl leading-relaxed text-[#2a2520]/70">
+            Scroll up to try different window presets, or upload your own photo.
+            Open the settings panel to fine-tune threshold, contrast, and depth
+            for each image.
           </p>
-          <div className="space-y-2">
-            <p className="text-sm text-[#2a2520]/60">DC-1 Tablet</p>
-            <p className="text-sm text-[#2a2520]/60">Accessories</p>
-            <p className="text-sm text-[#2a2520]/60">Sol:Reader</p>
-          </div>
         </div>
-        <div>
-          <p className="mb-4 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078]">
-            Company
-          </p>
-          <div className="space-y-2">
-            <p className="text-sm text-[#2a2520]/60">About</p>
-            <p className="text-sm text-[#2a2520]/60">Blog</p>
-            <p className="text-sm text-[#2a2520]/60">Careers</p>
-          </div>
-        </div>
-        <div className="flex flex-col justify-between">
-          <div>
-            <p className="mb-4 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078]">
-              Connect
+      </motion.section>
+
+      {/* ─── Footer ─── */}
+      <footer className="border-t border-[#1a1815]/10 px-6 py-12 lg:px-[6vw]">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-[#8a8078]">
+              WebGL + Vogel Disk Sampling
             </p>
-            <div className="space-y-2">
-              <p className="text-sm text-[#2a2520]/60">Twitter</p>
-              <p className="text-sm text-[#2a2520]/60">Newsletter</p>
-            </div>
+            <Link
+              href="/labs/daylight/playground"
+              className="rounded-full border border-[#c4a46a]/30 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-[#c4a46a] transition-colors hover:bg-[#c4a46a]/10"
+            >
+              playground
+            </Link>
           </div>
-        </div>
-      </div>
-      <div className="mx-auto mt-12 flex max-w-7xl items-center justify-between border-t border-[#1a1815]/5 pt-8">
-        <div className="flex items-center gap-4">
-          <p className="text-xs text-[#8a8078]">
-            &copy; 2026 Daylight Computer Co. &mdash; Public Benefit Corporation
-          </p>
           <Link
-            href="/labs/daylight/playground"
-            className="rounded-full border border-[#c4a46a]/30 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-[#c4a46a] transition-colors hover:bg-[#c4a46a]/10"
+            href="/"
+            className="text-xs text-[#8a8078] transition-colors hover:text-[#1a1815]"
           >
-            playground
+            &larr; back to labs
           </Link>
         </div>
-        <Link
-          href="/"
-          className="text-xs text-[#8a8078] transition-colors hover:text-[#1a1815]"
-        >
-          &larr; back to labs
-        </Link>
-      </div>
-    </footer>
-  );
-}
-
-export default function DaylightPage() {
-  return (
-    <div className="min-h-screen scroll-smooth bg-[#faf5f2] font-sans text-[#1a1815] [&_::selection]:bg-[#c4a46a]/20">
-      {/* Override dark body background to prevent bleed-through on overscroll */}
-      <style>{`html, body { background-color: #faf5f2 !important; }`}</style>
-      <WindowShadowOverlay />
-      <DaylightNav />
-      <HeroSection />
-      <MissionSection />
-      <BenefitsGrid />
-      <FeatureShowcase />
-      <SpecsSection />
-      <OutdoorSection />
-      <TestimonialsSection />
-      <PressSection />
-      <PublicBenefitSection />
-      <DaylightFooter />
+      </footer>
     </div>
   );
 }

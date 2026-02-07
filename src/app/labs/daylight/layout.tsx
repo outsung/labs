@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Daylight — The computer, re-imagined",
+  title: "Daylight Shadows — Turn any window into light",
   description:
-    "A tablet designed for reading, writing, and focused work. Built for the way your eyes and mind actually work.",
+    "Upload a window photo or choose a preset to cast realistic shadows across your screen. Powered by WebGL Vogel Disk Sampling.",
 };
 
 export default function DaylightLayout({
