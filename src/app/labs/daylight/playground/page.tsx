@@ -1,8 +1,97 @@
 "use client";
 
 import Link from "next/link";
-import { useControls, folder, button } from "leva";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useControls, button } from "leva";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+
+/* ─── Preset definitions ─── */
+const PRESETS: { id: string; name: string; src: string }[] = [
+  { id: "venetian-blinds", name: "Blinds", src: "/presets/venetian-blinds.jpeg" },
+  { id: "arched-panes", name: "Arched", src: "/presets/arched-panes.jpeg" },
+  { id: "french-window", name: "French", src: "/presets/french-window.jpeg" },
+  { id: "foliage", name: "Foliage", src: "/presets/foliage-window.jpeg" },
+  { id: "ivy", name: "Ivy", src: "/presets/ivy-window.jpeg" },
+  { id: "provincial", name: "Provincial", src: "/presets/provincial.jpeg" },
+  { id: "orange-arch", name: "Arch", src: "/presets/orange-arch.jpeg" },
+  { id: "curtained", name: "Curtain", src: "/presets/curtained.jpeg" },
+];
+
+/* ─── Image → Depth Map conversion ─── */
+function processImageToDepthMap(
+  sourceCanvas: HTMLCanvasElement,
+  w: number,
+  h: number,
+  opts: { threshold: number; contrast: number; depth: number; invert: boolean }
+): HTMLCanvasElement {
+  const sourceCtx = sourceCanvas.getContext("2d")!;
+  const imageData = sourceCtx.getImageData(0, 0, w, h);
+  const { threshold, contrast, depth, invert } = opts;
+  const { data } = imageData;
+  const output = new ImageData(w, h);
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i],
+      g = data[i + 1],
+      b = data[i + 2];
+
+    // RGB → luminance
+    let lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    // Contrast enhancement
+    lum = ((lum / 255 - 0.5) * contrast + 0.5) * 255;
+    lum = Math.max(0, Math.min(255, lum));
+
+    // Invert (for exterior shots where window opening is dark)
+    if (invert) lum = 255 - lum;
+
+    if (lum > threshold) {
+      // Light passes through — no shadow object
+      output.data[i] = 0;
+      output.data[i + 1] = 0;
+      output.data[i + 2] = 0;
+      output.data[i + 3] = 255;
+    } else {
+      // Shadow-casting object
+      const depthVal = Math.round(
+        depth * 255 * (1 - lum / Math.max(threshold, 1))
+      );
+      output.data[i] = Math.max(1, Math.min(255, depthVal));
+      output.data[i + 1] = 255; // object flag
+      output.data[i + 2] = 0;
+      output.data[i + 3] = 255;
+    }
+  }
+
+  const outCanvas = document.createElement("canvas");
+  outCanvas.width = w;
+  outCanvas.height = h;
+  outCanvas.getContext("2d")!.putImageData(output, 0, 0);
+  return outCanvas;
+}
+
+/* ─── Draw image with cover fit ─── */
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  w: number,
+  h: number
+) {
+  const imgAspect = img.width / img.height;
+  const canvasAspect = w / h;
+  let drawW: number, drawH: number, drawX: number, drawY: number;
+
+  if (imgAspect > canvasAspect) {
+    drawH = h;
+    drawW = h * imgAspect;
+  } else {
+    drawW = w;
+    drawH = w / imgAspect;
+  }
+  drawX = (w - drawW) / 2;
+  drawY = (h - drawH) / 2;
+
+  ctx.drawImage(img, drawX, drawY, drawW, drawH);
+}
 
 /* ─── Sample content to see shadows over ─── */
 function SampleContent() {
@@ -86,14 +175,100 @@ function SampleContent() {
   );
 }
 
+/* ─── Preset selector bar ─── */
+function PresetBar({
+  presets,
+  selected,
+  onSelect,
+  onUpload,
+  visible,
+}: {
+  presets: { id: string; name: string; src: string }[];
+  selected: string;
+  onSelect: (id: string) => void;
+  onUpload: (file: File) => void;
+  visible: boolean;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  if (!visible) return null;
+
+  return (
+    <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
+      <div className="flex items-center gap-1.5 rounded-2xl bg-white/90 p-2 shadow-[0_2px_8px_rgba(26,24,21,0.12),0_8px_32px_rgba(26,24,21,0.08)] backdrop-blur-sm">
+        {presets.map((preset) => (
+          <button
+            key={preset.id}
+            onClick={() => onSelect(preset.id)}
+            className={`relative h-11 w-11 overflow-hidden rounded-lg transition-all ${
+              selected === preset.id
+                ? "ring-2 ring-[#1a1815] ring-offset-1"
+                : "opacity-50 hover:opacity-90"
+            }`}
+            title={preset.name}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={preset.src}
+              alt={preset.name}
+              className="h-full w-full object-cover"
+            />
+          </button>
+        ))}
+        <button
+          onClick={() => fileRef.current?.click()}
+          className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-dashed border-[#1a1815]/15 text-[#1a1815]/30 transition-colors hover:border-[#1a1815]/30 hover:text-[#1a1815]/50"
+          title="Upload image"
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path
+              d="M9 3v12M3 9h12"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onUpload(file);
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 /* ─── WebGL Shadow Overlay with leva controls ─── */
 function ControlledShadowOverlay() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const debugCanvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const programRef = useRef<WebGLProgram | null>(null);
   const quadBufRef = useRef<WebGLBuffer | null>(null);
   const depthTexRef = useRef<WebGLTexture | null>(null);
+  const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
+
   const [copied, setCopied] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState(PRESETS[0].id);
+  const [customPresets, setCustomPresets] = useState<
+    { id: string; name: string; src: string }[]
+  >([]);
+  const [imageReady, setImageReady] = useState(0);
+
+  const allPresets = useMemo(
+    () => [...PRESETS, ...customPresets],
+    [customPresets]
+  );
+
+  // ── Source mode ──
+  const { mode } = useControls("Source", {
+    mode: { value: "image", options: ["image", "programmatic"] },
+  });
 
   // ── Shader parameters ──
   const shader = useControls(
@@ -107,7 +282,7 @@ function ControlledShadowOverlay() {
       influenceClose: { value: 8.0, min: 1.0, max: 20.0, step: 0.5 },
       influenceFar: { value: 0.5, min: 0.1, max: 5.0, step: 0.1 },
     },
-    { collapsed: false }
+    { collapsed: true }
   );
 
   const shadowColor = useControls(
@@ -120,7 +295,19 @@ function ControlledShadowOverlay() {
     { collapsed: true }
   );
 
-  // ── Depth map (blind slats) parameters ──
+  // ── Image processing parameters ──
+  const imageOpts = useControls(
+    "Image Processing",
+    {
+      threshold: { value: 128, min: 0, max: 255, step: 1 },
+      contrast: { value: 1.8, min: 0.5, max: 5.0, step: 0.1 },
+      depth: { value: 0.4, min: 0.05, max: 1.0, step: 0.05 },
+      invert: false,
+    },
+    { collapsed: false }
+  );
+
+  // ── Programmatic blind slat parameters ──
   const blinds = useControls(
     "Blind Slats",
     {
@@ -130,7 +317,7 @@ function ControlledShadowOverlay() {
       depthBase: { value: 0.3, min: 0.05, max: 0.9, step: 0.05 },
       depthVariation: { value: 0.08, min: 0, max: 0.3, step: 0.01 },
     },
-    { collapsed: false }
+    { collapsed: true }
   );
 
   const frame = useControls(
@@ -154,17 +341,71 @@ function ControlledShadowOverlay() {
     { collapsed: true }
   );
 
+  const debug = useControls(
+    "Debug",
+    {
+      showDepthMap: false,
+    },
+    { collapsed: true }
+  );
+
   // ── Export config ──
   const exportConfig = useCallback(() => {
-    const config = { shader, shadowColor, blinds, frame, rendering };
+    const config = {
+      mode,
+      shader,
+      shadowColor,
+      imageOpts,
+      blinds,
+      frame,
+      rendering,
+    };
     navigator.clipboard.writeText(JSON.stringify(config, null, 2));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [shader, shadowColor, blinds, frame, rendering]);
+  }, [mode, shader, shadowColor, imageOpts, blinds, frame, rendering]);
 
   useControls("Export", {
     "Copy Config": button(() => exportConfig()),
   });
+
+  // ── Load preset image ──
+  useEffect(() => {
+    if (mode !== "image") return;
+    const preset = allPresets.find((p) => p.id === selectedPreset);
+    if (!preset) return;
+
+    if (imageCacheRef.current.has(preset.src)) {
+      setImageReady((v) => v + 1);
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      imageCacheRef.current.set(preset.src, img);
+      setImageReady((v) => v + 1);
+    };
+    img.onerror = () => console.error("Failed to load preset:", preset.src);
+    img.src = preset.src;
+  }, [mode, selectedPreset, allPresets]);
+
+  // ── Handle file upload ──
+  const handleUpload = useCallback((file: File) => {
+    const url = URL.createObjectURL(file);
+    const id = `custom-${Date.now()}`;
+    const name = file.name.replace(/\.[^.]+$/, "").slice(0, 10);
+
+    // Pre-load the image before switching
+    const img = new Image();
+    img.onload = () => {
+      imageCacheRef.current.set(url, img);
+      setCustomPresets((prev) => [...prev, { id, name, src: url }]);
+      setSelectedPreset(id);
+      setImageReady((v) => v + 1);
+    };
+    img.src = url;
+  }, []);
 
   // ── Init WebGL once ──
   useEffect(() => {
@@ -305,73 +546,103 @@ function ControlledShadowOverlay() {
     gl.deleteShader(vs);
     gl.deleteShader(fs);
 
-    // ─ Generate depth map ─
+    // ─ Set up canvas size ─
     const dpr = window.devicePixelRatio || 1;
     const w = Math.round(window.innerWidth * rendering.scale * dpr);
     const h = Math.round(window.innerHeight * rendering.scale * dpr);
-
     canvas.width = w;
     canvas.height = h;
     gl.viewport(0, 0, w, h);
 
+    // ─ Generate depth map ─
     const depthCanvas = document.createElement("canvas");
     depthCanvas.width = w;
     depthCanvas.height = h;
     const ctx = depthCanvas.getContext("2d")!;
-
     ctx.fillStyle = "rgb(0, 0, 0)";
     ctx.fillRect(0, 0, w, h);
 
-    const angleRad = (blinds.angle * Math.PI) / 180;
+    if (mode === "image") {
+      // Image-based depth map
+      const preset = allPresets.find((p) => p.id === selectedPreset);
+      const img = preset ? imageCacheRef.current.get(preset.src) : null;
+      if (!img) return; // not loaded yet
 
-    // Blind slats
-    ctx.save();
-    ctx.translate(w / 2, h / 2);
-    ctx.rotate(angleRad);
+      // Draw image to temp canvas (cover fit)
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = w;
+      tempCanvas.height = h;
+      const tempCtx = tempCanvas.getContext("2d")!;
+      drawImageCover(tempCtx, img, w, h);
 
-    const count = Math.ceil((Math.max(w, h) * 2) / blinds.slatSpacing);
-    for (let i = -count; i <= count; i++) {
-      const depth =
-        blinds.depthBase +
-        Math.sin(i * 1.37) * blinds.depthVariation +
-        Math.cos(i * 0.73) * blinds.depthVariation * 0.6;
-      const r = Math.round(Math.max(1, Math.min(255, depth * 255)));
-      ctx.fillStyle = `rgb(${r}, 255, 0)`;
-      ctx.fillRect(
-        -w * 2,
-        i * blinds.slatSpacing,
-        w * 4,
-        blinds.slatWidth
-      );
-    }
-    ctx.restore();
+      // Convert to depth map
+      const processed = processImageToDepthMap(tempCanvas, w, h, imageOpts);
+      ctx.drawImage(processed, 0, 0);
+    } else {
+      // Programmatic blind slats
+      const angleRad = (blinds.angle * Math.PI) / 180;
 
-    // Window frame
-    if (frame.enabled) {
-      const fd = Math.round(frame.depth * 255);
       ctx.save();
       ctx.translate(w / 2, h / 2);
       ctx.rotate(angleRad);
-      ctx.fillStyle = `rgb(${fd}, 255, 0)`;
-      ctx.fillRect(-w * 2, h * frame.crossbar1Y, w * 4, frame.thickness);
-      ctx.fillRect(-w * 2, h * frame.crossbar2Y, w * 4, frame.thickness);
+      const count = Math.ceil((Math.max(w, h) * 2) / blinds.slatSpacing);
+      for (let i = -count; i <= count; i++) {
+        const depthVal =
+          blinds.depthBase +
+          Math.sin(i * 1.37) * blinds.depthVariation +
+          Math.cos(i * 0.73) * blinds.depthVariation * 0.6;
+        const r = Math.round(Math.max(1, Math.min(255, depthVal * 255)));
+        ctx.fillStyle = `rgb(${r}, 255, 0)`;
+        ctx.fillRect(
+          -w * 2,
+          i * blinds.slatSpacing,
+          w * 4,
+          blinds.slatWidth
+        );
+      }
       ctx.restore();
 
-      if (frame.verticalBar) {
+      if (frame.enabled) {
+        const fd = Math.round(frame.depth * 255);
         ctx.save();
         ctx.translate(w / 2, h / 2);
-        ctx.rotate(angleRad + Math.PI / 2);
+        ctx.rotate(angleRad);
         ctx.fillStyle = `rgb(${fd}, 255, 0)`;
-        ctx.fillRect(-w * 2, 0, w * 4, frame.thickness);
+        ctx.fillRect(-w * 2, h * frame.crossbar1Y, w * 4, frame.thickness);
+        ctx.fillRect(-w * 2, h * frame.crossbar2Y, w * 4, frame.thickness);
         ctx.restore();
+
+        if (frame.verticalBar) {
+          ctx.save();
+          ctx.translate(w / 2, h / 2);
+          ctx.rotate(angleRad + Math.PI / 2);
+          ctx.fillStyle = `rgb(${fd}, 255, 0)`;
+          ctx.fillRect(-w * 2, 0, w * 4, frame.thickness);
+          ctx.restore();
+        }
       }
+    }
+
+    // ─ Debug depth map preview ─
+    if (debug.showDepthMap && debugCanvasRef.current) {
+      const dbg = debugCanvasRef.current;
+      dbg.width = w;
+      dbg.height = h;
+      dbg.getContext("2d")!.drawImage(depthCanvas, 0, 0);
     }
 
     // ─ Upload depth texture ─
     if (depthTexRef.current) gl.deleteTexture(depthTexRef.current);
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, depthCanvas);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      depthCanvas
+    );
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -391,17 +662,23 @@ function ControlledShadowOverlay() {
     gl.enableVertexAttribArray(aPos);
     gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  }, [shader, shadowColor, blinds, frame, rendering]);
+  }, [
+    shader,
+    shadowColor,
+    mode,
+    selectedPreset,
+    imageOpts,
+    blinds,
+    frame,
+    rendering,
+    debug.showDepthMap,
+    imageReady,
+    allPresets,
+  ]);
 
   // ── Handle resize ──
   useEffect(() => {
-    // The main effect above runs on control changes.
-    // For resize, we trigger a re-render by forcing a state update.
-    const onResize = () => {
-      // Touch a control value to force re-render
-      // Actually, just dispatch resize - the effect dependencies handle it
-      window.dispatchEvent(new Event("leva-resize"));
-    };
+    const onResize = () => setImageReady((v) => v + 1);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
@@ -417,6 +694,20 @@ function ControlledShadowOverlay() {
         ref={canvasRef}
         className="pointer-events-none fixed inset-0 z-40 h-full w-full"
         style={{ mixBlendMode: "multiply" }}
+      />
+      {debug.showDepthMap && (
+        <canvas
+          ref={debugCanvasRef}
+          className="fixed bottom-24 right-6 z-50 h-36 w-52 rounded-xl border border-[#1a1815]/10 bg-black shadow-lg"
+          style={{ imageRendering: "pixelated" }}
+        />
+      )}
+      <PresetBar
+        presets={allPresets}
+        selected={selectedPreset}
+        onSelect={setSelectedPreset}
+        onUpload={handleUpload}
+        visible={mode === "image"}
       />
     </>
   );
