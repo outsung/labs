@@ -826,7 +826,7 @@ function UploadZone({ onUpload }: { onUpload: (file: File) => void }) {
       }`}
     >
       <p className="text-sm text-[#8a8078]">
-        이미지를 드래그하거나 클릭하여 업로드
+        Drop an image here, or click to upload
       </p>
       <p className="mt-1 text-[11px] text-[#8a8078]/50">JPG, PNG, WebP</p>
       <input
@@ -973,8 +973,8 @@ export default function DaylightPage() {
             transition={{ delay: 1.4, duration: 0.6, ease: EASE_OUT_QUINT }}
             className="mx-auto mt-8 max-w-lg text-base text-[#2a2520] lg:text-lg"
           >
-            창문 사진을 선택하거나 업로드하면 실시간으로 그림자가 화면에
-            드리워집니다.
+            Pick a window preset or upload your own photo to cast
+            real-time shadows across the screen.
           </motion.p>
         </div>
       </section>
