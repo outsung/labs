@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 
 /* ─── Preset definitions ─── */
 const PRESETS: { id: string; name: string; src: string }[] = [
+  { id: "classic-blinds", name: "Classic", src: "" },
   { id: "venetian-blinds", name: "Blinds", src: "/presets/venetian-blinds.jpeg" },
   { id: "arched-panes", name: "Arched", src: "/presets/arched-panes.jpeg" },
   { id: "french-window", name: "French", src: "/presets/french-window.jpeg" },
@@ -15,6 +16,148 @@ const PRESETS: { id: string; name: string; src: string }[] = [
   { id: "orange-arch", name: "Arch", src: "/presets/orange-arch.jpeg" },
   { id: "curtained", name: "Curtain", src: "/presets/curtained.jpeg" },
 ];
+
+/* ─── Sun angle from hour ─── */
+function getSunAngle(hours: number): number {
+  const t = Math.max(0, Math.min(1, (hours - 6) / 12));
+  const arc = -4 * (t - 0.5) ** 2 + 1;
+  return -45 + arc * 25;
+}
+
+/* ─── Deterministic pseudo-random ─── */
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/* ─── Foliage shadows ─── */
+function drawFoliageShadows(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  opacity: number
+) {
+  const baseDepth = Math.round(0.2 * opacity * 255);
+  if (baseDepth < 1) return;
+
+  const branches = [
+    { cx: 0.72, cy: 0.2, spread: 0.18, leaves: 16, seed: 1 },
+    { cx: 0.88, cy: 0.4, spread: 0.14, leaves: 12, seed: 2 },
+    { cx: 0.65, cy: 0.6, spread: 0.2, leaves: 18, seed: 3 },
+    { cx: 0.92, cy: 0.12, spread: 0.1, leaves: 10, seed: 4 },
+    { cx: 0.78, cy: 0.75, spread: 0.16, leaves: 14, seed: 5 },
+    { cx: 0.55, cy: 0.35, spread: 0.12, leaves: 8, seed: 6 },
+  ];
+
+  for (const branch of branches) {
+    for (let l = 0; l < branch.leaves; l++) {
+      const s = branch.seed * 100 + l;
+      const lx = (branch.cx + (seededRandom(s) - 0.5) * branch.spread) * w;
+      const ly =
+        (branch.cy + (seededRandom(s + 1) - 0.5) * branch.spread * 1.5) * h;
+      const scale = w / 600;
+      const lw = (3 + seededRandom(s + 2) * 10) * scale;
+      const lh = (6 + seededRandom(s + 3) * 16) * scale;
+      const angle = seededRandom(s + 4) * Math.PI;
+      const leafDepth = Math.max(
+        1,
+        Math.round(baseDepth * (0.6 + seededRandom(s + 5) * 0.4))
+      );
+
+      ctx.save();
+      ctx.translate(lx, ly);
+      ctx.rotate(angle);
+      ctx.fillStyle = `rgb(${leafDepth}, 255, 0)`;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, lw, lh, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+
+/* ─── Left-to-right shadow gradient ─── */
+function applyHorizontalGradient(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number
+) {
+  const imageData = ctx.getImageData(0, 0, w, h);
+  const { data } = imageData;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if (data[i + 1] !== 255) continue;
+
+      const factor = 0.03 + 0.97 * Math.pow(x / Math.max(1, w - 1), 2.0);
+      const newDepth = Math.round(data[i] * factor);
+
+      if (newDepth < 1) {
+        data[i] = 0;
+        data[i + 1] = 0;
+      } else {
+        data[i] = newDepth;
+      }
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
+
+/* ─── Classic depth map (matches home page) ─── */
+function generateClassicDepthMap(
+  w: number,
+  h: number,
+  hour: number
+): HTMLCanvasElement {
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d")!;
+
+  ctx.fillStyle = "rgb(0, 0, 0)";
+  ctx.fillRect(0, 0, w, h);
+
+  const angleDeg = getSunAngle(hour);
+  const angleRad = (angleDeg * Math.PI) / 180;
+
+  const slatSpacing = 50;
+  const tiltAngle = 65 * (Math.PI / 180);
+  const slatWidth = slatSpacing * Math.cos(tiltAngle);
+
+  // Foliage shadows (drawn first so slats cover them)
+  drawFoliageShadows(ctx, w, h, 1);
+
+  // Blind slats (pivot shifted right, same as home page)
+  ctx.save();
+  ctx.translate(w * 0.75, h / 2);
+  ctx.scale(1.0, 1.5);
+  ctx.rotate(angleRad);
+  const count = Math.ceil((Math.max(w, h) * 2) / slatSpacing);
+  for (let i = -count; i <= count; i++) {
+    const depth = 0.3 + Math.sin(i * 1.37) * 0.08 + Math.cos(i * 0.73) * 0.05;
+    const r = Math.round(Math.max(1, Math.min(255, depth * 255)));
+    ctx.fillStyle = `rgb(${r}, 255, 0)`;
+    ctx.fillRect(-w * 2, i * slatSpacing, w * 4, slatWidth);
+  }
+  ctx.restore();
+
+  // Vertical bar
+  const frameDepth = Math.round(0.65 * 255);
+  ctx.save();
+  ctx.translate(w * 0.75, h / 2);
+  ctx.scale(1.0, 1.5);
+  ctx.rotate(angleRad + Math.PI / 2);
+  ctx.fillStyle = `rgb(${frameDepth}, 255, 0)`;
+  ctx.fillRect(-w * 2, 0, w * 4, 10);
+  ctx.restore();
+
+  // Left-to-right gradient
+  applyHorizontalGradient(ctx, w, h);
+
+  return c;
+}
 
 /* ─── Image → Depth Map conversion ─── */
 function processImageToDepthMap(
@@ -93,85 +236,226 @@ function drawImageCover(
   ctx.drawImage(img, drawX, drawY, drawW, drawH);
 }
 
-/* ─── Sample content to see shadows over ─── */
+/* ─── Page content (mirrors home page sections, static) ─── */
 function SampleContent() {
   return (
-    <div className="mx-auto max-w-4xl space-y-24 px-6 py-32 lg:px-16">
-      <div className="text-center">
-        <p className="mb-4 text-[11px] uppercase tracking-[0.25em] text-[#8a8078]">
-          Shadow Playground
-        </p>
-        <h1 className="font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2.5rem,6vw,5rem)] leading-[1.05] text-[#1a1815]">
-          The computer,
-          <br />
-          re-imagined
-        </h1>
-        <p className="mx-auto mt-6 max-w-md text-[#8a8078]">
-          Adjust the controls to tune the Vogel Disk Sampling shadow shader.
-          Changes re-render the WebGL pipeline in real-time.
-        </p>
-      </div>
+    <>
+      {/* ─── Hero ─── */}
+      <section className="relative flex min-h-[85vh] flex-col items-center justify-center px-6 pt-20 lg:px-[6vw]">
+        <div className="mx-auto max-w-7xl text-center">
+          <p className="mb-6 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs">
+            Window Shadow Experience
+          </p>
+          <h1 className="font-[Georgia,_'Times_New_Roman',serif] text-[clamp(3rem,8vw,7.5rem)] font-normal leading-[1.05] text-[#1a1815]">
+            Turn any window
+            <br />
+            into light.
+          </h1>
+          <p className="mx-auto mt-8 max-w-lg text-base text-[#2a2520] lg:text-lg">
+            Pick a window preset or upload your own photo to cast
+            real-time shadows across the screen.
+          </p>
+        </div>
+      </section>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {["Smooth like paper", "Calm by design", "Built for health"].map(
-          (title) => (
-            <div
-              key={title}
-              className="rounded-2xl bg-white p-8 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)]"
-            >
-              <h3 className="mb-3 font-[Georgia,_'Times_New_Roman',serif] text-xl text-[#1a1815]">
-                {title}
+      {/* ─── Mission Quote ─── */}
+      <section className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto mb-8 h-px w-16 bg-[#c4a46a]/40" />
+          <blockquote className="font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,2rem)] leading-relaxed text-[#1a1815]">
+            &ldquo;The most beautiful thing about light is how it turns
+            ordinary spaces into something quietly extraordinary.&rdquo;
+          </blockquote>
+          <div className="mx-auto mt-8 h-px w-16 bg-[#c4a46a]/40" />
+        </div>
+      </section>
+
+      {/* ─── How it works ─── */}
+      <section className="bg-[#f5ede8] px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
+        <div className="mx-auto max-w-7xl">
+          <p className="mb-4 text-center font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs">
+            How it works
+          </p>
+          <h2 className="mb-16 text-center font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#1a1815]">
+            Light, computed
+          </h2>
+          <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
+            {[
+              {
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <rect x="4" y="8" width="24" height="16" rx="2" stroke="#c4a46a" strokeWidth="1.5" />
+                    <line x1="4" y1="14" x2="28" y2="14" stroke="#c4a46a" strokeWidth="1" opacity="0.5" />
+                    <line x1="4" y1="18" x2="28" y2="18" stroke="#c4a46a" strokeWidth="1" opacity="0.3" />
+                  </svg>
+                ),
+                title: "Depth mapping",
+                description:
+                  "Window photos are converted into depth maps. Light areas pass through; dark regions become shadow-casting objects with varying depth.",
+              },
+              {
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <circle cx="16" cy="16" r="10" stroke="#c4a46a" strokeWidth="1.5" />
+                    <circle cx="16" cy="16" r="4" fill="#c4a46a" opacity="0.3" />
+                  </svg>
+                ),
+                title: "Vogel disk sampling",
+                description:
+                  "100 samples per pixel distributed in a golden-angle spiral. Each sample checks the depth map for shadow influence, creating smooth, natural falloff.",
+              },
+              {
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <circle cx="16" cy="14" r="5" stroke="#c4a46a" strokeWidth="1.5" />
+                    <line x1="16" y1="4" x2="16" y2="7" stroke="#c4a46a" strokeWidth="1.5" strokeLinecap="round" />
+                    <line x1="16" y1="21" x2="16" y2="24" stroke="#c4a46a" strokeWidth="1.5" strokeLinecap="round" />
+                    <line x1="6" y1="14" x2="9" y2="14" stroke="#c4a46a" strokeWidth="1.5" strokeLinecap="round" />
+                    <line x1="23" y1="14" x2="26" y2="14" stroke="#c4a46a" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                ),
+                title: "Warm-tinted shadows",
+                description:
+                  "Shadows are tinted with a warm off-white tone rather than cold gray, composited via multiply blend for a natural, sunlit atmosphere.",
+              },
+            ].map((b, i) => (
+              <div
+                key={i}
+                className="rounded-2xl bg-white p-8 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)] lg:p-10"
+              >
+                <div className="mb-6">{b.icon}</div>
+                <h3 className="mb-3 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,1.5rem)] text-[#1a1815]">
+                  {b.title}
+                </h3>
+                <p className="leading-relaxed text-[#2a2520]/70">
+                  {b.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Specs ─── */}
+      <section className="bg-[#1a1815] px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
+        <div className="mx-auto max-w-7xl">
+          <p className="mb-4 text-center font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs">
+            Under the hood
+          </p>
+          <h2 className="mb-16 text-center font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#faf5f2]">
+            The shader
+          </h2>
+          <div className="grid grid-cols-2 gap-6 lg:grid-cols-5 lg:gap-4">
+            {[
+              { value: "100", label: "Samples / px" },
+              { value: "WebGL", label: "Rendering" },
+              { value: "0.33x", label: "Render Scale" },
+              { value: "60fps", label: "Target" },
+              { value: "Vogel", label: "Disk Sampling" },
+            ].map((s, i) => (
+              <div
+                key={i}
+                className="flex flex-col items-center rounded-2xl border border-[#d4b87a22] p-6 text-center lg:p-8"
+              >
+                <p className="font-[Georgia,_'Times_New_Roman',serif] text-2xl text-[#faf5f2] lg:text-3xl">
+                  {s.value}
+                </p>
+                <p className="mt-2 text-sm text-[#8a8078]">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Demo Content ─── */}
+      <section className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
+        <div className="mx-auto max-w-7xl space-y-24 lg:space-y-32">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div>
+              <p className="mb-3 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs">
+                Programmatic
+              </p>
+              <h3 className="mb-4 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,2rem)] text-[#1a1815]">
+                Classic blind slats
               </h3>
-              <p className="text-sm leading-relaxed text-[#2a2520]/70">
-                A display that mirrors the warmth and readability of physical
-                print, reducing visual fatigue throughout the day.
+              <p className="max-w-md leading-relaxed text-[#2a2520]/70">
+                The original shadow mode generates venetian blind slats with
+                window frame crossbars directly in code. The sun angle shifts
+                with time of day for a living, dynamic effect.
               </p>
             </div>
-          )
-        )}
-      </div>
+            <div className="rounded-2xl bg-white p-6 shadow-[0_1px_2px_rgba(26,24,21,0.08),0_4px_12px_rgba(26,24,21,0.06),0_16px_40px_rgba(26,24,21,0.04)] lg:p-8">
+              <div className="space-y-4">
+                <div className="h-3 w-3/4 rounded bg-[#1a1815]/10" />
+                <div className="h-3 w-full rounded bg-[#1a1815]/8" />
+                <div className="h-3 w-5/6 rounded bg-[#1a1815]/8" />
+                <div className="mt-6 h-2.5 w-2/3 rounded bg-[#1a1815]/6" />
+                <div className="h-2.5 w-full rounded bg-[#1a1815]/6" />
+                <div className="h-2.5 w-4/5 rounded bg-[#1a1815]/6" />
+                <div className="h-2.5 w-3/4 rounded bg-[#1a1815]/6" />
+              </div>
+            </div>
+          </div>
 
-      <div className="mx-auto max-w-2xl">
-        <div className="rounded-[24px] bg-[#f0e8e0] p-5 shadow-[0_2px_4px_rgba(26,24,21,0.10),0_8px_24px_rgba(26,24,21,0.08),0_24px_60px_rgba(26,24,21,0.06)]">
-          <div className="rounded-2xl bg-white p-8">
-            <div className="space-y-4">
-              <div className="h-3 w-3/4 rounded bg-[#1a1815]/10" />
-              <div className="h-3 w-full rounded bg-[#1a1815]/8" />
-              <div className="h-3 w-5/6 rounded bg-[#1a1815]/8" />
-              <div className="mt-6 h-2.5 w-2/3 rounded bg-[#1a1815]/6" />
-              <div className="h-2.5 w-full rounded bg-[#1a1815]/6" />
-              <div className="h-2.5 w-4/5 rounded bg-[#1a1815]/6" />
-              <div className="h-2.5 w-3/4 rounded bg-[#1a1815]/6" />
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 lg:[direction:rtl]">
+            <div className="lg:[direction:ltr]">
+              <p className="mb-3 font-sans text-[11px] uppercase tracking-[0.25em] text-[#8a8078] lg:text-xs">
+                Image-based
+              </p>
+              <h3 className="mb-4 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,2rem)] text-[#1a1815]">
+                Any window, any shape
+              </h3>
+              <p className="max-w-md leading-relaxed text-[#2a2520]/70">
+                Upload a window photo or pick from presets — arched panes,
+                foliage-covered frames, French windows. Each image is processed
+                into a depth map that the shader renders as realistic shadows.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 lg:[direction:ltr]">
+              {[
+                { color: "bg-[#585b3d]/10", h: "h-20" },
+                { color: "bg-[#c4a46a]/10", h: "h-24" },
+                { color: "bg-[#272819]/8", h: "h-28" },
+                { color: "bg-[#434626]/10", h: "h-20" },
+              ].map((card, i) => (
+                <div
+                  key={i}
+                  className={`${card.h} rounded-xl ${card.color} p-4 shadow-[0_1px_3px_rgba(26,24,21,0.04),0_4px_8px_rgba(26,24,21,0.03)]`}
+                >
+                  <div className="mb-2 h-2 w-3/4 rounded bg-[#1a1815]/10" />
+                  <div className="h-1.5 w-full rounded bg-[#1a1815]/5" />
+                  <div className="mt-1 h-1.5 w-4/5 rounded bg-[#1a1815]/5" />
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="rounded-3xl bg-[#1a1815] px-8 py-16 text-center">
-        <h2 className="font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.5rem,4vw,3rem)] text-[#faf5f2]">
-          Specifications
-        </h2>
-        <div className="mt-8 flex flex-wrap justify-center gap-12">
-          {[
-            ['10.5"', "Display"],
-            ["60Hz", "Refresh"],
-            ["12hr", "Battery"],
-          ].map(([val, label]) => (
-            <div key={label}>
-              <p className="text-2xl text-[#faf5f2]">{val}</p>
-              <p className="text-xs text-[#8a8078]">{label}</p>
+      {/* ─── CTA ─── */}
+      <section className="px-6 py-[8vh] lg:px-[6vw] lg:py-[12vh]">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto mb-10 flex h-24 w-24 items-center justify-center">
+            <div className="relative">
+              <div className="h-16 w-16 rounded-full border border-[#c4a46a]/20" />
+              <div className="absolute inset-2 rounded-full border border-[#c4a46a]/30" />
+              <div className="absolute inset-4 rounded-full bg-[#c4a46a]/15" />
+              <div className="absolute -top-3 left-1/2 h-3 w-px -translate-x-1/2 bg-[#c4a46a]/40" />
+              <div className="absolute -bottom-3 left-1/2 h-3 w-px -translate-x-1/2 bg-[#c4a46a]/40" />
+              <div className="absolute -left-3 top-1/2 h-px w-3 -translate-y-1/2 bg-[#c4a46a]/40" />
+              <div className="absolute -right-3 top-1/2 h-px w-3 -translate-y-1/2 bg-[#c4a46a]/40" />
             </div>
-          ))}
+          </div>
+          <h2 className="mb-6 font-[Georgia,_'Times_New_Roman',serif] text-[clamp(2rem,5vw,4rem)] text-[#1a1815]">
+            Light shapes everything
+          </h2>
+          <p className="mx-auto max-w-xl leading-relaxed text-[#2a2520]/70">
+            Adjust the Leva controls to tune the Vogel Disk Sampling shadow
+            shader. Pick a preset below or upload your own window photo.
+          </p>
         </div>
-      </div>
-
-      <div className="mx-auto max-w-2xl text-center">
-        <blockquote className="font-[Georgia,_'Times_New_Roman',serif] text-[clamp(1.25rem,2.5vw,2rem)] leading-relaxed text-[#1a1815]">
-          &ldquo;We believe your most important technology should not leave you
-          feeling exhausted, distracted, or in pain.&rdquo;
-        </blockquote>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }
 
@@ -206,12 +490,24 @@ function PresetBar({
             }`}
             title={preset.name}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={preset.src}
-              alt={preset.name}
-              className="h-full w-full object-cover"
-            />
+            {preset.src ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={preset.src}
+                alt={preset.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#f0e8e0] to-[#e8ddd4]">
+                <svg width="20" height="20" viewBox="0 0 28 28" fill="none" className="text-[#8a8078]">
+                  <rect x="4" y="5" width="20" height="18" rx="2" stroke="currentColor" strokeWidth="1.2" />
+                  <line x1="4" y1="9" x2="24" y2="9" stroke="currentColor" strokeWidth="0.8" opacity="0.6" />
+                  <line x1="4" y1="13" x2="24" y2="13" stroke="currentColor" strokeWidth="0.8" opacity="0.6" />
+                  <line x1="4" y1="17" x2="24" y2="17" stroke="currentColor" strokeWidth="0.8" opacity="0.6" />
+                  <line x1="4" y1="21" x2="24" y2="21" stroke="currentColor" strokeWidth="0.8" opacity="0.6" />
+                </svg>
+              </div>
+            )}
           </button>
         ))}
         <button
@@ -266,9 +562,39 @@ function ControlledShadowOverlay() {
   );
 
   // ── Source mode ──
-  const { mode } = useControls("Source", {
-    mode: { value: "image", options: ["image", "programmatic"] },
-  });
+  const [{ mode }, setSource] = useControls("Source", () => ({
+    mode: { value: "programmatic", options: ["image", "programmatic"] },
+  }));
+
+  // ── Sync preset selection with Leva mode ──
+  const handlePresetSelect = useCallback(
+    (id: string) => {
+      setSelectedPreset(id);
+      const preset = [...PRESETS, ...customPresets].find((p) => p.id === id);
+      if (preset) {
+        const newMode = preset.src === "" ? "programmatic" : "image";
+        setSource({ mode: newMode });
+      }
+    },
+    [customPresets, setSource]
+  );
+
+  // ── Sync Leva mode change → select appropriate preset ──
+  const prevModeRef = useRef(mode);
+  useEffect(() => {
+    if (mode === prevModeRef.current) return;
+    prevModeRef.current = mode;
+
+    const currentPreset = allPresets.find((p) => p.id === selectedPreset);
+    const currentIsClassic = currentPreset?.src === "";
+
+    if (mode === "programmatic" && !currentIsClassic) {
+      setSelectedPreset("classic-blinds");
+    } else if (mode === "image" && currentIsClassic) {
+      const firstImage = allPresets.find((p) => p.src !== "");
+      if (firstImage) setSelectedPreset(firstImage.id);
+    }
+  }, [mode, selectedPreset, allPresets]);
 
   // ── Shader parameters ──
   const shader = useControls(
@@ -288,9 +614,9 @@ function ControlledShadowOverlay() {
   const shadowColor = useControls(
     "Shadow Tint",
     {
-      r: { value: 0.92, min: 0.5, max: 1.0, step: 0.01 },
-      g: { value: 0.9, min: 0.5, max: 1.0, step: 0.01 },
-      b: { value: 0.88, min: 0.5, max: 1.0, step: 0.01 },
+      r: { value: 0.92, min: 0.3, max: 1.0, step: 0.01 },
+      g: { value: 0.90, min: 0.3, max: 1.0, step: 0.01 },
+      b: { value: 0.88, min: 0.3, max: 1.0, step: 0.01 },
     },
     { collapsed: true }
   );
@@ -307,30 +633,17 @@ function ControlledShadowOverlay() {
     { collapsed: false }
   );
 
-  // ── Programmatic blind slat parameters ──
-  const blinds = useControls(
-    "Blind Slats",
-    {
-      angle: { value: -35, min: -80, max: 0, step: 1 },
-      slatWidth: { value: 5, min: 1, max: 20, step: 1 },
-      slatSpacing: { value: 50, min: 15, max: 120, step: 1 },
-      depthBase: { value: 0.3, min: 0.05, max: 0.9, step: 0.05 },
-      depthVariation: { value: 0.08, min: 0, max: 0.3, step: 0.01 },
-    },
-    { collapsed: true }
-  );
+  const defaultHourRef = useRef(() => {
+    const now = new Date();
+    return now.getHours() + Math.round(now.getMinutes() / 30) * 0.5;
+  });
 
-  const frame = useControls(
-    "Window Frame",
+  const sunTime = useControls(
+    "Sun / Time",
     {
-      enabled: true,
-      depth: { value: 0.65, min: 0.1, max: 1.0, step: 0.05 },
-      thickness: { value: 10, min: 2, max: 30, step: 1 },
-      crossbar1Y: { value: -0.15, min: -0.5, max: 0.5, step: 0.05 },
-      crossbar2Y: { value: 0.35, min: -0.5, max: 0.5, step: 0.05 },
-      verticalBar: true,
+      hour: { value: defaultHourRef.current(), min: 0, max: 24, step: 0.5 },
     },
-    { collapsed: true }
+    { collapsed: false }
   );
 
   const rendering = useControls(
@@ -356,14 +669,13 @@ function ControlledShadowOverlay() {
       shader,
       shadowColor,
       imageOpts,
-      blinds,
-      frame,
       rendering,
+      sunTime,
     };
     navigator.clipboard.writeText(JSON.stringify(config, null, 2));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [mode, shader, shadowColor, imageOpts, blinds, frame, rendering]);
+  }, [mode, shader, shadowColor, imageOpts, rendering, sunTime]);
 
   useControls("Export", {
     "Copy Config": button(() => exportConfig()),
@@ -402,10 +714,11 @@ function ControlledShadowOverlay() {
       imageCacheRef.current.set(url, img);
       setCustomPresets((prev) => [...prev, { id, name, src: url }]);
       setSelectedPreset(id);
+      setSource({ mode: "image" });
       setImageReady((v) => v + 1);
     };
     img.src = url;
-  }, []);
+  }, [setSource]);
 
   // ── Init WebGL once ──
   useEffect(() => {
@@ -451,10 +764,10 @@ function ControlledShadowOverlay() {
 
       const float pi = 3.14159265358979;
       const float goldenAngle = pi * (3.0 - sqrt(5.0));
-      const float diskSize = ${shader.diskSize.toFixed(1)};
+      const float diskSize = ${(shader.diskSize * (mode === "programmatic" ? rendering.scale : 1.0)).toFixed(1)};
       const int diskSamples = ${shader.diskSamples};
-      const float minSize = ${shader.minSize.toFixed(1)};
-      const float maxSize = ${shader.maxSize.toFixed(1)};
+      const float minSize = ${(shader.minSize * (mode === "programmatic" ? rendering.scale : 1.0)).toFixed(1)};
+      const float maxSize = ${(shader.maxSize * (mode === "programmatic" ? rendering.scale : 1.0)).toFixed(1)};
       const float maxShadow = ${shader.maxShadow.toFixed(2)};
       const float influenceClose = ${shader.influenceClose.toFixed(1)};
       const float influenceFar = ${shader.influenceFar.toFixed(1)};
@@ -579,48 +892,9 @@ function ControlledShadowOverlay() {
       const processed = processImageToDepthMap(tempCanvas, w, h, imageOpts);
       ctx.drawImage(processed, 0, 0);
     } else {
-      // Programmatic blind slats
-      const angleRad = (blinds.angle * Math.PI) / 180;
-
-      ctx.save();
-      ctx.translate(w / 2, h / 2);
-      ctx.rotate(angleRad);
-      const count = Math.ceil((Math.max(w, h) * 2) / blinds.slatSpacing);
-      for (let i = -count; i <= count; i++) {
-        const depthVal =
-          blinds.depthBase +
-          Math.sin(i * 1.37) * blinds.depthVariation +
-          Math.cos(i * 0.73) * blinds.depthVariation * 0.6;
-        const r = Math.round(Math.max(1, Math.min(255, depthVal * 255)));
-        ctx.fillStyle = `rgb(${r}, 255, 0)`;
-        ctx.fillRect(
-          -w * 2,
-          i * blinds.slatSpacing,
-          w * 4,
-          blinds.slatWidth
-        );
-      }
-      ctx.restore();
-
-      if (frame.enabled) {
-        const fd = Math.round(frame.depth * 255);
-        ctx.save();
-        ctx.translate(w / 2, h / 2);
-        ctx.rotate(angleRad);
-        ctx.fillStyle = `rgb(${fd}, 255, 0)`;
-        ctx.fillRect(-w * 2, h * frame.crossbar1Y, w * 4, frame.thickness);
-        ctx.fillRect(-w * 2, h * frame.crossbar2Y, w * 4, frame.thickness);
-        ctx.restore();
-
-        if (frame.verticalBar) {
-          ctx.save();
-          ctx.translate(w / 2, h / 2);
-          ctx.rotate(angleRad + Math.PI / 2);
-          ctx.fillStyle = `rgb(${fd}, 255, 0)`;
-          ctx.fillRect(-w * 2, 0, w * 4, frame.thickness);
-          ctx.restore();
-        }
-      }
+      // Classic / programmatic mode — same as home page
+      const classicDepth = generateClassicDepthMap(w, h, sunTime.hour);
+      ctx.drawImage(classicDepth, 0, 0);
     }
 
     // ─ Debug depth map preview ─
@@ -668,9 +942,8 @@ function ControlledShadowOverlay() {
     mode,
     selectedPreset,
     imageOpts,
-    blinds,
-    frame,
     rendering,
+    sunTime,
     debug.showDepthMap,
     imageReady,
     allPresets,
@@ -705,9 +978,9 @@ function ControlledShadowOverlay() {
       <PresetBar
         presets={allPresets}
         selected={selectedPreset}
-        onSelect={setSelectedPreset}
+        onSelect={handlePresetSelect}
         onUpload={handleUpload}
-        visible={mode === "image"}
+        visible={true}
       />
     </>
   );
@@ -730,7 +1003,7 @@ export default function PlaygroundPage() {
           </Link>
           <span className="text-xs text-[#1a1815]/20">|</span>
           <span className="text-xs text-[#8a8078]">
-            Shadow Playground — WebGL + Vogel Disk Sampling
+            Shadow Playground
           </span>
         </div>
       </nav>

@@ -47,6 +47,13 @@ function CharacterReveal({
   );
 }
 
+/* ─── Sun angle from hour ─── */
+function getSunAngle(hours: number): number {
+  const t = Math.max(0, Math.min(1, (hours - 6) / 12));
+  const arc = -4 * (t - 0.5) ** 2 + 1;
+  return -45 + arc * 25;
+}
+
 /* ─── Preset definitions ─── */
 type ShadowMode = "programmatic" | "image";
 
@@ -138,8 +145,94 @@ const PRESETS: Preset[] = [
   },
 ];
 
-/* ─── Programmatic depth map (original blind slats) ─── */
-function generateProgrammaticDepthMap(w: number, h: number): HTMLCanvasElement {
+/* ─── Deterministic pseudo-random ─── */
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/* ─── Foliage shadows ─── */
+function drawFoliageShadows(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  opacity: number
+) {
+  const baseDepth = Math.round(0.2 * opacity * 255);
+  if (baseDepth < 1) return;
+
+  const branches = [
+    { cx: 0.72, cy: 0.2, spread: 0.18, leaves: 16, seed: 1 },
+    { cx: 0.88, cy: 0.4, spread: 0.14, leaves: 12, seed: 2 },
+    { cx: 0.65, cy: 0.6, spread: 0.2, leaves: 18, seed: 3 },
+    { cx: 0.92, cy: 0.12, spread: 0.1, leaves: 10, seed: 4 },
+    { cx: 0.78, cy: 0.75, spread: 0.16, leaves: 14, seed: 5 },
+    { cx: 0.55, cy: 0.35, spread: 0.12, leaves: 8, seed: 6 },
+  ];
+
+  for (const branch of branches) {
+    for (let l = 0; l < branch.leaves; l++) {
+      const s = branch.seed * 100 + l;
+      const lx =
+        (branch.cx + (seededRandom(s) - 0.5) * branch.spread) * w;
+      const ly =
+        (branch.cy + (seededRandom(s + 1) - 0.5) * branch.spread * 1.5) * h;
+      const scale = w / 600;
+      const lw = (3 + seededRandom(s + 2) * 10) * scale;
+      const lh = (6 + seededRandom(s + 3) * 16) * scale;
+      const angle = seededRandom(s + 4) * Math.PI;
+      const leafDepth = Math.max(
+        1,
+        Math.round(baseDepth * (0.6 + seededRandom(s + 5) * 0.4))
+      );
+
+      ctx.save();
+      ctx.translate(lx, ly);
+      ctx.rotate(angle);
+      ctx.fillStyle = `rgb(${leafDepth}, 255, 0)`;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, lw, lh, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+
+/* ─── Left-to-right shadow gradient ─── */
+function applyHorizontalGradient(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number
+) {
+  const imageData = ctx.getImageData(0, 0, w, h);
+  const { data } = imageData;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if (data[i + 1] !== 255) continue;
+
+      const factor = 0.03 + 0.97 * Math.pow(x / Math.max(1, w - 1), 2.0);
+      const newDepth = Math.round(data[i] * factor);
+
+      if (newDepth < 1) {
+        data[i] = 0;
+        data[i + 1] = 0;
+      } else {
+        data[i] = newDepth;
+      }
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
+
+/* ─── Programmatic depth map (animated blind slats + foliage) ─── */
+function generateProgrammaticDepthMap(
+  w: number,
+  h: number,
+  progress: number = 1
+): HTMLCanvasElement {
   const c = document.createElement("canvas");
   c.width = w;
   c.height = h;
@@ -148,6 +241,10 @@ function generateProgrammaticDepthMap(w: number, h: number): HTMLCanvasElement {
   ctx.fillStyle = "rgb(0, 0, 0)";
   ctx.fillRect(0, 0, w, h);
 
+  // Foliage shadows (drawn first — slats will overwrite on top)
+  drawFoliageShadows(ctx, w, h, 1);
+
+  // Time-based sun angle (fixed — no rotation animation)
   const now = new Date();
   const hours = now.getHours() + now.getMinutes() / 60;
   const t = Math.max(0, Math.min(1, (hours - 6) / 12));
@@ -155,12 +252,18 @@ function generateProgrammaticDepthMap(w: number, h: number): HTMLCanvasElement {
   const angleDeg = -45 + arc * 25;
   const angleRad = (angleDeg * Math.PI) / 180;
 
+  // Animate blind opening: each slat panel tilts from flat (closed) to angled (open)
+  // Spacing is fixed — only the projected width changes via cos(tiltAngle)
+  const slatSpacing = 50;
+  const tiltAngle = progress * 65 * (Math.PI / 180); // 0° → 65°
+  const slatWidth = slatSpacing * Math.cos(tiltAngle); // 50 → ~9
+
+  // Blind slats (pivot shifted right, elongated for perspective)
   ctx.save();
-  ctx.translate(w / 2, h / 2);
+  ctx.translate(w * 0.75, h / 2);
+  ctx.scale(1.0, 1.5);
   ctx.rotate(angleRad);
 
-  const slatSpacing = 50;
-  const slatWidth = 5;
   const count = Math.ceil((Math.max(w, h) * 2) / slatSpacing);
 
   for (let i = -count; i <= count; i++) {
@@ -170,19 +273,20 @@ function generateProgrammaticDepthMap(w: number, h: number): HTMLCanvasElement {
     ctx.fillStyle = `rgb(${r}, 255, 0)`;
     ctx.fillRect(-w * 2, i * slatSpacing, w * 4, slatWidth);
   }
-
-  const frameDepth = Math.round(0.65 * 255);
-  ctx.fillStyle = `rgb(${frameDepth}, 255, 0)`;
-  ctx.fillRect(-w * 2, -h * 0.15, w * 4, 10);
-  ctx.fillRect(-w * 2, h * 0.35, w * 4, 10);
   ctx.restore();
 
+  // Vertical bar
+  const frameDepth = Math.round(0.65 * 255);
   ctx.save();
-  ctx.translate(w / 2, h / 2);
+  ctx.translate(w * 0.75, h / 2);
+  ctx.scale(1.0, 1.5);
   ctx.rotate(angleRad + Math.PI / 2);
   ctx.fillStyle = `rgb(${frameDepth}, 255, 0)`;
   ctx.fillRect(-w * 2, 0, w * 4, 10);
   ctx.restore();
+
+  // Left-to-right gradient
+  applyHorizontalGradient(ctx, w, h);
 
   return c;
 }
@@ -276,15 +380,14 @@ function ShadowOverlay({
   const quadBufRef = useRef<WebGLBuffer | null>(null);
   const depthTexRef = useRef<WebGLTexture | null>(null);
   const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
+  const animatingRef = useRef(false);
+  const [glReady, setGlReady] = useState(false);
   const [internalReady, setInternalReady] = useState(0);
 
   // Load preset image (skip for programmatic)
   useEffect(() => {
     const preset = allPresets.find((p) => p.id === selectedPreset);
-    if (!preset || preset.mode === "programmatic") {
-      setInternalReady((v) => v + 1);
-      return;
-    }
+    if (!preset || preset.mode === "programmatic") return;
 
     if (imageCacheRef.current.has(preset.src)) {
       setInternalReady((v) => v + 1);
@@ -301,7 +404,7 @@ function ShadowOverlay({
     img.src = preset.src;
   }, [selectedPreset, allPresets]);
 
-  // Init WebGL once
+  // Init WebGL + compile shader (once)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -322,21 +425,7 @@ function ShadowOverlay({
     );
     quadBufRef.current = quadBuf;
 
-    return () => {
-      if (depthTexRef.current) gl.deleteTexture(depthTexRef.current);
-      if (programRef.current) gl.deleteProgram(programRef.current);
-      if (quadBufRef.current) gl.deleteBuffer(quadBufRef.current);
-    };
-  }, []);
-
-  // Render
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const gl = glRef.current;
-    if (!canvas || !gl) return;
-
-    const RENDER_SCALE = 0.33;
-
+    // Compile shader (static source — done once)
     const vertexSource = `
       attribute vec2 aPosition;
       varying vec2 vTexCoord;
@@ -351,14 +440,14 @@ function ShadowOverlay({
       uniform sampler2D uDepthMap;
       uniform float uWidth;
       uniform float uHeight;
+      uniform float uDiskSize;
+      uniform float uMinSize;
+      uniform float uMaxSize;
       varying vec2 vTexCoord;
 
       const float pi = 3.14159265358979;
       const float goldenAngle = pi * (3.0 - sqrt(5.0));
-      const float diskSize = 80.0;
       const int diskSamples = 100;
-      const float minSize = 20.0;
-      const float maxSize = 300.0;
 
       vec3 rand(vec2 uv) {
         return vec3(
@@ -379,7 +468,7 @@ function ShadowOverlay({
         float sinA = sin(angle);
 
         for (int i = 1; i <= 100; i++) {
-          float r = diskSize * sqrt(float(i) / float(diskSamples));
+          float r = uDiskSize * sqrt(float(i) / float(diskSamples));
           float theta = float(i) * goldenAngle;
 
           vec2 offset = vec2(r * cos(theta), r * sin(theta));
@@ -392,10 +481,10 @@ function ShadowOverlay({
 
           if (samp.r > 0.0 && samp.g > 0.9) {
             float dist = length(offset);
-            float size = (samp.r * (maxSize - minSize)) + minSize;
+            float size = (samp.r * (uMaxSize - uMinSize)) + uMinSize;
 
             if (size / 2.0 >= dist) {
-              shadowInfluence += mix(8.0, 0.5, size / maxSize);
+              shadowInfluence += mix(8.0, 0.5, size / uMaxSize);
             }
           }
         }
@@ -423,7 +512,6 @@ function ShadowOverlay({
     const fs = compile(gl.FRAGMENT_SHADER, fragmentSource);
     if (!vs || !fs) return;
 
-    if (programRef.current) gl.deleteProgram(programRef.current);
     const program = gl.createProgram()!;
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
@@ -436,65 +524,147 @@ function ShadowOverlay({
     gl.deleteShader(vs);
     gl.deleteShader(fs);
 
-    const dpr = window.devicePixelRatio || 1;
-    const w = Math.round(window.innerWidth * RENDER_SCALE * dpr);
-    const h = Math.round(window.innerHeight * RENDER_SCALE * dpr);
-    canvas.width = w;
-    canvas.height = h;
-    gl.viewport(0, 0, w, h);
+    setGlReady(true);
 
-    // Generate depth map
+    return () => {
+      if (depthTexRef.current) gl.deleteTexture(depthTexRef.current);
+      if (programRef.current) gl.deleteProgram(programRef.current);
+      if (quadBufRef.current) gl.deleteBuffer(quadBufRef.current);
+    };
+  }, []);
+
+  // Render helper — uploads depth map texture + draws (no shader compilation)
+  // isProgrammatic: true → scaled params for 0.33x, false → full-size params for image mode
+  const renderDepthMap = useCallback(
+    (depthCanvas: HTMLCanvasElement, isProgrammatic: boolean = true) => {
+      const canvas = canvasRef.current;
+      const gl = glRef.current;
+      const program = programRef.current;
+      if (!canvas || !gl || !program) return;
+
+      const renderScale = 0.33;
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.round(window.innerWidth * renderScale * dpr);
+      const h = Math.round(window.innerHeight * renderScale * dpr);
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+
+      if (depthTexRef.current) gl.deleteTexture(depthTexRef.current);
+      const tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        depthCanvas
+      );
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      depthTexRef.current = tex;
+
+      gl.useProgram(program);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.uniform1i(gl.getUniformLocation(program, "uDepthMap"), 0);
+      gl.uniform1f(gl.getUniformLocation(program, "uWidth"), w);
+      gl.uniform1f(gl.getUniformLocation(program, "uHeight"), h);
+
+      // Scale pixel-space params for programmatic mode (depth map at 0.33x)
+      // Image mode uses full-size params (photos have larger features)
+      const s = isProgrammatic ? renderScale : 1.0;
+      gl.uniform1f(gl.getUniformLocation(program, "uDiskSize"), 80 * s);
+      gl.uniform1f(gl.getUniformLocation(program, "uMinSize"), 20 * s);
+      gl.uniform1f(gl.getUniformLocation(program, "uMaxSize"), 300 * s);
+
+      const aPos = gl.getAttribLocation(program, "aPosition");
+      gl.bindBuffer(gl.ARRAY_BUFFER, quadBufRef.current);
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    },
+    []
+  );
+
+  // Opening animation for programmatic mode (blinds closed → open)
+  useEffect(() => {
+    if (!glReady) return;
     const preset = allPresets.find((p) => p.id === selectedPreset);
-    let depthCanvas: HTMLCanvasElement;
+    if (!preset || preset.mode !== "programmatic") return;
 
-    if (!preset || preset.mode === "programmatic") {
-      depthCanvas = generateProgrammaticDepthMap(w, h);
-    } else {
-      const img = imageCacheRef.current.get(preset.src);
-      if (!img) return;
+    animatingRef.current = true;
+    const duration = 5000;
+    let startTime = 0;
+    let rafId: number;
 
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = w;
-      tempCanvas.height = h;
-      const tempCtx = tempCanvas.getContext("2d")!;
-      tempCtx.fillStyle = "rgb(0, 0, 0)";
-      tempCtx.fillRect(0, 0, w, h);
-      drawImageCover(tempCtx, img, w, h);
-      depthCanvas = processImageToDepthMap(tempCanvas, w, h, settings);
+    const animate = (now: number) => {
+      if (startTime === 0) startTime = now;
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / duration);
+      const progress = 1 - Math.pow(1 - t, 3); // ease-out cubic
+
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.round(window.innerWidth * 0.33 * dpr);
+      const h = Math.round(window.innerHeight * 0.33 * dpr);
+      renderDepthMap(generateProgrammaticDepthMap(w, h, progress), true);
+
+      if (t < 1) {
+        rafId = requestAnimationFrame(animate);
+      } else {
+        animatingRef.current = false;
+      }
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => {
+      cancelAnimationFrame(rafId);
+      animatingRef.current = false;
+    };
+  }, [glReady, selectedPreset, allPresets, renderDepthMap]);
+
+  // Static render for image presets + post-animation resize
+  useEffect(() => {
+    if (!glReady) return;
+    const preset = allPresets.find((p) => p.id === selectedPreset);
+    if (!preset) return;
+
+    if (preset.mode === "programmatic") {
+      if (animatingRef.current) return;
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.round(window.innerWidth * 0.33 * dpr);
+      const h = Math.round(window.innerHeight * 0.33 * dpr);
+      renderDepthMap(generateProgrammaticDepthMap(w, h, 1), true);
+      return;
     }
 
-    // Upload depth texture
-    if (depthTexRef.current) gl.deleteTexture(depthTexRef.current);
-    const tex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      depthCanvas
-    );
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    depthTexRef.current = tex;
+    const img = imageCacheRef.current.get(preset.src);
+    if (!img) return;
 
-    // Render
-    gl.useProgram(program);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.uniform1i(gl.getUniformLocation(program, "uDepthMap"), 0);
-    gl.uniform1f(gl.getUniformLocation(program, "uWidth"), w);
-    gl.uniform1f(gl.getUniformLocation(program, "uHeight"), h);
-
-    const aPos = gl.getAttribLocation(program, "aPosition");
-    gl.bindBuffer(gl.ARRAY_BUFFER, quadBufRef.current);
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  }, [selectedPreset, settings, imageReady, internalReady, allPresets]);
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.round(window.innerWidth * 0.33 * dpr);
+    const h = Math.round(window.innerHeight * 0.33 * dpr);
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = w;
+    tempCanvas.height = h;
+    const tempCtx = tempCanvas.getContext("2d")!;
+    tempCtx.fillStyle = "rgb(0, 0, 0)";
+    tempCtx.fillRect(0, 0, w, h);
+    drawImageCover(tempCtx, img, w, h);
+    const depthCanvas = processImageToDepthMap(tempCanvas, w, h, settings);
+    renderDepthMap(depthCanvas, false);
+  }, [
+    glReady,
+    selectedPreset,
+    settings,
+    imageReady,
+    internalReady,
+    allPresets,
+    renderDepthMap,
+  ]);
 
   // Handle resize
   useEffect(() => {
@@ -850,6 +1020,23 @@ export default function DaylightPage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [imageReady, setImageReady] = useState(0);
   const [customPresets, setCustomPresets] = useState<Preset[]>([]);
+  const [clockStr, setClockStr] = useState("");
+  const [sunAngle, setSunAngle] = useState(0);
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      setClockStr(
+        `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`
+      );
+      setSunAngle(Math.round(getSunAngle(h + m / 60)));
+    };
+    update();
+    const id = setInterval(update, 30000);
+    return () => clearInterval(id);
+  }, []);
 
   const allPresets = useMemo(
     () => [...PRESETS, ...customPresets],
@@ -915,6 +1102,11 @@ export default function DaylightPage() {
             penumbra
           </span>
           <div className="flex items-center gap-3">
+            {clockStr && (
+              <span className="tabular-nums text-[11px] tracking-wide text-[#8a8078]">
+                {clockStr} · {sunAngle}°
+              </span>
+            )}
             <button
               onClick={() => setSettingsOpen(true)}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-[#1a1815]/15 text-[#8a8078] transition-colors hover:border-[#1a1815]/30 hover:text-[#1a1815]"
