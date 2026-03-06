@@ -1,7 +1,7 @@
 export interface Pick {
   id: string;
   title: string;
-  group: "cvpr" | "iccv" | "eccv" | "other";
+  group: "cvpr" | "iccv" | "eccv" | "iclr" | "other";
   venue: string;
   year: number;
   paperUrl: string;
@@ -840,6 +840,182 @@ NeRF의 각 3D 포인트에 색상과 밀도뿐 아니라 **CLIP 언어 특징**
 ### 실용적 의미
 
 디지털 트윈에서는 보기 좋은 렌더링만으로는 부족하고 벽·바닥·가구의 **정확한 3D 메쉬**가 필요하다. Gaussian Surfels는 실시간 렌더링과 정밀 메쉬 추출을 동시에 달성해, 스캔 → 메쉬 → 디지털 트윈 변환 파이프라인에 실질적으로 유용하다.`,
+  },
+
+  // ─── ICLR ──────────────────────────────────────────
+  {
+    id: "depthsplat",
+    title: "DepthSplat: Connecting Gaussian Splatting and Depth",
+    group: "iclr",
+    venue: "ICLR 2026",
+    year: 2026,
+    paperUrl: "https://openreview.net/forum?id=IcPkW3QNW2",
+    codeUrl: "https://github.com/cvg/depthsplat",
+    tagKo: "3DGS + 깊이",
+    oneLineKo:
+      "깊이 추정과 3D Gaussian Splatting을 하나로 연결. 사전학습 깊이 특징으로 고품질 피드포워드 3DGS.",
+    summaryKo: `## DepthSplat: Connecting Gaussian Splatting and Depth
+
+### 핵심 아이디어
+
+기존 피드포워드 3DGS 방법들(pixelSplat 등)은 이미지 특징만으로 Gaussian을 예측했다. DepthSplat은 **사전학습된 단안 깊이 모델의 특징**(feature)을 3DGS 예측 파이프라인에 직접 통합하여, 깊이 추정과 뷰 합성을 하나로 연결한다.
+
+### 접근 방식
+
+- 사전학습된 깊이 모델(DPT 계열)의 중간 특징을 추출하여 3DGS 디코더에 조건으로 제공
+- 깊이 특징이 기하학적 사전지식 역할을 하여, 적은 뷰에서도 정확한 Gaussian 위치 예측 가능
+- 멀티뷰 깊이 추정도 동시에 수행 — 단안 깊이 사전지식 + 멀티뷰 일관성을 결합
+- 기존 피드포워드 방법 대비 특히 **적은 뷰(2~3장)**에서 큰 폭의 품질 향상
+
+### 실용적 의미
+
+실내 디지털 트윈에서 사진 2~3장만으로 빠르게 3D 프리뷰를 만드는 시나리오에 최적이다. 깊이 모델의 사전지식 덕분에 텍스처 부족 영역에서도 안정적인 3D 복원이 가능하다.`,
+  },
+  {
+    id: "gs-embedding",
+    title: "Learning Unified Representation of 3D Gaussian Splatting",
+    group: "iclr",
+    venue: "ICLR 2026",
+    year: 2026,
+    paperUrl: "https://openreview.net/forum?id=gs-embedding",
+    codeUrl: "https://github.com/cilix-ai/gs-embedding",
+    tagKo: "3DGS 표현",
+    oneLineKo:
+      "3DGS의 파라미터를 신경망이 이해할 수 있는 통일된 표현으로 변환하는 방법.",
+    summaryKo: `## Learning Unified Representation of 3D Gaussian Splatting
+
+### 핵심 아이디어
+
+3DGS는 위치, 공분산, 색상, 투명도 등 다양한 파라미터로 구성되지만, 이 원시 파라미터를 신경망에 직접 넣으면 잘 동작하지 않는다. 같은 장면을 다르게 매개변수화할 수 있는 **비고유성(non-uniqueness)** 문제 때문이다. 이 논문은 3DGS를 신경망이 학습하기 좋은 **통일된 특징 표현(SF embedding)**으로 변환하는 방법을 제안한다.
+
+### 왜 중요한가
+
+- 3DGS 장면을 신경망으로 처리하려면(분류, 편집, 생성 등) 좋은 입력 표현이 필요하다
+- 기존에는 3DGS를 2D 이미지로 렌더링한 후 처리했지만, 3D 정보가 손실된다
+- SF embedding은 3D 구조를 보존하면서도 신경망 친화적인 표현을 제공
+
+### 실용적 의미
+
+디지털 트윈에서 3DGS 장면을 AI 모델로 자동 분석(방 유형 분류, 가구 배치 이해 등)하거나, 여러 장면 간 비교·검색하는 후처리 태스크의 기반 기술이 될 수 있다.`,
+  },
+  {
+    id: "open-semantic-gs-slam",
+    title: "Open-Set Semantic Gaussian Splatting SLAM",
+    group: "iclr",
+    venue: "ICLR 2026",
+    year: 2026,
+    paperUrl: "https://openreview.net/forum?id=E68dgQUzrC",
+    tagKo: "시맨틱 SLAM",
+    oneLineKo:
+      "스마트폰으로 3D 스캔하면서 동시에 개방형 의미 분할. 새 물체도 즉시 인식.",
+    summaryKo: `## Open-Set Semantic Gaussian Splatting SLAM
+
+### 핵심 아이디어
+
+기존 GS-SLAM에 **개방형 의미 분할(open-set semantics)**을 추가한 시스템이다. 스마트폰으로 공간을 스캔하면서 동시에 각 Gaussian에 의미 정보를 부여하되, 사전 정의된 카테고리에 제한되지 않고 어떤 물체든 인식할 수 있다.
+
+### 접근 방식
+
+- **확장 가능한 시맨틱 풀(expandable semantic feature pool)**: 장면 수준의 의미 특징을 개별 Gaussian에서 분리하여 저장
+- 새로운 종류의 물체를 만나면 풀을 동적으로 확장 — 재학습 없이 즉시 대응
+- 메모리 효율이 높아 스마트폰에서도 동작 가능
+
+### LangSplat/LERF와의 차이
+
+LangSplat과 LERF는 사전에 완성된 3DGS/NeRF에 언어 특징을 입히는 방식이다. 이 논문은 **SLAM 과정에서 실시간으로** 의미 정보를 함께 구축한다. 스캔이 끝나면 3D 맵 + 의미 분할이 동시에 완성된다.
+
+### 실용적 의미
+
+실내 디지털 트윈에서 한 번의 스캔으로 "어디에 뭐가 있는지"까지 파악된 3D 맵을 만들 수 있다. 시설 관리, 자산 목록 작성, 공간 분석을 별도 후처리 없이 스캔 단계에서 해결한다.`,
+  },
+  {
+    id: "ddgs",
+    title: "Depth-and-Density Guided Gaussian Splatting for Robust 3D Reconstruction",
+    group: "iclr",
+    venue: "ICLR 2026",
+    year: 2026,
+    paperUrl: "https://openreview.net/pdf/e57c89fb5aa1551b4d2dfb8be435c2ea2a10c52d.pdf",
+    tagKo: "3DGS + 깊이",
+    oneLineKo:
+      "깊이 사전지식과 밀도 조절로 3DGS의 기하학적 정확도를 크게 향상.",
+    summaryKo: `## Depth-and-Density Guided Gaussian Splatting
+
+### 핵심 아이디어
+
+3DGS의 고질적 문제인 **기하학적 부정확성**(렌더링은 예쁜데 깊이/메쉬가 부정확한 현상)을 깊이 사전지식과 밀도 조절 전략으로 해결한다.
+
+### 접근 방식
+
+- **깊이 가이드**: 사전학습된 단안 깊이 모델의 예측을 활용하여 Gaussian이 올바른 깊이에 배치되도록 유도
+- **밀도 가이드**: Gaussian의 밀도(개수와 분포)를 장면 복잡도에 맞게 적응적으로 조절
+- 두 가이드가 함께 작동하여, 렌더링 품질을 유지하면서 기하학적 정확도를 끌어올림
+- GaussianRoom과 유사한 철학이지만 더 일반화된 프레임워크
+
+### 실용적 의미
+
+실내 디지털 트윈에서 3DGS의 장점(실시간 렌더링)을 유지하면서 메쉬 추출 품질까지 확보하는 최신 접근법이다. 텍스처가 부족한 실내 벽면이나 넓은 평면에서 특히 효과적이다.`,
+  },
+  {
+    id: "embodiedsplat",
+    title: "EmbodiedSplat: Online Feed-Forward Semantic 3DGS for Open-Vocabulary 3D Scene Understanding",
+    group: "cvpr",
+    venue: "CVPR 2026",
+    year: 2026,
+    paperUrl: "https://cvpr.thecvf.com/virtual/2026/papers.html",
+    tagKo: "시맨틱 3DGS",
+    oneLineKo:
+      "실시간 피드포워드로 의미 정보가 포함된 3DGS를 생성. 로봇/AR용 3D 이해.",
+    summaryKo: `## EmbodiedSplat: Online Feed-Forward Semantic 3DGS
+
+### 핵심 아이디어
+
+카메라 영상을 받으면서 **실시간으로** 의미 정보가 포함된 3D Gaussian Splatting 장면을 구축하는 피드포워드 모델이다. 기존의 per-scene 최적화 없이 즉시 동작한다.
+
+### 기존 방법과의 차이
+
+- **LangSplat/LERF**: 사전에 완성된 3DGS/NeRF에 언어 특징을 사후 추가 → 오프라인
+- **Open-Set Semantic GS-SLAM**: SLAM 과정에서 실시간 구축하지만 최적화 기반
+- **EmbodiedSplat**: 피드포워드(한 번의 순전파)로 즉시 시맨틱 3DGS 생성 → 가장 빠름
+
+### 개방형 어휘(Open-Vocabulary)
+
+사전 정의된 카테고리 없이 자연어로 3D 장면을 검색할 수 있다. CLIP 기반 언어 특징을 Gaussian에 내장하되, 피드포워드 방식으로 실시간 처리한다.
+
+### 실용적 의미
+
+실내 디지털 트윈에서 로봇이나 AR 기기가 **실시간으로 공간을 이해**하는 데 핵심이다. 방에 들어서는 즉시 "문", "창문", "소파" 등을 3D 공간에서 인식할 수 있어, 내비게이션이나 물체 조작에 바로 활용 가능하다.`,
+  },
+  {
+    id: "material-gs",
+    title: "Material-informed Gaussian Splatting for 3D World Reconstruction in a Digital Twin",
+    group: "other",
+    venue: "arXiv 2024 / CVPR 2026 Workshop",
+    year: 2024,
+    paperUrl: "https://arxiv.org/abs/2511.20348",
+    tagKo: "디지털 트윈",
+    oneLineKo:
+      "3DGS에 물리적 재질 정보를 추가하여 시뮬레이션 가능한 디지털 트윈 생성.",
+    summaryKo: `## Material-informed Gaussian Splatting for Digital Twin
+
+### 핵심 아이디어
+
+기존 3DGS는 시각적으로 사실적이지만 **물리적 재질 정보가 없다** — 벽이 콘크리트인지 나무인지, 바닥이 미끄러운지 알 수 없다. 이 논문은 3DGS 재구성에 **시맨틱 재질 분류**를 결합하여, 물리 시뮬레이션이 가능한 디지털 트윈을 만든다.
+
+### 파이프라인
+
+- 멀티뷰 사진에서 3DGS로 장면 재구성
+- 비전 모델로 각 영역의 **시맨틱 재질 마스크**(콘크리트, 목재, 유리, 금속 등)를 추출
+- Gaussian 표현을 메시로 변환하고 재질 라벨을 투영
+- 각 재질에 **물리 기반 속성**(마찰 계수, 반사율, 강성 등)을 할당
+- 결과: 그래픽 엔진이나 시뮬레이터에서 바로 사용 가능한 디지털 트윈
+
+### 왜 중요한가
+
+지금까지의 3DGS 연구는 "보기 좋은 3D"에 집중했지만, 진정한 디지털 트윈은 **물리적 상호작용이 가능**해야 한다. 이 논문은 시각적 복원과 물리 시뮬레이션 사이의 간극을 잇는 첫 걸음이다.
+
+### 실용적 의미
+
+실내 디지털 트윈의 **최종 목표**에 가장 가까운 연구이다. 방을 스캔한 후 가구를 밀어보거나, 물을 쏟았을 때 어떻게 퍼지는지 시뮬레이션하거나, 센서(LiDAR, 초음파 등)의 동작을 가상 환경에서 테스트할 수 있다.`,
   },
 
   // ─── Other ─────────────────────────────────────────

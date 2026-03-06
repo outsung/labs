@@ -29,12 +29,19 @@ const CONFERENCES = [
     year: 2024,
     filter: "default.search:ECCV 2024",
   },
+  {
+    id: "iclr",
+    name: "ICLR",
+    year: 2026,
+    filter: "default.search:ICLR 2026",
+  },
 ];
 
 const PICK_TABS: { id: Pick["group"]; label: string }[] = [
   { id: "cvpr", label: "CVPR" },
   { id: "iccv", label: "ICCV" },
   { id: "eccv", label: "ECCV" },
+  { id: "iclr", label: "ICLR" },
   { id: "other", label: "Etc" },
 ];
 
