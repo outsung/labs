@@ -88,7 +88,7 @@ export const clusters: Cluster[] = [
 export const tags: TagEntry[] = [
   {
     "tag": "react-native",
-    "count": 51
+    "count": 52
   },
   {
     "tag": "typescript",
@@ -96,15 +96,27 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "open-source",
-    "count": 25
+    "count": 28
   },
   {
     "tag": "react",
-    "count": 23
+    "count": 26
   },
   {
     "tag": "claude-code",
-    "count": 20
+    "count": 23
+  },
+  {
+    "tag": "threejs",
+    "count": 23
+  },
+  {
+    "tag": "animation",
+    "count": 19
+  },
+  {
+    "tag": "webgl",
+    "count": 18
   },
   {
     "tag": "expo",
@@ -115,12 +127,16 @@ export const tags: TagEntry[] = [
     "count": 15
   },
   {
-    "tag": "threejs",
+    "tag": "indie-game",
     "count": 15
   },
   {
+    "tag": "3d-reconstruction",
+    "count": 14
+  },
+  {
     "tag": "ai-agent",
-    "count": 13
+    "count": 14
   },
   {
     "tag": "rust",
@@ -131,19 +147,19 @@ export const tags: TagEntry[] = [
     "count": 13
   },
   {
-    "tag": "3d-reconstruction",
-    "count": 12
-  },
-  {
-    "tag": "webgl",
-    "count": 12
-  },
-  {
     "tag": "performance",
     "count": 12
   },
   {
-    "tag": "animation",
+    "tag": "prompt-engineering",
+    "count": 11
+  },
+  {
+    "tag": "blender",
+    "count": 11
+  },
+  {
+    "tag": "3d",
     "count": 10
   },
   {
@@ -151,11 +167,23 @@ export const tags: TagEntry[] = [
     "count": 10
   },
   {
+    "tag": "steam",
+    "count": 10
+  },
+  {
     "tag": "automation",
     "count": 9
   },
   {
-    "tag": "3d",
+    "tag": "openclaw",
+    "count": 9
+  },
+  {
+    "tag": "workflow",
+    "count": 9
+  },
+  {
+    "tag": "motion-design",
     "count": 9
   },
   {
@@ -163,7 +191,19 @@ export const tags: TagEntry[] = [
     "count": 9
   },
   {
+    "tag": "figma",
+    "count": 8
+  },
+  {
+    "tag": "vibe-coding",
+    "count": 8
+  },
+  {
     "tag": "ios",
+    "count": 8
+  },
+  {
+    "tag": "pixel-art",
     "count": 8
   },
   {
@@ -171,7 +211,7 @@ export const tags: TagEntry[] = [
     "count": 7
   },
   {
-    "tag": "openclaw",
+    "tag": "portfolio",
     "count": 7
   },
   {
@@ -179,15 +219,31 @@ export const tags: TagEntry[] = [
     "count": 7
   },
   {
+    "tag": "web-design",
+    "count": 7
+  },
+  {
     "tag": "multi-agent",
     "count": 7
   },
   {
-    "tag": "workflow",
+    "tag": "architecture",
+    "count": 7
+  },
+  {
+    "tag": "midjourney",
+    "count": 7
+  },
+  {
+    "tag": "ui-design",
     "count": 7
   },
   {
     "tag": "claude",
+    "count": 7
+  },
+  {
+    "tag": "ai-video",
     "count": 7
   },
   {
@@ -199,15 +255,19 @@ export const tags: TagEntry[] = [
     "count": 7
   },
   {
+    "tag": "cozy-game",
+    "count": 7
+  },
+  {
+    "tag": "interactive",
+    "count": 7
+  },
+  {
     "tag": "mcp",
     "count": 6
   },
   {
-    "tag": "web-design",
-    "count": 6
-  },
-  {
-    "tag": "midjourney",
+    "tag": "saas",
     "count": 6
   },
   {
@@ -215,11 +275,19 @@ export const tags: TagEntry[] = [
     "count": 6
   },
   {
-    "tag": "prompt-engineering",
+    "tag": "ai-art",
     "count": 6
   },
   {
-    "tag": "indie-game",
+    "tag": "generative-ai",
+    "count": 6
+  },
+  {
+    "tag": "developer-tools",
+    "count": 6
+  },
+  {
+    "tag": "ai-agents",
     "count": 6
   },
   {
@@ -227,7 +295,11 @@ export const tags: TagEntry[] = [
     "count": 6
   },
   {
-    "tag": "portfolio",
+    "tag": "self-hosted",
+    "count": 5
+  },
+  {
+    "tag": "slam",
     "count": 5
   },
   {
@@ -239,15 +311,27 @@ export const tags: TagEntry[] = [
     "count": 5
   },
   {
-    "tag": "saas",
+    "tag": "microsoft",
     "count": 5
   },
   {
-    "tag": "vibe-coding",
+    "tag": "tutorial",
     "count": 5
   },
   {
-    "tag": "pixel-art",
+    "tag": "typography",
+    "count": 5
+  },
+  {
+    "tag": "branding",
+    "count": 5
+  },
+  {
+    "tag": "vfx",
+    "count": 5
+  },
+  {
+    "tag": "seedance",
     "count": 5
   },
   {
@@ -255,15 +339,15 @@ export const tags: TagEntry[] = [
     "count": 5
   },
   {
-    "tag": "generative-ai",
+    "tag": "tamagotchi",
     "count": 5
   },
   {
-    "tag": "developer-tools",
+    "tag": "simulation",
     "count": 5
   },
   {
-    "tag": "blender",
+    "tag": "reference",
     "count": 5
   },
   {
@@ -271,15 +355,31 @@ export const tags: TagEntry[] = [
     "count": 5
   },
   {
+    "tag": "framer",
+    "count": 5
+  },
+  {
+    "tag": "layout",
+    "count": 5
+  },
+  {
+    "tag": "nintendo-switch",
+    "count": 5
+  },
+  {
     "tag": "mobile",
     "count": 5
   },
   {
-    "tag": "slam",
+    "tag": "r3f",
+    "count": 5
+  },
+  {
+    "tag": "interior-design",
     "count": 4
   },
   {
-    "tag": "figma",
+    "tag": "hero-section",
     "count": 4
   },
   {
@@ -287,7 +387,11 @@ export const tags: TagEntry[] = [
     "count": 4
   },
   {
-    "tag": "microsoft",
+    "tag": "visual-design",
+    "count": 4
+  },
+  {
+    "tag": "nano-banana",
     "count": 4
   },
   {
@@ -303,7 +407,15 @@ export const tags: TagEntry[] = [
     "count": 4
   },
   {
+    "tag": "3d-modeling",
+    "count": 4
+  },
+  {
     "tag": "api",
+    "count": 4
+  },
+  {
+    "tag": "gemini",
     "count": 4
   },
   {
@@ -311,7 +423,7 @@ export const tags: TagEntry[] = [
     "count": 4
   },
   {
-    "tag": "ui-design",
+    "tag": "nvidia",
     "count": 4
   },
   {
@@ -320,6 +432,10 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "no-code",
+    "count": 4
+  },
+  {
+    "tag": "google",
     "count": 4
   },
   {
@@ -332,6 +448,14 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "agentic-ai",
+    "count": 4
+  },
+  {
+    "tag": "community",
+    "count": 4
+  },
+  {
+    "tag": "illustration",
     "count": 4
   },
   {
@@ -359,19 +483,15 @@ export const tags: TagEntry[] = [
     "count": 4
   },
   {
-    "tag": "tamagotchi",
-    "count": 4
-  },
-  {
     "tag": "robotics",
     "count": 4
   },
   {
-    "tag": "simulation",
+    "tag": "unity",
     "count": 4
   },
   {
-    "tag": "self-hosted",
+    "tag": "transformer",
     "count": 4
   },
   {
@@ -379,7 +499,7 @@ export const tags: TagEntry[] = [
     "count": 4
   },
   {
-    "tag": "ai-agents",
+    "tag": "react-three-fiber",
     "count": 4
   },
   {
@@ -415,7 +535,7 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
-    "tag": "hero-section",
+    "tag": "character-animation",
     "count": 3
   },
   {
@@ -423,23 +543,19 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
+    "tag": "inspiration",
+    "count": 3
+  },
+  {
     "tag": "ui-generation",
     "count": 3
   },
   {
-    "tag": "tutorial",
+    "tag": "kling",
     "count": 3
   },
   {
-    "tag": "architecture",
-    "count": 3
-  },
-  {
-    "tag": "3d-modeling",
-    "count": 3
-  },
-  {
-    "tag": "motion-design",
+    "tag": "app-design",
     "count": 3
   },
   {
@@ -455,7 +571,7 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
-    "tag": "nvidia",
+    "tag": "digital-art",
     "count": 3
   },
   {
@@ -463,15 +579,7 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
-    "tag": "ai-art",
-    "count": 3
-  },
-  {
-    "tag": "google",
-    "count": 3
-  },
-  {
-    "tag": "vfx",
+    "tag": "fullstack",
     "count": 3
   },
   {
@@ -479,7 +587,19 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
-    "tag": "seedance",
+    "tag": "3d-art",
+    "count": 3
+  },
+  {
+    "tag": "character-design",
+    "count": 3
+  },
+  {
+    "tag": "sprite",
+    "count": 3
+  },
+  {
+    "tag": "game-art",
     "count": 3
   },
   {
@@ -487,7 +607,31 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
+    "tag": "benchmark",
+    "count": 3
+  },
+  {
+    "tag": "artwork",
+    "count": 3
+  },
+  {
+    "tag": "real-estate",
+    "count": 3
+  },
+  {
+    "tag": "glsl",
+    "count": 3
+  },
+  {
+    "tag": "poster",
+    "count": 3
+  },
+  {
     "tag": "droid-slam",
+    "count": 3
+  },
+  {
+    "tag": "world-generation",
     "count": 3
   },
   {
@@ -503,7 +647,15 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
+    "tag": "video-generation",
+    "count": 3
+  },
+  {
     "tag": "test-time-training",
+    "count": 3
+  },
+  {
+    "tag": "autoregressive",
     "count": 3
   },
   {
@@ -535,11 +687,19 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
-    "tag": "interactive",
+    "tag": "monocular",
     "count": 3
   },
   {
-    "tag": "unity",
+    "tag": "indie",
+    "count": 3
+  },
+  {
+    "tag": "shadcn",
+    "count": 3
+  },
+  {
+    "tag": "starter-kit",
     "count": 3
   },
   {
@@ -547,7 +707,39 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
-    "tag": "transformer",
+    "tag": "co-op",
+    "count": 3
+  },
+  {
+    "tag": "svg",
+    "count": 3
+  },
+  {
+    "tag": "3d-web",
+    "count": 3
+  },
+  {
+    "tag": "ai-coding",
+    "count": 3
+  },
+  {
+    "tag": "motion",
+    "count": 3
+  },
+  {
+    "tag": "twitter-post",
+    "count": 3
+  },
+  {
+    "tag": "aesthetic",
+    "count": 3
+  },
+  {
+    "tag": "component-library",
+    "count": 3
+  },
+  {
+    "tag": "retro",
     "count": 3
   },
   {
@@ -564,6 +756,10 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "virtualization",
+    "count": 3
+  },
+  {
+    "tag": "mobile-ui",
     "count": 3
   },
   {
@@ -591,23 +787,15 @@ export const tags: TagEntry[] = [
     "count": 3
   },
   {
+    "tag": "iot",
+    "count": 2
+  },
+  {
     "tag": "image-processing",
     "count": 2
   },
   {
-    "tag": "character-animation",
-    "count": 2
-  },
-  {
-    "tag": "visual-design",
-    "count": 2
-  },
-  {
-    "tag": "inspiration",
-    "count": 2
-  },
-  {
-    "tag": "nano-banana",
+    "tag": "unreal-engine",
     "count": 2
   },
   {
@@ -619,15 +807,11 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
+    "tag": "mobile-dev",
+    "count": 2
+  },
+  {
     "tag": "google-stitch",
-    "count": 2
-  },
-  {
-    "tag": "typography",
-    "count": 2
-  },
-  {
-    "tag": "app-design",
     "count": 2
   },
   {
@@ -647,7 +831,7 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "gemini",
+    "tag": "google-ai-studio",
     "count": 2
   },
   {
@@ -660,10 +844,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "agent-patterns",
-    "count": 2
-  },
-  {
-    "tag": "branding",
     "count": 2
   },
   {
@@ -691,10 +871,6 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "fullstack",
-    "count": 2
-  },
-  {
     "tag": "devops",
     "count": 2
   },
@@ -719,7 +895,7 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "community",
+    "tag": "2d-to-3d",
     "count": 2
   },
   {
@@ -731,11 +907,11 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "niji7",
+    "tag": "reply",
     "count": 2
   },
   {
-    "tag": "character-design",
+    "tag": "niji7",
     "count": 2
   },
   {
@@ -759,15 +935,15 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "sprite",
-    "count": 2
-  },
-  {
-    "tag": "game-art",
-    "count": 2
-  },
-  {
     "tag": "stripe",
+    "count": 2
+  },
+  {
+    "tag": "higgsfield",
+    "count": 2
+  },
+  {
+    "tag": "motion-graphics",
     "count": 2
   },
   {
@@ -783,15 +959,39 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "real-estate",
+    "tag": "rag",
     "count": 2
   },
   {
-    "tag": "ai-video",
+    "tag": "meta",
     "count": 2
   },
   {
-    "tag": "glsl",
+    "tag": "openai",
+    "count": 2
+  },
+  {
+    "tag": "huggingface",
+    "count": 2
+  },
+  {
+    "tag": "demo",
+    "count": 2
+  },
+  {
+    "tag": "character-rigging",
+    "count": 2
+  },
+  {
+    "tag": "3d-render",
+    "count": 2
+  },
+  {
+    "tag": "philosophy",
+    "count": 2
+  },
+  {
+    "tag": "identity",
     "count": 2
   },
   {
@@ -804,10 +1004,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "3d-gaussian",
-    "count": 2
-  },
-  {
-    "tag": "world-generation",
     "count": 2
   },
   {
@@ -843,7 +1039,7 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "video-generation",
+    "tag": "curation",
     "count": 2
   },
   {
@@ -859,19 +1055,11 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "autoregressive",
-    "count": 2
-  },
-  {
     "tag": "3d-scene",
     "count": 2
   },
   {
     "tag": "korean",
-    "count": 2
-  },
-  {
-    "tag": "cozy-game",
     "count": 2
   },
   {
@@ -895,15 +1083,19 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
+    "tag": "world-labs",
+    "count": 2
+  },
+  {
+    "tag": "free-assets",
+    "count": 2
+  },
+  {
     "tag": "video-to-3d",
     "count": 2
   },
   {
     "tag": "vlm",
-    "count": 2
-  },
-  {
-    "tag": "benchmark",
     "count": 2
   },
   {
@@ -919,7 +1111,7 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "monocular",
+    "tag": "physics",
     "count": 2
   },
   {
@@ -931,11 +1123,11 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "reference",
+    "tag": "pose-estimation",
     "count": 2
   },
   {
-    "tag": "pose-estimation",
+    "tag": "marketing",
     "count": 2
   },
   {
@@ -943,11 +1135,7 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "shadcn",
-    "count": 2
-  },
-  {
-    "tag": "starter-kit",
+    "tag": "storytelling",
     "count": 2
   },
   {
@@ -959,11 +1147,31 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
+    "tag": "fantasy",
+    "count": 2
+  },
+  {
+    "tag": "japanese-localization",
+    "count": 2
+  },
+  {
+    "tag": "screenshot",
+    "count": 2
+  },
+  {
+    "tag": "nintendo",
+    "count": 2
+  },
+  {
     "tag": "shader",
     "count": 2
   },
   {
-    "tag": "svg",
+    "tag": "generative",
+    "count": 2
+  },
+  {
+    "tag": "freepik",
     "count": 2
   },
   {
@@ -971,11 +1179,95 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
+    "tag": "cleaning-sim",
+    "count": 2
+  },
+  {
+    "tag": "gaussian-splat",
+    "count": 2
+  },
+  {
+    "tag": "apple-ml",
+    "count": 2
+  },
+  {
+    "tag": "depth-map",
+    "count": 2
+  },
+  {
+    "tag": "webxr",
+    "count": 2
+  },
+  {
+    "tag": "visual",
+    "count": 2
+  },
+  {
+    "tag": "art",
+    "count": 2
+  },
+  {
+    "tag": "3d-graphics",
+    "count": 2
+  },
+  {
+    "tag": "meme",
+    "count": 2
+  },
+  {
+    "tag": "framer-motion",
+    "count": 2
+  },
+  {
+    "tag": "ai-image",
+    "count": 2
+  },
+  {
+    "tag": "interactive-website",
+    "count": 2
+  },
+  {
+    "tag": "template",
+    "count": 2
+  },
+  {
     "tag": "neural-rendering",
     "count": 2
   },
   {
+    "tag": "dynamic-scene",
+    "count": 2
+  },
+  {
+    "tag": "tradingview",
+    "count": 2
+  },
+  {
     "tag": "crypto",
+    "count": 2
+  },
+  {
+    "tag": "sdk",
+    "count": 2
+  },
+  {
+    "tag": "canvas",
+    "count": 2
+  },
+  {
+    "tag": "audio",
+    "count": 2
+  },
+  {
+    "tag": "ui-ux",
+    "count": 2
+  },
+  {
+    "tag": "graphic-design",
+    "count": 2
+  },
+  {
+    "tag": "adobe",
     "count": 2
   },
   {
@@ -999,7 +1291,15 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
+    "tag": "vercel",
+    "count": 2
+  },
+  {
     "tag": "disk-cleanup",
+    "count": 2
+  },
+  {
+    "tag": "isometric",
     "count": 2
   },
   {
@@ -1103,15 +1403,7 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "mobile-ui",
-    "count": 2
-  },
-  {
     "tag": "analytics",
-    "count": 2
-  },
-  {
-    "tag": "component-library",
     "count": 2
   },
   {
@@ -1143,10 +1435,6 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "motion",
-    "count": 2
-  },
-  {
     "tag": "graphql",
     "count": 2
   },
@@ -1164,6 +1452,10 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "pdf",
+    "count": 2
+  },
+  {
+    "tag": "shopify",
     "count": 2
   },
   {
@@ -1219,8 +1511,28 @@ export const tags: TagEntry[] = [
     "count": 2
   },
   {
-    "tag": "react-three-fiber",
-    "count": 2
+    "tag": "3d-from-2d",
+    "count": 1
+  },
+  {
+    "tag": "furniture-rearrangement",
+    "count": 1
+  },
+  {
+    "tag": "neural-scene",
+    "count": 1
+  },
+  {
+    "tag": "home-assistant",
+    "count": 1
+  },
+  {
+    "tag": "the-sims",
+    "count": 1
+  },
+  {
+    "tag": "simulation-game",
+    "count": 1
   },
   {
     "tag": "language-embedding",
@@ -1264,10 +1576,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "hand-pose",
-    "count": 1
-  },
-  {
-    "tag": "unreal-engine",
     "count": 1
   },
   {
@@ -1367,10 +1675,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "mobile-dev",
-    "count": 1
-  },
-  {
     "tag": "no-designer",
     "count": 1
   },
@@ -1384,10 +1688,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "image-model",
-    "count": 1
-  },
-  {
-    "tag": "kling",
     "count": 1
   },
   {
@@ -1439,10 +1739,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "google-ai-studio",
-    "count": 1
-  },
-  {
     "tag": "free-credits",
     "count": 1
   },
@@ -1480,10 +1776,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "madmapper",
-    "count": 1
-  },
-  {
-    "tag": "digital-art",
     "count": 1
   },
   {
@@ -1863,10 +2155,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "3d-art",
-    "count": 1
-  },
-  {
     "tag": "coloso",
     "count": 1
   },
@@ -1895,10 +2183,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "2d-to-3d",
-    "count": 1
-  },
-  {
     "tag": "creative-workflow",
     "count": 1
   },
@@ -1924,10 +2208,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "prompt-to-diagram",
-    "count": 1
-  },
-  {
-    "tag": "reply",
     "count": 1
   },
   {
@@ -2135,14 +2415,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "higgsfield",
-    "count": 1
-  },
-  {
-    "tag": "motion-graphics",
-    "count": 1
-  },
-  {
     "tag": "hero-animation",
     "count": 1
   },
@@ -2187,6 +2459,98 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "supermemory",
+    "count": 1
+  },
+  {
+    "tag": "longmemeval",
+    "count": 1
+  },
+  {
+    "tag": "layered-generation",
+    "count": 1
+  },
+  {
+    "tag": "bubble-flow",
+    "count": 1
+  },
+  {
+    "tag": "visual-effect",
+    "count": 1
+  },
+  {
+    "tag": "hand-rig",
+    "count": 1
+  },
+  {
+    "tag": "3d-artist",
+    "count": 1
+  },
+  {
+    "tag": "wabi-sabi",
+    "count": 1
+  },
+  {
+    "tag": "imperfection",
+    "count": 1
+  },
+  {
+    "tag": "japanese-aesthetics",
+    "count": 1
+  },
+  {
+    "tag": "weekly-inspiration",
+    "count": 1
+  },
+  {
+    "tag": "embergen",
+    "count": 1
+  },
+  {
+    "tag": "smoke-simulation",
+    "count": 1
+  },
+  {
+    "tag": "daily-sketch",
+    "count": 1
+  },
+  {
+    "tag": "popular-work",
+    "count": 1
+  },
+  {
+    "tag": "creative-showcase",
+    "count": 1
+  },
+  {
+    "tag": "memo",
+    "count": 1
+  },
+  {
+    "tag": "daily-thoughts",
+    "count": 1
+  },
+  {
+    "tag": "reflection",
+    "count": 1
+  },
+  {
+    "tag": "communication",
+    "count": 1
+  },
+  {
+    "tag": "knowledge-gap",
+    "count": 1
+  },
+  {
+    "tag": "self-awareness",
+    "count": 1
+  },
+  {
+    "tag": "privacy",
+    "count": 1
+  },
+  {
     "tag": "meta-quest",
     "count": 1
   },
@@ -2204,10 +2568,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "cartography",
-    "count": 1
-  },
-  {
-    "tag": "poster",
     "count": 1
   },
   {
@@ -2244,10 +2604,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "3d-model-generation",
-    "count": 1
-  },
-  {
-    "tag": "interior-design",
     "count": 1
   },
   {
@@ -2491,19 +2847,11 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "iot",
-    "count": 1
-  },
-  {
     "tag": "ui-collection",
     "count": 1
   },
   {
     "tag": "design-inspiration",
-    "count": 1
-  },
-  {
-    "tag": "curation",
     "count": 1
   },
   {
@@ -2691,10 +3039,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "world-labs",
-    "count": 1
-  },
-  {
     "tag": "alphaxiv",
     "count": 1
   },
@@ -2720,10 +3064,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "paper",
-    "count": 1
-  },
-  {
-    "tag": "free-assets",
     "count": 1
   },
   {
@@ -2955,10 +3295,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "physics",
-    "count": 1
-  },
-  {
     "tag": "bezier-surface",
     "count": 1
   },
@@ -2999,15 +3335,7 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "marketing",
-    "count": 1
-  },
-  {
     "tag": "steam-wishlist",
-    "count": 1
-  },
-  {
-    "tag": "indie",
     "count": 1
   },
   {
@@ -3028,10 +3356,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "video-editing",
-    "count": 1
-  },
-  {
-    "tag": "storytelling",
     "count": 1
   },
   {
@@ -3083,10 +3407,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "framer",
-    "count": 1
-  },
-  {
     "tag": "page-transition",
     "count": 1
   },
@@ -3112,10 +3432,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "occluded-geometry",
-    "count": 1
-  },
-  {
-    "tag": "huggingface",
     "count": 1
   },
   {
@@ -3199,15 +3515,7 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "fantasy",
-    "count": 1
-  },
-  {
     "tag": "shop-sim",
-    "count": 1
-  },
-  {
-    "tag": "japanese-localization",
     "count": 1
   },
   {
@@ -3220,6 +3528,10 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "spatial-ai",
+    "count": 1
+  },
+  {
+    "tag": "factory-sim",
     "count": 1
   },
   {
@@ -3251,6 +3563,14 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "restaurant-sim",
+    "count": 1
+  },
+  {
+    "tag": "casual-game",
+    "count": 1
+  },
+  {
     "tag": "session-management",
     "count": 1
   },
@@ -3260,6 +3580,30 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "readout",
+    "count": 1
+  },
+  {
+    "tag": "app-store",
+    "count": 1
+  },
+  {
+    "tag": "sharing",
+    "count": 1
+  },
+  {
+    "tag": "product-tool",
+    "count": 1
+  },
+  {
+    "tag": "pikmin",
+    "count": 1
+  },
+  {
+    "tag": "collectible",
+    "count": 1
+  },
+  {
+    "tag": "light-onion",
     "count": 1
   },
   {
@@ -3295,11 +3639,79 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "ai-anime",
+    "count": 1
+  },
+  {
+    "tag": "orange",
+    "count": 1
+  },
+  {
+    "tag": "whitespace",
+    "count": 1
+  },
+  {
     "tag": "lottie",
     "count": 1
   },
   {
     "tag": "vector-animation",
+    "count": 1
+  },
+  {
+    "tag": "vibecoding",
+    "count": 1
+  },
+  {
+    "tag": "screen-recorder",
+    "count": 1
+  },
+  {
+    "tag": "custom-tools",
+    "count": 1
+  },
+  {
+    "tag": "dot-graphics",
+    "count": 1
+  },
+  {
+    "tag": "rural-life",
+    "count": 1
+  },
+  {
+    "tag": "toem",
+    "count": 1
+  },
+  {
+    "tag": "photography-game",
+    "count": 1
+  },
+  {
+    "tag": "3d-generation",
+    "count": 1
+  },
+  {
+    "tag": "house-design",
+    "count": 1
+  },
+  {
+    "tag": "floorplan",
+    "count": 1
+  },
+  {
+    "tag": "ai-tool",
+    "count": 1
+  },
+  {
+    "tag": "slow-life",
+    "count": 1
+  },
+  {
+    "tag": "japanese-countryside",
+    "count": 1
+  },
+  {
+    "tag": "switch-2",
     "count": 1
   },
   {
@@ -3312,6 +3724,58 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "metric-scale",
+    "count": 1
+  },
+  {
+    "tag": "ai-generation",
+    "count": 1
+  },
+  {
+    "tag": "iteration",
+    "count": 1
+  },
+  {
+    "tag": "embeddable",
+    "count": 1
+  },
+  {
+    "tag": "workflow-sharing",
+    "count": 1
+  },
+  {
+    "tag": "ip-theft",
+    "count": 1
+  },
+  {
+    "tag": "management",
+    "count": 1
+  },
+  {
+    "tag": "quirky",
+    "count": 1
+  },
+  {
+    "tag": "sfx",
+    "count": 1
+  },
+  {
+    "tag": "vfx-breakdown",
+    "count": 1
+  },
+  {
+    "tag": "effects",
+    "count": 1
+  },
+  {
+    "tag": "grid-snapping",
+    "count": 1
+  },
+  {
+    "tag": "factory-building",
+    "count": 1
+  },
+  {
+    "tag": "production-line",
     "count": 1
   },
   {
@@ -3331,7 +3795,235 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "party-game",
+    "count": 1
+  },
+  {
+    "tag": "sharp",
+    "count": 1
+  },
+  {
+    "tag": "3d-particle",
+    "count": 1
+  },
+  {
+    "tag": "quest3",
+    "count": 1
+  },
+  {
+    "tag": "spatial-video",
+    "count": 1
+  },
+  {
     "tag": "text-to-3d",
+    "count": 1
+  },
+  {
+    "tag": "game-menu",
+    "count": 1
+  },
+  {
+    "tag": "interactive-ui",
+    "count": 1
+  },
+  {
+    "tag": "game-dev",
+    "count": 1
+  },
+  {
+    "tag": "interior-ai",
+    "count": 1
+  },
+  {
+    "tag": "3d-viewer",
+    "count": 1
+  },
+  {
+    "tag": "room-decoration",
+    "count": 1
+  },
+  {
+    "tag": "life-sim",
+    "count": 1
+  },
+  {
+    "tag": "cooking",
+    "count": 1
+  },
+  {
+    "tag": "cute",
+    "count": 1
+  },
+  {
+    "tag": "hamster",
+    "count": 1
+  },
+  {
+    "tag": "wireframe",
+    "count": 1
+  },
+  {
+    "tag": "web-development",
+    "count": 1
+  },
+  {
+    "tag": "three-js",
+    "count": 1
+  },
+  {
+    "tag": "papercraft",
+    "count": 1
+  },
+  {
+    "tag": "interface-design",
+    "count": 1
+  },
+  {
+    "tag": "clean-ui",
+    "count": 1
+  },
+  {
+    "tag": "property",
+    "count": 1
+  },
+  {
+    "tag": "shitpost",
+    "count": 1
+  },
+  {
+    "tag": "casual",
+    "count": 1
+  },
+  {
+    "tag": "satisfying",
+    "count": 1
+  },
+  {
+    "tag": "signature",
+    "count": 1
+  },
+  {
+    "tag": "path-animation",
+    "count": 1
+  },
+  {
+    "tag": "prompt",
+    "count": 1
+  },
+  {
+    "tag": "handwriting",
+    "count": 1
+  },
+  {
+    "tag": "svg-animation",
+    "count": 1
+  },
+  {
+    "tag": "stroke-animation",
+    "count": 1
+  },
+  {
+    "tag": "folding-ui",
+    "count": 1
+  },
+  {
+    "tag": "product-design",
+    "count": 1
+  },
+  {
+    "tag": "water-rendering",
+    "count": 1
+  },
+  {
+    "tag": "physics-simulation",
+    "count": 1
+  },
+  {
+    "tag": "driving-game",
+    "count": 1
+  },
+  {
+    "tag": "stylized-graphics",
+    "count": 1
+  },
+  {
+    "tag": "packing-simulation",
+    "count": 1
+  },
+  {
+    "tag": "work-simulator",
+    "count": 1
+  },
+  {
+    "tag": "logo-carousel",
+    "count": 1
+  },
+  {
+    "tag": "react-components",
+    "count": 1
+  },
+  {
+    "tag": "portland",
+    "count": 1
+  },
+  {
+    "tag": "tokyo",
+    "count": 1
+  },
+  {
+    "tag": "city-design",
+    "count": 1
+  },
+  {
+    "tag": "visual-comparison",
+    "count": 1
+  },
+  {
+    "tag": "apple-sharp",
+    "count": 1
+  },
+  {
+    "tag": "gpgpu",
+    "count": 1
+  },
+  {
+    "tag": "particle-flow",
+    "count": 1
+  },
+  {
+    "tag": "footer",
+    "count": 1
+  },
+  {
+    "tag": "ui-detail",
+    "count": 1
+  },
+  {
+    "tag": "intentional-design",
+    "count": 1
+  },
+  {
+    "tag": "developer-portfolio",
+    "count": 1
+  },
+  {
+    "tag": "floor-plan",
+    "count": 1
+  },
+  {
+    "tag": "3d-tour",
+    "count": 1
+  },
+  {
+    "tag": "2d-assets",
+    "count": 1
+  },
+  {
+    "tag": "freebie",
+    "count": 1
+  },
+  {
+    "tag": "buildbox",
     "count": 1
   },
   {
@@ -3351,15 +4043,111 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "unknown",
+    "count": 1
+  },
+  {
+    "tag": "structure",
+    "count": 1
+  },
+  {
+    "tag": "gvs",
+    "count": 1
+  },
+  {
+    "tag": "vestibular",
+    "count": 1
+  },
+  {
+    "tag": "neurostimulation",
+    "count": 1
+  },
+  {
+    "tag": "diy-device",
+    "count": 1
+  },
+  {
+    "tag": "arc-systems",
+    "count": 1
+  },
+  {
+    "tag": "hagia-sophia",
+    "count": 1
+  },
+  {
+    "tag": "real-time-voice",
+    "count": 1
+  },
+  {
+    "tag": "3d-conversational",
+    "count": 1
+  },
+  {
     "tag": "neural-ode",
     "count": 1
   },
   {
-    "tag": "dynamic-scene",
+    "tag": "scalable",
     "count": 1
   },
   {
-    "tag": "scalable",
+    "tag": "keshi",
+    "count": 1
+  },
+  {
+    "tag": "artist",
+    "count": 1
+  },
+  {
+    "tag": "point-and-click",
+    "count": 1
+  },
+  {
+    "tag": "2.5d",
+    "count": 1
+  },
+  {
+    "tag": "token-pruning",
+    "count": 1
+  },
+  {
+    "tag": "long-video",
+    "count": 1
+  },
+  {
+    "tag": "inference-optimization",
+    "count": 1
+  },
+  {
+    "tag": "factory",
+    "count": 1
+  },
+  {
+    "tag": "design-work",
+    "count": 1
+  },
+  {
+    "tag": "visual-identity",
+    "count": 1
+  },
+  {
+    "tag": "animal-breeding",
+    "count": 1
+  },
+  {
+    "tag": "farming-sim",
+    "count": 1
+  },
+  {
+    "tag": "pixel-vault",
+    "count": 1
+  },
+  {
+    "tag": "idea-inspiration",
+    "count": 1
+  },
+  {
+    "tag": "chart-analysis",
     "count": 1
   },
   {
@@ -3368,10 +4156,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "golf",
-    "count": 1
-  },
-  {
-    "tag": "tradingview",
     "count": 1
   },
   {
@@ -3387,6 +4171,78 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "soul-md",
+    "count": 1
+  },
+  {
+    "tag": "personality",
+    "count": 1
+  },
+  {
+    "tag": "infinite-terrain",
+    "count": 1
+  },
+  {
+    "tag": "tree-streaming",
+    "count": 1
+  },
+  {
+    "tag": "wind-effects",
+    "count": 1
+  },
+  {
+    "tag": "3d-world",
+    "count": 1
+  },
+  {
+    "tag": "pixel-font",
+    "count": 1
+  },
+  {
+    "tag": "poster-design",
+    "count": 1
+  },
+  {
+    "tag": "textures",
+    "count": 1
+  },
+  {
+    "tag": "free-resources",
+    "count": 1
+  },
+  {
+    "tag": "design-assets",
+    "count": 1
+  },
+  {
+    "tag": "tldraw",
+    "count": 1
+  },
+  {
+    "tag": "video-production",
+    "count": 1
+  },
+  {
+    "tag": "breakdown",
+    "count": 1
+  },
+  {
+    "tag": "photography",
+    "count": 1
+  },
+  {
+    "tag": "fruit",
+    "count": 1
+  },
+  {
+    "tag": "prompting-guide",
+    "count": 1
+  },
+  {
+    "tag": "multi-shot",
+    "count": 1
+  },
+  {
     "tag": "digital-finance",
     "count": 1
   },
@@ -3395,23 +4251,91 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "depth-map",
-    "count": 1
-  },
-  {
-    "tag": "apple-ml",
-    "count": 1
-  },
-  {
-    "tag": "ui-ux",
-    "count": 1
-  },
-  {
     "tag": "ai-skill",
     "count": 1
   },
   {
     "tag": "design-intelligence",
+    "count": 1
+  },
+  {
+    "tag": "claude-ai",
+    "count": 1
+  },
+  {
+    "tag": "cavalry",
+    "count": 1
+  },
+  {
+    "tag": "retro-gaming",
+    "count": 1
+  },
+  {
+    "tag": "prompting",
+    "count": 1
+  },
+  {
+    "tag": "comfyui",
+    "count": 1
+  },
+  {
+    "tag": "flipbook",
+    "count": 1
+  },
+  {
+    "tag": "texture-generation",
+    "count": 1
+  },
+  {
+    "tag": "ai-workflow",
+    "count": 1
+  },
+  {
+    "tag": "disney",
+    "count": 1
+  },
+  {
+    "tag": "fonts",
+    "count": 1
+  },
+  {
+    "tag": "design-resource",
+    "count": 1
+  },
+  {
+    "tag": "open-world",
+    "count": 1
+  },
+  {
+    "tag": "horse-riding",
+    "count": 1
+  },
+  {
+    "tag": "industrial-design",
+    "count": 1
+  },
+  {
+    "tag": "concept-sketch",
+    "count": 1
+  },
+  {
+    "tag": "market-cap",
+    "count": 1
+  },
+  {
+    "tag": "ai-disruption",
+    "count": 1
+  },
+  {
+    "tag": "banner",
+    "count": 1
+  },
+  {
+    "tag": "cursor",
+    "count": 1
+  },
+  {
+    "tag": "icon-library",
     "count": 1
   },
   {
@@ -3447,10 +4371,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "sdk",
-    "count": 1
-  },
-  {
     "tag": "cloudflare-workers",
     "count": 1
   },
@@ -3460,10 +4380,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "image-to-video",
-    "count": 1
-  },
-  {
-    "tag": "rag",
     "count": 1
   },
   {
@@ -3491,7 +4407,59 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "meta",
+    "tag": "mailer",
+    "count": 1
+  },
+  {
+    "tag": "print-design",
+    "count": 1
+  },
+  {
+    "tag": "mymind",
+    "count": 1
+  },
+  {
+    "tag": "bookmarking",
+    "count": 1
+  },
+  {
+    "tag": "knowledge-management",
+    "count": 1
+  },
+  {
+    "tag": "public-domain",
+    "count": 1
+  },
+  {
+    "tag": "classic-art",
+    "count": 1
+  },
+  {
+    "tag": "ccl",
+    "count": 1
+  },
+  {
+    "tag": "free-fonts",
+    "count": 1
+  },
+  {
+    "tag": "typeface",
+    "count": 1
+  },
+  {
+    "tag": "design-resources",
+    "count": 1
+  },
+  {
+    "tag": "remotion",
+    "count": 1
+  },
+  {
+    "tag": "cats",
+    "count": 1
+  },
+  {
+    "tag": "wallpaper",
     "count": 1
   },
   {
@@ -3535,6 +4503,14 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "plugin",
+    "count": 1
+  },
+  {
+    "tag": "easometric",
+    "count": 1
+  },
+  {
     "tag": "financial-analysis",
     "count": 1
   },
@@ -3551,11 +4527,11 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "screenshot",
+    "tag": "ui-capture",
     "count": 1
   },
   {
-    "tag": "ui-capture",
+    "tag": "design-showcase",
     "count": 1
   },
   {
@@ -3571,7 +4547,19 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "3d-graphics",
+    "tag": "living-identity",
+    "count": 1
+  },
+  {
+    "tag": "manifesto",
+    "count": 1
+  },
+  {
+    "tag": "showreel",
+    "count": 1
+  },
+  {
+    "tag": "creative-studio",
     "count": 1
   },
   {
@@ -3623,6 +4611,54 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "quant-trading",
+    "count": 1
+  },
+  {
+    "tag": "potential-fields",
+    "count": 1
+  },
+  {
+    "tag": "math-art",
+    "count": 1
+  },
+  {
+    "tag": "shape-generation",
+    "count": 1
+  },
+  {
+    "tag": "rectified-flow",
+    "count": 1
+  },
+  {
+    "tag": "paywall-design",
+    "count": 1
+  },
+  {
+    "tag": "ux-strategy",
+    "count": 1
+  },
+  {
+    "tag": "health-app",
+    "count": 1
+  },
+  {
+    "tag": "growth",
+    "count": 1
+  },
+  {
+    "tag": "ai-generated",
+    "count": 1
+  },
+  {
+    "tag": "web3",
+    "count": 1
+  },
+  {
+    "tag": "archillect",
+    "count": 1
+  },
+  {
     "tag": "nanobind",
     "count": 1
   },
@@ -3643,6 +4679,22 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "lettering",
+    "count": 1
+  },
+  {
+    "tag": "japanese",
+    "count": 1
+  },
+  {
+    "tag": "weekly-challenge",
+    "count": 1
+  },
+  {
+    "tag": "hand-crafted",
+    "count": 1
+  },
+  {
     "tag": "point-cloud",
     "count": 1
   },
@@ -3660,6 +4712,30 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "email-automation",
+    "count": 1
+  },
+  {
+    "tag": "halftone",
+    "count": 1
+  },
+  {
+    "tag": "gooey",
+    "count": 1
+  },
+  {
+    "tag": "candlestick",
+    "count": 1
+  },
+  {
+    "tag": "chart",
+    "count": 1
+  },
+  {
+    "tag": "haptics",
+    "count": 1
+  },
+  {
+    "tag": "farcaster",
     "count": 1
   },
   {
@@ -3700,10 +4776,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "financial-app",
-    "count": 1
-  },
-  {
-    "tag": "openai",
     "count": 1
   },
   {
@@ -3815,6 +4887,14 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "ui",
+    "count": 1
+  },
+  {
+    "tag": "polished",
+    "count": 1
+  },
+  {
     "tag": "type-safe",
     "count": 1
   },
@@ -3855,7 +4935,51 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "glassmorphism",
+    "count": 1
+  },
+  {
+    "tag": "spline",
+    "count": 1
+  },
+  {
+    "tag": "flow",
+    "count": 1
+  },
+  {
+    "tag": "visual-art",
+    "count": 1
+  },
+  {
+    "tag": "personal-site",
+    "count": 1
+  },
+  {
+    "tag": "preloader",
+    "count": 1
+  },
+  {
+    "tag": "luxury",
+    "count": 1
+  },
+  {
+    "tag": "card-design",
+    "count": 1
+  },
+  {
+    "tag": "travel",
+    "count": 1
+  },
+  {
     "tag": "blog",
+    "count": 1
+  },
+  {
+    "tag": "bruno-simon",
+    "count": 1
+  },
+  {
+    "tag": "cvpr2025",
     "count": 1
   },
   {
@@ -4035,10 +5159,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "framer-motion",
-    "count": 1
-  },
-  {
     "tag": "components",
     "count": 1
   },
@@ -4087,15 +5207,7 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "vercel",
-    "count": 1
-  },
-  {
     "tag": "accessibility",
-    "count": 1
-  },
-  {
-    "tag": "adobe",
     "count": 1
   },
   {
@@ -4179,6 +5291,10 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "gsap",
+    "count": 1
+  },
+  {
     "tag": "pinch-to-zoom",
     "count": 1
   },
@@ -4188,6 +5304,22 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "gallery",
+    "count": 1
+  },
+  {
+    "tag": "path-tracing",
+    "count": 1
+  },
+  {
+    "tag": "awwwards",
+    "count": 1
+  },
+  {
+    "tag": "sotd",
+    "count": 1
+  },
+  {
+    "tag": "showcase",
     "count": 1
   },
   {
@@ -4223,11 +5355,31 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "canvas",
+    "tag": "confetti",
     "count": 1
   },
   {
-    "tag": "confetti",
+    "tag": "text-animation",
+    "count": 1
+  },
+  {
+    "tag": "codesandbox",
+    "count": 1
+  },
+  {
+    "tag": "math",
+    "count": 1
+  },
+  {
+    "tag": "drei",
+    "count": 1
+  },
+  {
+    "tag": "pivot-controls",
+    "count": 1
+  },
+  {
+    "tag": "3d-interaction",
     "count": 1
   },
   {
@@ -4239,11 +5391,31 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
+    "tag": "liveblocks",
+    "count": 1
+  },
+  {
+    "tag": "real-time-collaboration",
+    "count": 1
+  },
+  {
     "tag": "textinput",
     "count": 1
   },
   {
     "tag": "live-preview",
+    "count": 1
+  },
+  {
+    "tag": "soft-shadows",
+    "count": 1
+  },
+  {
+    "tag": "css-techniques",
+    "count": 1
+  },
+  {
+    "tag": "technical-breakdown",
     "count": 1
   },
   {
@@ -4264,6 +5436,14 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "reader",
+    "count": 1
+  },
+  {
+    "tag": "0xca0a",
+    "count": 1
+  },
+  {
+    "tag": "humor",
     "count": 1
   },
   {
@@ -4456,10 +5636,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "resizable",
-    "count": 1
-  },
-  {
-    "tag": "layout",
     "count": 1
   },
   {
@@ -4743,10 +5919,6 @@ export const tags: TagEntry[] = [
     "count": 1
   },
   {
-    "tag": "r3f",
-    "count": 1
-  },
-  {
     "tag": "keyframe-editor",
     "count": 1
   },
@@ -4756,14 +5928,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "nodejs-alternative",
-    "count": 1
-  },
-  {
-    "tag": "webxr",
-    "count": 1
-  },
-  {
-    "tag": "shopify",
     "count": 1
   },
   {
@@ -4808,10 +5972,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "gesture",
-    "count": 1
-  },
-  {
-    "tag": "template",
     "count": 1
   },
   {
@@ -4884,10 +6044,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "work-culture",
-    "count": 1
-  },
-  {
-    "tag": "audio",
     "count": 1
   },
   {
@@ -5012,10 +6168,6 @@ export const tags: TagEntry[] = [
   },
   {
     "tag": "information",
-    "count": 1
-  },
-  {
-    "tag": "meme",
     "count": 1
   },
   {
