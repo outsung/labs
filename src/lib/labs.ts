@@ -2,6 +2,14 @@ import { Lab } from "@/types/lab";
 
 export const labs: Lab[] = [
   {
+    id: "liked",
+    title: "Liked",
+    description: "Multi-platform likes curation — X, Threads, GitHub",
+    tags: ["curation", "knowledge", "bookmarks"],
+    date: "2026-03",
+    status: "active",
+  },
+  {
     id: "cv-study",
     title: "CV Study Hub",
     description: "Computer vision conference paper browser",
