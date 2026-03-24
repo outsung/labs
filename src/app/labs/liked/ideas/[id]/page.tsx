@@ -55,25 +55,36 @@ export default async function IdeaDetailPage({ params }: { params: Promise<{ id:
           {linkedItems.length === 0 ? (
             <p className="text-xs text-zinc-600">No items linked yet.</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {linkedItems.map((item) => {
                 if (!item) return null;
+                const imgs = (item.platformMeta?.images as string[]) ?? [];
+                const origImgs = (item.platformMeta?.originalImages as string[]) ?? [];
+                const firstImage = imgs[0]?.startsWith("images/") ? origImgs[0] : imgs[0];
                 return (
                   <Link
                     key={item.id}
                     href={`/labs/liked/${item.id}`}
-                    className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 hover:border-white/[0.12] transition-all"
+                    className="group rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden hover:border-white/[0.12] transition-all"
                   >
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded border ${SOURCE_COLORS[item.source]}`}>
-                        {item.source}
-                      </span>
-                      {item.likeType && (
-                        <span className="text-[10px] text-zinc-600">{item.likeType}</span>
-                      )}
+                    {firstImage && (
+                      <div className="aspect-video overflow-hidden bg-white/[0.02]">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={firstImage} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    )}
+                    <div className="p-3">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded border ${SOURCE_COLORS[item.source]}`}>
+                          {item.source}
+                        </span>
+                        {item.likeType && (
+                          <span className="text-[10px] text-zinc-600">{item.likeType}</span>
+                        )}
+                      </div>
+                      <p className="text-sm text-zinc-200 line-clamp-2">{item.title}</p>
+                      <p className="text-[10px] text-zinc-600 mt-1">{item.author.handle}</p>
                     </div>
-                    <p className="text-sm text-zinc-200 line-clamp-2">{item.title}</p>
-                    <p className="text-[10px] text-zinc-600 mt-1">{item.author.handle}</p>
                   </Link>
                 );
               })}

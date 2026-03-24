@@ -19,15 +19,16 @@ const SOURCE_LABELS: Record<string, string> = {
 
 function ItemCard({ item }: { item: LikedItem }) {
   const clusterLabel = clusters.find((c) => c.id === item.cluster)?.label;
-  const firstImage = (item.platformMeta?.images as string[])?.[0];
-  const isLocalImage = firstImage?.startsWith("images/");
+  const imgs = (item.platformMeta?.images as string[]) ?? [];
+  const origImgs = (item.platformMeta?.originalImages as string[]) ?? [];
+  const firstImage = imgs[0]?.startsWith("images/") ? origImgs[0] : imgs[0];
 
   return (
     <Link
       href={`/labs/liked/${item.id}`}
       className="group rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-200"
     >
-      {firstImage && !isLocalImage && (
+      {firstImage && (
         <div className="aspect-video overflow-hidden bg-white/[0.02]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

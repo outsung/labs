@@ -130,16 +130,22 @@ export default async function LikedItemPage({ params }: { params: Promise<{ id: 
 
         <article className="mt-6">
           {/* Images */}
-          {images.length > 0 && (
-            <div className="rounded-xl overflow-hidden mb-6 bg-white/[0.02]">
-              {images.filter((img) => !img.startsWith("images/")).slice(0, 3).map((img, i) => (
-                <div key={i} className="aspect-video overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt="" className="w-full h-full object-cover" />
-                </div>
-              ))}
-            </div>
-          )}
+          {(() => {
+            const origImages = (item.platformMeta?.originalImages as string[]) ?? [];
+            const displayImages = images.map((img, idx) =>
+              img.startsWith("images/") ? (origImages[idx] || null) : img
+            ).filter(Boolean).slice(0, 3);
+            return displayImages.length > 0 ? (
+              <div className="rounded-xl overflow-hidden mb-6 bg-white/[0.02]">
+                {displayImages.map((img, i) => (
+                  <div key={i} className="aspect-video overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img!} alt="" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            ) : null;
+          })()}
 
           {/* Meta badges */}
           <div className="flex items-center gap-2 flex-wrap mb-4">
