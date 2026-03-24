@@ -69,13 +69,12 @@ export default async function LikedItemPage({ params }: { params: Promise<{ id: 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
-        {/* Back link */}
-        <Link
-          href="/labs/liked"
-          className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
-        >
-          ← back to liked
-        </Link>
+        {/* Nav */}
+        <div className="flex gap-4 text-xs">
+          <Link href="/labs/liked" className="text-zinc-500 hover:text-zinc-300 transition-colors">Home</Link>
+          <Link href="/labs/liked/review" className="text-zinc-500 hover:text-zinc-300 transition-colors">Review</Link>
+          <Link href="/labs/liked/ideas" className="text-zinc-500 hover:text-zinc-300 transition-colors">Ideas</Link>
+        </div>
 
         <article className="mt-6">
           {/* Images */}

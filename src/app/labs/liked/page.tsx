@@ -98,12 +98,17 @@ export default function LikedHomePage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
+        {/* Nav */}
+        <div className="flex gap-4 text-xs mb-8">
+          <Link href="/labs" className="text-zinc-600 hover:text-zinc-400 transition-colors">← labs</Link>
+          <span className="text-white font-medium">Home</span>
+          <Link href="/labs/liked/review" className="text-zinc-500 hover:text-zinc-300 transition-colors">Review</Link>
+          <Link href="/labs/liked/ideas" className="text-zinc-500 hover:text-zinc-300 transition-colors">Ideas</Link>
+        </div>
+
         {/* Header */}
         <div className="mb-10">
-          <Link href="/labs" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
-            ← labs
-          </Link>
-          <h1 className="text-3xl font-bold text-white mt-3 tracking-tight">Liked</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Liked</h1>
           <p className="text-sm text-zinc-500 mt-2">
             {stats.total} items curated from X ({stats.x}), Threads ({stats.threads}), GitHub ({stats.github})
           </p>
