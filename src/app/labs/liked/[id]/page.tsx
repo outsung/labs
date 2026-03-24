@@ -27,41 +27,93 @@ export default async function LikedItemPage({ params }: { params: Promise<{ id: 
     github: "text-green-400 bg-green-500/10 border-green-500/20",
   }[item.source];
 
-  // Simple markdown-to-html (for blog posts)
+  // Markdown renderer — supports ##/###, **bold**, [link](url), lists, code blocks
   function renderMarkdown(md: string) {
-    // Remove frontmatter
     const body = md.replace(/^---[\s\S]*?---\n*/m, "");
-    // Convert headers, bold, links, lists
-    return body
-      .split("\n\n")
-      .map((block, i) => {
-        if (block.startsWith("## ")) {
-          return (
-            <h2 key={i} className="text-lg font-semibold text-white mt-6 mb-3">
-              {block.replace("## ", "")}
-            </h2>
+
+    // Extract code blocks first to protect them from splitting
+    const codeBlocks: string[] = [];
+    const withPlaceholders = body.replace(/```[\s\S]*?```/g, (match) => {
+      codeBlocks.push(match.replace(/```\w*\n?/, "").replace(/\n?```$/, ""));
+      return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+    });
+
+    // Inline formatting helper
+    function renderInline(text: string) {
+      const parts: (string | React.ReactElement)[] = [];
+      // Process **bold** and [link](url)
+      const regex = /(\*\*(.+?)\*\*|\[([^\]]+)\]\(([^)]+)\))/g;
+      let lastIndex = 0;
+      let match;
+      let key = 0;
+      while ((match = regex.exec(text)) !== null) {
+        if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
+        if (match[2]) {
+          parts.push(<strong key={key++} className="font-semibold text-zinc-200">{match[2]}</strong>);
+        } else if (match[3] && match[4]) {
+          parts.push(
+            <a key={key++} href={match[4]} target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 transition-colors">
+              {match[3]}
+            </a>
           );
         }
-        if (block.startsWith("- ")) {
-          const listItems = block.split("\n").filter((l) => l.startsWith("- "));
+        lastIndex = match.index + match[0].length;
+      }
+      if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+      return parts.length > 0 ? parts : [text];
+    }
+
+    return withPlaceholders
+      .split("\n\n")
+      .map((block, i) => {
+        const trimmed = block.trim();
+        if (!trimmed) return null;
+
+        // Code block placeholder
+        const codeMatch = trimmed.match(/^__CODE_BLOCK_(\d+)__$/);
+        if (codeMatch) {
           return (
-            <ul key={i} className="list-disc list-inside space-y-1 mb-4">
+            <pre key={i} className="rounded-lg bg-white/[0.04] p-4 mb-4 overflow-x-auto">
+              <code className="text-xs text-zinc-300 font-mono">{codeBlocks[parseInt(codeMatch[1])]}</code>
+            </pre>
+          );
+        }
+
+        // ### Header
+        if (trimmed.startsWith("### ")) {
+          return <h3 key={i} className="text-base font-semibold text-zinc-100 mt-5 mb-2">{renderInline(trimmed.slice(4))}</h3>;
+        }
+        // ## Header
+        if (trimmed.startsWith("## ")) {
+          return <h2 key={i} className="text-lg font-semibold text-white mt-6 mb-3">{renderInline(trimmed.slice(3))}</h2>;
+        }
+
+        // Unordered list
+        if (trimmed.startsWith("- ")) {
+          const listItems = trimmed.split("\n").filter((l) => l.startsWith("- "));
+          return (
+            <ul key={i} className="list-disc list-inside space-y-1 mb-4 ml-1">
               {listItems.map((li, j) => (
-                <li key={j} className="text-sm text-zinc-300 leading-relaxed">
-                  {li.replace("- ", "")}
-                </li>
+                <li key={j} className="text-sm text-zinc-300 leading-relaxed">{renderInline(li.slice(2))}</li>
               ))}
             </ul>
           );
         }
-        if (block.trim()) {
+
+        // Numbered list
+        if (/^\d+\.\s/.test(trimmed)) {
+          const listItems = trimmed.split("\n").filter((l) => /^\d+\.\s/.test(l));
           return (
-            <p key={i} className="text-sm text-zinc-300 leading-relaxed mb-4">
-              {block}
-            </p>
+            <ol key={i} className="list-decimal list-inside space-y-1 mb-4 ml-1">
+              {listItems.map((li, j) => (
+                <li key={j} className="text-sm text-zinc-300 leading-relaxed">{renderInline(li.replace(/^\d+\.\s/, ""))}</li>
+              ))}
+            </ol>
           );
         }
-        return null;
+
+        // Paragraph
+        return <p key={i} className="text-sm text-zinc-300 leading-relaxed mb-4">{renderInline(trimmed)}</p>;
       })
       .filter(Boolean);
   }

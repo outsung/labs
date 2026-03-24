@@ -69,12 +69,14 @@ function ItemCard({ item }: { item: LikedItem }) {
 export default function LikedHomePage() {
   const [sourceFilter, setSourceFilter] = useState<string | null>(null);
   const [clusterFilter, setClusterFilter] = useState<string | null>(null);
+  const [likeTypeFilter, setLikeTypeFilter] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
     let result = [...items];
     if (sourceFilter) result = result.filter((i) => i.source === sourceFilter);
     if (clusterFilter) result = result.filter((i) => i.cluster === clusterFilter);
+    if (likeTypeFilter) result = result.filter((i) => i.likeType === likeTypeFilter);
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -86,7 +88,7 @@ export default function LikedHomePage() {
       );
     }
     return result;
-  }, [sourceFilter, clusterFilter, search]);
+  }, [sourceFilter, clusterFilter, likeTypeFilter, search]);
 
   const stats = {
     total: items.length,
@@ -164,6 +166,24 @@ export default function LikedHomePage() {
                 }`}
               >
                 {c.label} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        {/* LikeType chips */}
+        <div className="flex flex-wrap gap-1.5 mb-8">
+          {(["tech-info", "idea-tech", "reference-idea", "reference-simple"] as const).map((lt) => {
+            const count = items.filter((i) => i.likeType === lt).length;
+            return (
+              <button
+                key={lt}
+                onClick={() => setLikeTypeFilter(likeTypeFilter === lt ? null : lt)}
+                className={`rounded-full px-3 py-1 text-xs transition-all ${
+                  likeTypeFilter === lt ? "bg-white/10 text-white" : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                {lt} ({count})
               </button>
             );
           })}
